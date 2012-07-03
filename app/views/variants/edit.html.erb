@@ -1,0 +1,27 @@
+<div class="span9 offset1">
+<h2><%= @product_title + ' - ' + @variant.title %></h2>
+
+<%= form_tag "/variants/"+@variant.id.to_s, :method => 'put' do %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Variant</th>
+      <th>Sku</th>
+      <th>Inventory Quantity</th>
+      <th>Inventory Management</th>
+    </tr>
+  </thead>
+      <tr>
+        <td><%= @product_title %></td>
+        <td><%= @variant.title %></td>
+        <td><%= text_field_tag @variant.sku, @variant.sku %></td>
+        <td><%= @variant.inventory_quantity %></td>
+        <td><%= select_tag :inventory_management, options_for_select([@variant.inventory_management, @other_service]), :id => 'inventory_management' %></td>
+      </tr>  
+</table>
+  <br />
+  <%= submit_tag :Update, :class => 'btn btn-success' %>
+<% end %>
+
+</div>

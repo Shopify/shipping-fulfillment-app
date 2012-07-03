@@ -1,0 +1,66 @@
+ 
+ <div class="span9 offset1"> 
+   <h2>Order <%= @order.name %></h2>
+      <%= form_tag(:controller => "fulfillments", :action => "create", :method => "post") do %>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <% if @setting.automatic_fulfillment == false %>
+            <th>Fulfill</th>
+            <% end %>
+            <th>Variant</th>
+            <th>SKU</th>
+            <th>Fulfillment Service</th>
+            <th>Requires Shipping</th>
+            <th>Fulfillment</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <% @order.line_items.each do |item| %>
+          <tr>
+            <% if @setting.automatic_fulfillment == false %>
+            <td><%= check_box_tag 'items[]', item.id, false, :class => 'selector', :disabled => (item.fulfillment_status == 'fulfilled' && ['shipwire','shopify'].include?(item.fulfillment_service)) %></td>
+            <% end %>
+            <td><%= item.name %></td>
+            <td><%= item.sku %></td>
+            <td><%= item.requires_shipping %></td>
+            <td>
+              <% if !item.fulfillment_status %>
+              <span class="label">Not Fulfilled</span>
+              <% else %>
+              <span class="label label-success">Fulfilled</span>
+              <% end %>
+            </td>
+            <td><%= item.price %></td>
+          </tr>
+        <% end %>
+        </table>
+        <br />
+        <hr>
+        
+        <table class="fulfill_submit">
+          <tr>
+            <td>
+              <%= label_tag :shipping_method, 'Shipping Method: ' %>
+              <%= select_tag :shipping_method, options_for_select([['1 Day Service','1D'],['2 Day Service','2D'],['Ground Service','GD'],['Freight Service', 'FT'],['International', 'INTL']]), :id => "shipping_method" %>
+            </td>
+            <td>
+              <%= label_tag :tracking_number, 'Tracking Number: ' %>
+              <%= text_field_tag :tracking_number, nil, :id => "tracking_number" %>
+            </td>
+            <td>
+              <%= submit_tag("Fullfill",:class => "btn btn-success") %>
+            </td>
+          </tr>
+        </table>
+        <% end %>
+        </div> <!-- span8 / right-column -->
+        <div class="span9 offset1">
+          <div class="pagination">
+          <ul class="paginate"> 
+            <% (1..(@page_count)).each do |i| %>
+              <li <%= 'class="active"' if i == @page %>><a href="<%= order_path(@order) + "/page/" + i.to_s %>"><%= i %></a></li>
+            <% end %>
+          </ul>
+          </div>
+        </div>

@@ -1,0 +1,35 @@
+<div class="span9 offset1">
+<h2>Inventory</h2>
+<hr>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Variant</th>
+      <th>Sku</th>
+      <th>Inventory Quantity</th>
+      <th>Inventory Management</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+    <% @products.each do |product| %>
+      <% product.variants.each do |variant| %>
+      <tr class="inventory_item">
+        <td><%= product.title %></td>
+        <td><%= variant.title %></td>
+        <td><%= variant.sku %></td>
+        <td><%= variant.inventory_quantity %></td>
+        <td><%= variant.inventory_management %></td>
+        <td><%= link_to 'edit', {:controller => 'variants', :action => 'edit', :id => variant.id, :product_title => product.title} %></td>
+      </tr> 
+
+      <% end %>
+    <% end %>
+</table>
+<br />
+</div> 
+
+<div class="span9 offset1">
+<hr>
+<p>Click on an item to edit it.</p>
+</div>

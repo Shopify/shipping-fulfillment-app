@@ -1,0 +1,34 @@
+/*
+ * This is a manifest file that'll automatically include all the stylesheets available in this directory
+ * and any sub-directories. You're free to add application-wide styles to this file and they'll appear at
+ * the top of the compiled file, but it's generally better to create a new file per style scope.
+ *= require_self
+ *= require twitter/bootstrap
+ *= require imports
+ *= require shopify_app_buttons
+ *= require shopify_app
+ *= require_tree
+*/
+
+.pagination ul {
+  margin:0 auto;
+  padding-top:14px;
+}
+
+.pagination{
+  text-align:center;
+}
+
+.fulfill_submit td{
+  width: 270px;
+
+}
+
+.alert-success, .alert-error{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  margin-bottom: 0!important;
+  text-align: center;
+}
+

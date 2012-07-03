@@ -1,0 +1,11 @@
+<div class="span9 offset1">
+<h2>Settings</h2>
+
+<ul>
+  <li>Shipwire Login: <span><%= @setting.login %></span></li>
+  <li>Shipwire Password: <span><%= @setting.password %></span></li>
+  <li>Automatic Fulfillment: <span><%= @setting.automatic_fulfillment %></span></li>
+</ul>
+
+<%= link_to "Update", "/settings/edit", :class => 'btn btn-primary' %>
+</div>
