@@ -26,10 +26,13 @@ class OrdersController < ApplicationController
     per_page = 10
     if @page < @page_count+1 && @page > 0
       return @order.line_items[(@page-1)*per_page, per_page]
+    elsif @page == @page_count
+      return @order.line_items[((page-1)*per_page)..-1]
+    else
+      flash[:errors] = "Invalid page number, you have been redirected to the first page."
+      @page = 1
+      get_paginated_line_items
     end
-    flash[:errors] = "Invalid page number, you have been redirected to the first page."
-    @page = 1
-    return @order.line_items[((page-1)*per_page)..-1]
   end
 end
 
