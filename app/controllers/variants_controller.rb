@@ -21,51 +21,45 @@ class VariantsController < ApplicationController
   def edit
     @product_title = params[:product_title]
     @variant = ShopifyAPI::Variant.find(params[:id])
-    @variant.inventory_management == 'shipwire' ? @other_service = 'other': @other_service = 'shipwire' 
+
+    case @variant.inventory_management
+    when 'shipwire'
+      @inventory_services = ['shipwire','shopify','other']
+    when 'shopify'
+      @inventory_services = ['shopify','shipwire','other']
+    else
+      @inventory_services = ['other','shipwire','shopify']
+    end
   end
 
-  # def update
-  #   if Variant.where('variant_id = ?', params[:id]).empty?
-  #     @variant = Variant.new
-  #     @variant.id = params[:id]
-  #     @variant.
-  #   else
-  #     @variant = Variant.where('variant_id = ?', params[:id]).first
-  #     @variant.update_attributes(params[:variant])
-  #   end
-  #   puts params.inspect
-  #   @variant = Variant.find_by_id(params[:id])
-  #   if @variant.update_attributes(params[:variant])
-  #     flash[:success] = "Product Variant Update Successful!"
-  #   else
-  #     flash[:errors] = "Product Variant cannot save. Make sure Sku and account information are correct."
-  #   end
-  #   render action: 'index'
-  # end
-
-  # def unsync
-  #   params[:ids].each do |id|
-  #     puts id
-  #     redirect_to :action => 'index'
-  #   end 
-  # end
+  ## need params sku and inventory management
+  def update
+    shopify_variant = ShopifyAPI::Variant.find(params[:id])
+    begin 
+      if Variant.where('variant_id = ?', shopify_variant.id).present?
+        variant = Variant.where('variant_id = ?', shopify_variant.id).first
+        variant.activated = true unless params[:inventory_management] != 'shipwire'
+        variant.sku = params[:sku]
+        raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
+      elsif params[:inventory_management] == 'shipwire'
+        variant = Variant.new(variant_id: shopify_variant.id, setting_id: session[:setting_id], activated: true, sku: params[:sku])
+        raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
+      else
+        raise StandardError.new('The variant must have a good sku.') unless Variant.good_sku?(sku)
+      end
+      shopify_variant.inventory_management = params[:inventory_management] unless params[:inventory_management] == 'other'
+      shopify_variant.sku = params[:sku]
+      shopify_variant.save
+    rescue StandardError => e
+      flash[:errors] = e.message
+      redirect_to variants_path
+    end
+  end
 
   #eventually shopify will also be given/able to request the inventories from the app via variant_id
   def give_inventory
-    stock_levels = Variant.find_by_id(params[:variant_id]).inventory
-    render json: stock_levels unless stock_levels == -1
+    stock_levels = Variant.where('variant_id = ?', params[:variant_id]).inventory
+    render json: stock_levels
     render status: 500
-  end
-
-  private
-
-  #hard to paginate because need product and variant for view
-  def get_product_variants(page)
-    per_page = 10
-    if page < @page_count+1 && page > 0
-      puts "need to build"
-    end
-    flash[:errors] = "Invalid page number, you have been redirected to the first page."
-    @page = 1
   end
 end

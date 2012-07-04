@@ -1,9 +1,5 @@
 require 'test_helper'
 
-# class OrdersController < ApplicationController
-#   skip_around_filter :shopify_session
-# end
-
 class OrdersControllerTest < ActionController::TestCase
   def setup 
     session[:shopify] = ShopifyAPI::Session.new("example.myshopify.com")
@@ -98,7 +94,8 @@ class OrdersControllerTest < ActionController::TestCase
     get :index
 
     assert_no_tag 'form'
-    assert_select 'em'
+    assert_select 'p'
+    assert_select 'table', false
   end
 
   test "show renders as expected" do

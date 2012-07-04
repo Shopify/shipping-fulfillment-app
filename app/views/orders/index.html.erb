@@ -2,12 +2,7 @@
     <h2>Orders</h2>
     <hr>
     <% if @orders.blank? %>
-      <table id="order-table" class="table table-striped">
-        <tr>
-          <td><em>There are no orders in your store.</em></td>
-        </tr>
-      </table>
-    
+        <p>There are no orders in your store.</p>
     <% else %>
       <%= form_tag(:controller => "fulfillments", :action => "create", :method => "post") do %> 
       <table class="table table-striped">

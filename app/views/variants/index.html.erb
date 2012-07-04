@@ -1,6 +1,11 @@
 <div class="span9 offset1">
 <h2>Inventory</h2>
 <hr>
+
+<% if @products.blank? %>
+<p>There are no products in your store.</p>
+<% end %>
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -22,7 +27,6 @@
         <td><%= variant.inventory_management %></td>
         <td><%= link_to 'edit', {:controller => 'variants', :action => 'edit', :id => variant.id, :product_title => product.title} %></td>
       </tr> 
-
       <% end %>
     <% end %>
 </table>

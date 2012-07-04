@@ -17,7 +17,7 @@
         <td><%= @variant.title %></td>
         <td><%= text_field_tag @variant.sku, @variant.sku %></td>
         <td><%= @variant.inventory_quantity %></td>
-        <td><%= select_tag :inventory_management, options_for_select([@variant.inventory_management, @other_service]), :id => 'inventory_management' %></td>
+        <td><%= select_tag :inventory_management, options_for_select(@inventory_services), :id => 'inventory_management' %></td>
       </tr>  
 </table>
   <br />
