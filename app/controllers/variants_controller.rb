@@ -9,30 +9,14 @@ class VariantsController < ApplicationController
      @variant = ShopifyAPI::Variant.find(params[:id])
   end
 
-  #move to model
-  def sync
-    params[:ids].each do |id|
-      status = Variant.sync(id, session[:shop])
-    redirect_to :action => 'index', :errors => 'Unable to sync.'
-    end
-  end
-
   def edit
     @product_title = params[:product_title]
     @variant = ShopifyAPI::Variant.find(params[:id])
-
-    case @variant.inventory_management
-
-    when 'shipwire'
-      @inventory_services = ['shipwire','shopify','other']
-    when 'shopify'
-      @inventory_services = ['shopify','shipwire','other']
-    else
-      @inventory_services = ['other','shipwire','shopify']
-    end
+    @inventory_services = get_inventory_services(@variant.inventory_management)
   end
 
   ## need params sku and inventory management
+  ## need to push most of this to helpes and model, conditional validators
   def update
     shopify_variant = ShopifyAPI::Variant.find(params[:id])
     begin 
@@ -51,8 +35,7 @@ class VariantsController < ApplicationController
       shopify_variant.sku = params[:sku]
       shopify_variant.save
     rescue StandardError => e
-      flash[:errors] = e.message
-      redirect_to variants_path
+      redirect_to variants_path, :errors => e.message
     end
   end
 
@@ -61,5 +44,20 @@ class VariantsController < ApplicationController
     stock_levels = Variant.where('variant_id = ?', params[:variant_id]).inventory
     render json: stock_levels
     render status: 500
+  end
+
+
+  private 
+
+  def get_inventory_services(variant_service)
+    case variant_service
+
+    when 'shipwire'
+      return ['shipwire','shopify','other']
+    when 'shopify'
+      return ['shopify','shipwire','other']
+    else
+      return ['other','shipwire','shopify']
+    end
   end
 end

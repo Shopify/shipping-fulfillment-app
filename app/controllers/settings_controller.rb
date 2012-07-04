@@ -18,15 +18,15 @@ class SettingsController < ApplicationController
   end 
 
   def show
-    @setting = Setting.where('shop_id = ?', session[:shop]).first
+    current_setting
   end
 
   def edit
-    @setting = Setting.where('shop_id = ?', session[:shop]).first
+    current_setting
   end
 
   def update
-    @setting = Setting.where('shop_id = ?', session[:shop]).first
+    current_setting
     if @setting.update_attributes(params[:setting])
       render action:"show", :success => "Your settings have been updated."
     else
