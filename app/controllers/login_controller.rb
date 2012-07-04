@@ -24,16 +24,13 @@ class LoginController < ApplicationController
       redirect_to return_address
       session[:return_to] = nil
     else
-      flash[:errors] = "Could not log in to Shopify store."
-      redirect_to :action => 'index'
+      redirect_to :action => 'index', :errors => "Could not log in to Shopify store."
     end
   end
   
   def logout
-    session[:shopify] = nil
-    flash[:success] = "Successfully logged out."
-    
-    redirect_to :action => 'index'
+    session[:shopify] = nil    
+    redirect_to :action => 'index', :success => "Successfully logged out."
   end
   
   protected

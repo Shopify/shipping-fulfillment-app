@@ -13,8 +13,7 @@ class VariantsController < ApplicationController
   def sync
     params[:ids].each do |id|
       status = Variant.sync(id, session[:shop])
-      flash[:errors] unless status
-      redirect_to :action => 'index'
+    redirect_to :action => 'index', :errors => 'Unable to sync.'
     end
   end
 
@@ -23,6 +22,7 @@ class VariantsController < ApplicationController
     @variant = ShopifyAPI::Variant.find(params[:id])
 
     case @variant.inventory_management
+
     when 'shipwire'
       @inventory_services = ['shipwire','shopify','other']
     when 'shopify'

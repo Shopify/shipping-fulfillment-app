@@ -22,6 +22,8 @@ class Variant < ActiveRecord::Base
 
   private
 
+#use conditional validations
+
   def good_sku?
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
     !(shipwire.fetch_stock_levels(:sku => sku)[sku].nil?)

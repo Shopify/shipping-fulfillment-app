@@ -19,7 +19,6 @@ class VariantTest < ActiveSupport::TestCase
     assert !synced_variant.save
   end
 
-
   should validate_uniqueness_of(:variant_id)
 
   should validate_presence_of(:setting_id)
@@ -31,4 +30,6 @@ class VariantTest < ActiveSupport::TestCase
   should have_db_index(:setting_id)
 
   should belong_to(:setting)
+
+  #how to test good_sku??????
 end
