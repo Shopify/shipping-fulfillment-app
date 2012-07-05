@@ -1,6 +1,10 @@
  
  <div class="span9 offset1"> 
    <h2>Order <%= @order.name %></h2>
+
+
+
+
       <%= form_tag(:controller => "fulfillments", :action => "create", :method => "post") do %>
       <table class="table table-striped">
         <thead>
@@ -38,24 +42,26 @@
         </table>
         <br />
         <hr>
-        
-        <table class="fulfill_submit">
-          <tr>
-            <td>
-              <%= label_tag :shipping_method, 'Shipping Method: ' %>
-              <%= select_tag :shipping_method, options_for_select([['1 Day Service','1D'],['2 Day Service','2D'],['Ground Service','GD'],['Freight Service', 'FT'],['International', 'INTL']]), :id => "shipping_method" %>
-            </td>
-            <td>
-              <%= label_tag :tracking_number, 'Tracking Number: ' %>
-              <%= text_field_tag :tracking_number, nil, :id => "tracking_number" %>
-            </td>
-            <td>
-              <%= submit_tag("Fullfill",:class => "btn btn-success") %>
-            </td>
-          </tr>
-        </table>
+          <% if @order.fulfillment_status != 'fulfilled' %>
+          <table class="fulfill_submit">
+            <tr>
+              <td>
+                <%= label_tag :shipping_method, 'Shipping Method: ' %>
+                <%= select_tag :shipping_method, options_for_select([['1 Day Service','1D'],['2 Day Service','2D'],['Ground Service','GD'],['Freight Service', 'FT'],['International', 'INTL']]), :id => "shipping_method" %>
+              </td>
+              <td>
+                <%= label_tag :tracking_number, 'Tracking Number: ' %>
+                <%= text_field_tag :tracking_number, nil, :id => "tracking_number" %>
+              </td>
+              <td>
+                <%= submit_tag("Fullfill",:class => "btn btn-success") %>
+              </td>
+            </tr>
+          </table>
+          <% end %>
         <% end %>
         </div> <!-- span8 / right-column -->
+        <% if @page_count > 1 %>
         <div class="span9 offset1">
           <div class="pagination">
           <ul class="paginate"> 
@@ -65,3 +71,4 @@
           </ul>
           </div>
         </div>
+        <% end %>

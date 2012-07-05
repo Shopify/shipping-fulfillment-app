@@ -15,6 +15,14 @@ class OrdersController < ApplicationController
     @order = ShopifyAPI::Order.find(params[:id])
     @page_count = (@order.line_items.count/10.0).ceil
     @line_items = get_paginated_line_items
+    # puts "Attributes: #{@order.fulfillment_service}"
+    # if @order.fulfillment_service == "shipwire"
+    #   shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true}) 
+    #   response = shipwire.fetch_tracking_numbers(@order.id)
+    #   puts "RESPONSE: #{response}"
+    #   # @tracking_number = 
+    #   # @expected_delivery = 
+    # end
   end
 
 

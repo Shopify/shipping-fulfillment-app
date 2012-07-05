@@ -32,7 +32,7 @@ class Fulfillment < ActiveRecord::Base
       order = ShopifyAPI::Order.find(id)
       address =  order.shipping_address.attributes
       options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
-      setting_id = Setting.where("shop_id= ?", shop)
+      setting_id = current_setting.id
 
       if items != nil
         line_items = order.line_items.select{|li| items.include? li.id}
