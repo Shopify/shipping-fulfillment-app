@@ -1,4 +1,4 @@
-<%= form_for @setting, :url => {:action => "update"} do |f| %>
+<%= form_for current_setting, :url => {:action => "update"} do |f| %>
   <div class="field">
     <%= f.label :login %>
     <%= f.text_field :login %>

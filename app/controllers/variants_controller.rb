@@ -1,6 +1,5 @@
 class VariantsController < ApplicationController
   def index
-    @page_count = 1
     @products = ShopifyAPI::Product.all
   end
 
@@ -26,7 +25,7 @@ class VariantsController < ApplicationController
         variant.sku = params[:sku]
         raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
       elsif params[:inventory_management] == 'shipwire'
-        variant = Variant.new(variant_id: shopify_variant.id, setting_id: session[:setting_id], activated: true, sku: params[:sku])
+        variant = Variant.new(variant_id: shopify_variant.id, setting_id: current_setting.id, activated: true, sku: params[:sku])
         raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
       else
         raise StandardError.new('The variant must have a good sku.') unless Variant.good_sku?(sku)

@@ -5,6 +5,8 @@ class OrdersControllerTest < ActionController::TestCase
     session[:shopify] = ShopifyAPI::Session.new("example.myshopify.com")
     ShopifyAPI::Base.expects(:activate_session => true)
 
+    ApplicationController.stubs(:current_setting).returns([stub(:automatically_fulfill? => false)])
+    
     @order1 = stub(fulfillment_status: nil,
       id: 35,
       name: "#1029",
@@ -54,7 +56,7 @@ class OrdersControllerTest < ActionController::TestCase
   end 
 
   test "index: fulfill checkbox appears if automatic fulfillment set to false" do 
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => false)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.stubs(:all).returns([@order1, @order2])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])    
 
@@ -65,7 +67,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "index: no fulfill checkbox appears if automatic fulfillment set to true" do
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => true)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => true)])
     ShopifyAPI::Order.stubs(:all).returns([@order1, @order2])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])    
 
@@ -79,7 +81,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "index: get_paginated_orders is called and makes call to ShopifyAPI" do 
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => false)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.stubs(:all).returns([])
     ShopifyAPI::Order.expects(:find).with(:all, :params => {:limit => 10, :page => 1}).returns([@order1, @order2])
 
@@ -87,7 +89,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "index: has message and no form when no shop has no orders" do 
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => false)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.stubs(:all).returns([])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([])
 
@@ -99,7 +101,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "show renders as expected" do
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => false)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.expects(:find).with(@order1.id.to_s).returns(@order1)
     OrdersController.any_instance.expects(:get_paginated_line_items).with(1).returns(@order1.line_items)
 
@@ -108,7 +110,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "show: get_paginated_line_items paginates correctly" do
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => false)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.expects(:find).with(@order1.id.to_s).returns(@order1)
     OrdersController.any_instance.expects(:get_paginated_line_items).with(1).returns(@order1.line_items*4)
     Array.any_instance.expects(:count).returns(12)
@@ -118,7 +120,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "show: get_paginated_line_items redirects to page 1 if page out of bounds" do
-    Setting.stubs(:where).returns([stub(:automatic_fulfillment => false)])
+    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.expects(:find).with(@order1.id.to_s).returns(@order1)
     OrdersController.any_instance.expects(:get_paginated_line_items).with(2).returns(@order1.line_items)
 

@@ -15,6 +15,14 @@ class Setting < ActiveRecord::Base
     return setting
   end
 
+  def self.present?
+    true if Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).present?
+  end
+
+  def automatically_fulfill?
+    automatic_fulfillment
+  end
+
   private
 
   def setup_webhooks

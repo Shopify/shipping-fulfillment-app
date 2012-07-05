@@ -1,7 +1,8 @@
 class OrdersController < ApplicationController
   def index
     params[:page] = 1 unless params.has_key? :page 
-    @setting = Setting.where('shop_id = ?', session[:shop]).first
+    @page = params[:page].to_i
+
     @page_count = (ShopifyAPI::Order.all.count/10.0).ceil
     @orders = get_paginated_orders(params[:page].to_i)
   end
@@ -9,12 +10,15 @@ class OrdersController < ApplicationController
 
   def show
     params[:page] = 1 unless params.has_key? :page
-    @page = params[:page]
-    @setting = Setting.where('shop_id = ?', session[:shop]).first
+    @page = params[:page].to_i
+
     @order = ShopifyAPI::Order.find(params[:id])
     @page_count = (@order.line_items.count/10.0).ceil
-    @line_items = get_paginated_line_items(params[:page].to_i)
+    @line_items = get_paginated_line_items
   end
+
+
+
 
   private
   

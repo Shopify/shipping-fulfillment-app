@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   private
 
   def current_setting 
-    @setting ||= Setting.where('shop_id = ?', session[:shop]).first if session[:shop]
+    @setting ||= Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).first
   end
 
   helper_method :current_setting

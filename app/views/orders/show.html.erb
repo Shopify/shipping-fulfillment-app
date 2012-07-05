@@ -5,7 +5,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <% if @setting.automatic_fulfillment == false %>
+            <% if current_setting.automatically_fulfill? %>
             <th>Fulfill</th>
             <% end %>
             <th>Variant</th>
@@ -18,11 +18,12 @@
         </thead>
         <% @order.line_items.each do |item| %>
           <tr>
-            <% if @setting.automatic_fulfillment == false %>
+            <% if current_setting.automatically_fulfill? %>
             <td><%= check_box_tag 'items[]', item.id, false, :class => 'selector', :disabled => (item.fulfillment_status == 'fulfilled' && ['shipwire','shopify'].include?(item.fulfillment_service)) %></td>
             <% end %>
             <td><%= item.name %></td>
             <td><%= item.sku %></td>
+            <td><%= item.fulfillment_service %></td>
             <td><%= item.requires_shipping %></td>
             <td>
               <% if !item.fulfillment_status %>
