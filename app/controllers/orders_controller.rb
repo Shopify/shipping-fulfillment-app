@@ -33,7 +33,7 @@ class OrdersController < ApplicationController
     elsif @page == @page_count
       return @order.line_items[((page-1)*per_page)..-1]
     else
-      flash[:errors] = "Invalid page number, you have been redirected to the first page."
+      flash[:alert] = "Invalid page number, you have been redirected to the first page."
       @page = 1
       get_paginated_line_items
     end

@@ -25,13 +25,13 @@ class Fulfillment < ActiveRecord::Base
   end
 
 
-  def self.fulfill(shop, order_ids, shipping_method, tracking_number, items = nil)
+  def self.fulfill(setting_id, shop, order_ids, shipping_method, tracking_number, items = nil)
     response = true
+    puts "orders: #{order_ids}, class: #{order_ids.class}"
     order_ids.each do |id|
       order = ShopifyAPI::Order.find(id)
       address =  order.shipping_address.attributes
       options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
-      setting_id = Setting.where('shop_id = ?', shop).first.id
 
       if items != nil
         line_items = order.line_items.select{|li| items.include? li.id}
@@ -55,7 +55,6 @@ class Fulfillment < ActiveRecord::Base
       else
         Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
       end
-
     end
     return response
   end
@@ -76,8 +75,6 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def legal_shipping_method
-    if false == ['1D', '2D', 'GD', 'FT', 'INTL'].include?(shipping_method)
-      errors.add(:shipping_method, 'Must be one of the shipwire shipping methods.')
-    end
+    errors.add(:shipping_method, 'Must be one of the shipwire shipping methods.') unless ['1D', '2D', 'GD', 'FT', 'INTL'].include?(shipping_method)
   end
 end

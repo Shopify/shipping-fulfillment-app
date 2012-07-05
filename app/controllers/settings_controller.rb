@@ -10,9 +10,9 @@ class SettingsController < ApplicationController
   def create 
     @setting = Setting.build(params[:setting].merge({token: session[:shopify].token}))
     if @setting.save
-      redirect_to @setting, :success => "Your settings have been saved."
+      redirect_to @setting, :notice => "Your settings have been saved."
     else
-      render action:"new", :errors => "Invalid settings, was not able to save."
+      render action:"new", :alert => "Invalid settings, was not able to save."
     end
   end 
 
@@ -26,9 +26,9 @@ class SettingsController < ApplicationController
 
   def update
     if current_setting.update_attributes(params[:setting])
-      render action:"show", :success => "Your settings have been updated."
+      redirect_to '/settings', :notice => "Your settings have been updated."
     else
-      render action: 'edit', :errors => "Could not successfully update!"
+      redirect_to '/settings', :alert => "Could not successfully update!"
     end
   end
 end

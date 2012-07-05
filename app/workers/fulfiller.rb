@@ -12,6 +12,3 @@ class Fulfiller
     end
   end
 end
-
-
-#<ActiveMerchant::Fulfillment::Response:0x007f90b459eba0 @params={"status"=>"0", "total_orders"=>"1", "total_items"=>"0", "transaction_id"=>"1340715733-966655-1", "order_information"=>"\n    ", "processing_time"=>"471", "success"=>true, "message"=>"Successfully submitted the order"}, @message="Successfully submitted the order", @success=true, @test=true>

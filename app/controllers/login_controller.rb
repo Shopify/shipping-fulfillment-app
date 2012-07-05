@@ -20,17 +20,17 @@ class LoginController < ApplicationController
       sess = ShopifyAPI::Session.new(params['shop'], response['credentials']['token'])
       session[:shopify] = sess
       session[:shop] = params['shop']
-      flash[:success] = "Logged in"
+      flash[:notice] = "Logged in"
       redirect_to return_address
       session[:return_to] = nil
     else
-      redirect_to :action => 'index', :errors => "Could not log in to Shopify store."
+      redirect_to :action => 'index', :alert => "Could not log in to Shopify store."
     end
   end
   
   def logout
     session[:shopify] = nil    
-    redirect_to :action => 'index', :success => "Successfully logged out."
+    redirect_to :action => 'index', :notice => "Successfully logged out."
   end
   
   protected

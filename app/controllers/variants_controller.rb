@@ -34,7 +34,7 @@ class VariantsController < ApplicationController
       shopify_variant.sku = params[:sku]
       shopify_variant.save
     rescue StandardError => e
-      redirect_to variants_path, :errors => e.message
+      redirect_to variants_path, :alert => e.message
     end
   end
 
