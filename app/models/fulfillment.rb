@@ -1,5 +1,5 @@
 class Fulfillment < ActiveRecord::Base
-  attr_protected 
+  attr_accessible :status, :address, :order_id, :message, :email, :shipping_method
 
   belongs_to :setting
   has_many :line_items
@@ -25,7 +25,6 @@ class Fulfillment < ActiveRecord::Base
       :do => [:update_fulfillment_status_with_shopify]
   end
 
-  ##eventually need to deal with warehouse options
   def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method, warehouse)
     order = ShopifyAPI::Order.find(order_id)
     
@@ -38,7 +37,6 @@ class Fulfillment < ActiveRecord::Base
     
     fulfillment = Fulfillment.new(
     {
-      setting: current_setting,
       status: 'pending',
       address: order.shipping_address.attributes, 
       order_id: order.id, 
@@ -47,10 +45,13 @@ class Fulfillment < ActiveRecord::Base
       shipping_method: shipping_method
     })
 
+    fulfillment.setting = current_setting
     if fulfillment.save
       tracker = Tracker.create(fulfillment_id: fulfillment.id, shipwire_order_id: make_shipwire_order_id(order.id))
       line_items = order.line_items.select{|item| line_item_ids.include? item.id}
       line_items.each do |item|
+        item[:line_item_id] = item[:id]
+        item.delete(:id)
         Line_Item.create(item.attributes)
       end
       Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
@@ -74,7 +75,6 @@ class Fulfillment < ActiveRecord::Base
 
       fulfillment = Fulfillment.new(
       {
-        setting: current_setting,
         status: 'pending',
         address: order.shipping_address.attributes, 
         order_id: order.id, 
@@ -83,9 +83,12 @@ class Fulfillment < ActiveRecord::Base
         shipping_method: shipping_method
       })
 
+      fulfillment.setting = current_setting
       if fulfillment.save
         tracker = Tracker.create(fulfillment_id: fulfillment.id, shipwire_order_id: make_shipwire_order_id(order.id))
         order.line_items.each do |item|
+          item[:line_item_id] = item[:id]
+          item.delete(:id)
           LineItem.create(item.attributes)
         end
         Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)

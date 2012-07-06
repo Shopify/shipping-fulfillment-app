@@ -1,5 +1,5 @@
 class LineItem < ActiveRecord::Base
-  attr_protected
+  attr_accessible :fulfillment_service, :fulfillment_status, :grams, :line_item_id, :price, :product_id, :quantity, :requires_shipping, :sku, :title, :variant_id, :variant_title, :vendor, :name, :variant_inventory_management
 
   belongs_to :fulfillment
 
