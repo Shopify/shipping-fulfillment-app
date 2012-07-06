@@ -24,40 +24,57 @@ class Fulfillment < ActiveRecord::Base
       :do => [:update_fulfillment_status_with_shopify]
   end
 
+  ##eventually need to deal with email options and shipping_service options
+  def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method, tracking_number)
+    order = ShopifyAPI::Order.find(order_id)
+    options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
+    address = order.shipping_address.attributes
+    line_items = order.line_items.select{|item| line_item_ids.include? item.id}
+    fulfillment = Fulfillment.new(
+    {
+      setting: current_setting,
+      status: 'pending',
+      line_items: line_items, 
+      address: address, 
+      order_id: order.id, 
+      message: options[:comment], 
+      email: order.email, 
+      shipping_method: shipping_method, 
+      tracking_number: tracking_number
+    })
+    if fulfillment.save
+      Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
+      true
+    else
+      false
+    end
+  end
 
-  def self.fulfill(shop, order_ids, shipping_method, tracking_number, items = nil)
-    response = true
-    puts "orders: #{order_ids}, class: #{order_ids.class}"
-    order_ids.each do |id|
-      order = ShopifyAPI::Order.find(id)
-      address =  order.shipping_address.attributes
+
+
+  def self.fulfill_orders?(current_setting, order_ids, shipping_method, tracking_number)
+    order_ids.each do |order_id|
+      order = ShopifyAPI::Order.find(order_id)
       options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
-      setting_id = current_setting.id
 
-      if items != nil
-        line_items = order.line_items.select{|li| items.include? li.id}
-      else
-        line_items = order.line_items.map{|li| li.attributes}
-      end
-      
-      fulfillment = Fulfillment.new({setting_id: setting_id,
+      fulfillment = Fulfillment.new(
+      {
+        setting: current_setting,
         status: 'pending',
-        line_items: line_items, 
+        line_items: order.line_items, 
         address: address, 
         order_id: order.id, 
         message: options[:comment], 
         email: order.email, 
         shipping_method: shipping_method, 
-        tracking_number: tracking_number})
-
-      saved = fulfillment.save
-      if !saved
-        response = false
-      else
+        tracking_number: tracking_number
+      })
+      if fulfillment.save
         Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
+      else
+        return false
       end
     end
-    return response
   end
 
   private

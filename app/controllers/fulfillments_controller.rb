@@ -1,13 +1,20 @@
 class FulfillmentsController < ApplicationController
-  def create
-    if (params.has_key? :orders) && (Fulfillment.fulfill(session[:shop], params[:orders], params[:shipping_method], params[:tracking_number]))
-      flash[:notice] = "Order fulfillment request successfully sent."
-    elsif (params.has_key? :items) && (Fulfillment.fulfill(session[:shop], [params[:id]], params[:shipping_method], params[:tracking_number], params[:items]))     
-      flash[:notice] = "Line Item fulfillment request successfully sent."      
+  def create_line_item_fulfillment
+    if Fulfillment.fulfill_line_items? (current_setting, params[:order_id], params[:line_item_ids], params[:shipping_method], )
+      flash[:notice] = "Fulfillment request sent."
     else
-      flash[:alert] = "Invalid request."
+      flash[:alert] = "Invalid fulfillment request."
     end
-    redirect_to orders_url
+    redirect_to :back
+  end
+
+  def create_orders_fulfillment
+    if Fulfillment.fulfill_orders? (current_setting,)
+      flash[:notice] = "Fulfillment request sent."
+    else
+      flash[:alert] = "Invalid fulfillment request."
+    end
+    redirect_to :back
   end
 end
 
