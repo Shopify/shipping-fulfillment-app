@@ -1,4 +1,28 @@
 <div class="span9 offset1">
     <h2>Shipwire Fulfillments</h2>
     <hr>
+
+    <% if @fulfillments.blank? %>
+        <p>You have not made any fulfillments yet.</p>
+    <% else %>
+
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <% if current_setting.automatically_fulfill? %>
+            <th class="sortcol">Fulfill!</th>
+            <% end %>
+            <th class="sortcol">Order</th>
+            <th class="sortcol">Placed by</th>
+            <th class="sortcol">Date</th>
+            <th class="sortcol">Paid</th>
+            <th class="sortcol">Fulfillment</th>
+            <th class="sortcol">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+
+    <% end %>
 </div>

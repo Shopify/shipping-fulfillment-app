@@ -28,19 +28,28 @@ class Fulfillment < ActiveRecord::Base
   ##eventually need to deal with email options and shipping_service options
   def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method)
     order = ShopifyAPI::Order.find(order_id)
-    options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :shipping_method => shipping_method}
-    address = order.shipping_address.attributes
+    
+    options = 
+    {
+      :order_date => order.created_at, 
+      :comment => "Thank you for your purchase", 
+      :email => order.email, 
+      :shipping_method => shipping_method
+    }
+    
     fulfillment = Fulfillment.new(
     {
       setting: current_setting,
       status: 'pending',
-      address: address, 
+      address: order.shipping_address.attributes, 
       order_id: order.id, 
       message: options[:comment], 
       email: order.email, 
       shipping_method: shipping_method
     })
+
     if fulfillment.save
+      tracker = Tracker.create(fulfillment_id: fulfillment.id, shipwire_order_id: make_shipwire_order_id(order.id))
       line_items = order.line_items.select{|item| line_item_ids.include? item.id}
       line_items.each do |item|
         Line_Item.create(item.attributes)
@@ -56,18 +65,28 @@ class Fulfillment < ActiveRecord::Base
   def self.fulfill_orders?(current_setting, order_ids, shipping_method)
     order_ids.each do |order_id|
       order = ShopifyAPI::Order.find(order_id)
-      options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
+      
+      options = 
+      {
+        :order_date => order.created_at, 
+        :comment => "Thank you for your purchase", 
+        :email => order.email, :tracking_number => nil, 
+        :shipping_method => shipping_method
+      }
+
       fulfillment = Fulfillment.new(
       {
         setting: current_setting,
         status: 'pending',
-        address: address, 
+        address: order.shipping_address.attributes, 
         order_id: order.id, 
         message: options[:comment], 
         email: order.email, 
         shipping_method: shipping_method
       })
+
       if fulfillment.save
+        tracker = Tracker.create(fulfillment_id: fulfillment.id, shipwire_order_id: make_shipwire_order_id(order.id))
         order.line_items.each do |item|
           LineItem.create(item.attributes)
         end
@@ -79,6 +98,10 @@ class Fulfillment < ActiveRecord::Base
   end
 
   private
+
+  def make_shipwire_order_id(shopify_order_id)
+    "#{shopify_order_id}.#{number}"
+  end
 
   def update_fulfillment_status_with_shopify
     case status 

@@ -11,20 +11,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120706151252) do
+ActiveRecord::Schema.define(:version => 20120706174626) do
 
   create_table "fulfillments", :force => true do |t|
     t.text     "line_items"
     t.text     "address"
     t.integer  "shopify_order_id"
-    t.string   "shipwire_order_id"
     t.string   "message"
     t.string   "email"
     t.string   "shipping_method"
     t.string   "status"
     t.integer  "setting_id"
-    t.datetime "created_at",        :null => false
-    t.datetime "updated_at",        :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
   add_index "fulfillments", ["setting_id"], :name => "index_fulfillments_on_setting_id"
@@ -71,11 +70,11 @@ ActiveRecord::Schema.define(:version => 20120706151252) do
     t.string   "shipper_name"
     t.string   "total"
     t.string   "returned"
-    t.string   "returned_status"
     t.string   "shipped"
     t.integer  "fulfillment_id"
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
+    t.string   "shipwire_order_id"
   end
 
   add_index "trackers", ["fulfillment_id"], :name => "index_trackers_on_fulfillment_id"
