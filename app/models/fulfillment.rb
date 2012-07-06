@@ -1,12 +1,14 @@
+require 'secure random'
+
 class Fulfillment < ActiveRecord::Base
   attr_protected 
 
   belongs_to :setting
+  has_many :line_items
 
-  serialize :line_items
   serialize :address
   validate :legal_shipping_method
-  validates_presence_of :line_items, :address, :order_id
+  validates_presence_of :address, :order_id
 
 
   state_machine :status, :initial => 'pending' do
@@ -76,6 +78,10 @@ class Fulfillment < ActiveRecord::Base
   end
 
   private
+
+  def make_shipwire_key
+    self.shipwire_key = SecureRandom.base64(16)
+  end
 
   def update_fulfillment_status_with_shopify
     case status 

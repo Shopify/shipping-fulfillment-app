@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120706035506) do
+ActiveRecord::Schema.define(:version => 20120706131439) do
 
   create_table "fulfillments", :force => true do |t|
     t.text     "line_items"
@@ -28,6 +28,27 @@ ActiveRecord::Schema.define(:version => 20120706035506) do
 
   add_index "fulfillments", ["setting_id"], :name => "index_fulfillments_on_setting_id"
 
+  create_table "line_items", :force => true do |t|
+    t.integer  "fulfillment_id",               :null => false
+    t.string   "fulfillment_service"
+    t.string   "fulfillment_status"
+    t.integer  "grams"
+    t.integer  "line_item_id"
+    t.string   "price"
+    t.integer  "product_id",                   :null => false
+    t.integer  "quantity"
+    t.string   "requires_shipping"
+    t.string   "sku"
+    t.string   "title"
+    t.integer  "variant_id",                   :null => false
+    t.string   "variant_title"
+    t.string   "vendor"
+    t.string   "name"
+    t.string   "variant_inventory_management"
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
+  end
+
   create_table "settings", :force => true do |t|
     t.string   "login"
     t.string   "password"
@@ -36,6 +57,14 @@ ActiveRecord::Schema.define(:version => 20120706035506) do
     t.string   "token"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
+  end
+
+  create_table "shipwire_items", :force => true do |t|
+    t.integer  "order_id"
+    t.string   "shipwire_id"
+    t.integer  "line_item_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "variants", :force => true do |t|
