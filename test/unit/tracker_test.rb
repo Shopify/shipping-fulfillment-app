@@ -1,7 +1,10 @@
 require 'test_helper'
 
 class TrackerTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  should belong_to :fulfillment
+  
+  test "valid tracker saves" do
+    tracker = FactoryGirl.build(:tracker)
+    assert tracker.save, "Valid tracker did not save."
+  end
 end

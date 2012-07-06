@@ -11,13 +11,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120706174626) do
+ActiveRecord::Schema.define(:version => 20120706215505) do
 
   create_table "fulfillments", :force => true do |t|
-    t.text     "line_items"
     t.text     "address"
     t.integer  "shopify_order_id"
-    t.string   "message"
     t.string   "email"
     t.string   "shipping_method"
     t.string   "status"

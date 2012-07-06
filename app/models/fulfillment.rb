@@ -7,7 +7,8 @@ class Fulfillment < ActiveRecord::Base
 
   serialize :address
   validate :legal_shipping_method
-  validates_presence_of :address, :order_id
+  validates_presence_of :shopify_order_id
+  ## need to rework these specs
 
 
   state_machine :status, :initial => 'pending' do
@@ -39,7 +40,7 @@ class Fulfillment < ActiveRecord::Base
     {
       status: 'pending',
       address: order.shipping_address.attributes, 
-      order_id: order.id, 
+      shopify_order_id: order.id, 
       message: options[:comment], 
       email: order.email, 
       shipping_method: shipping_method
@@ -77,7 +78,7 @@ class Fulfillment < ActiveRecord::Base
       {
         status: 'pending',
         address: order.shipping_address.attributes, 
-        order_id: order.id, 
+        shopify_order_id: order.id, 
         message: options[:comment], 
         email: order.email, 
         shipping_method: shipping_method
