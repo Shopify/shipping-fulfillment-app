@@ -9,18 +9,24 @@
     <table class="table table-striped">
         <thead>
           <tr>
-            <% if current_setting.automatically_fulfill? %>
-            <th class="sortcol">Fulfill!</th>
-            <% end %>
-            <th class="sortcol">Order</th>
-            <th class="sortcol">Placed by</th>
-            <th class="sortcol">Date</th>
-            <th class="sortcol">Paid</th>
             <th class="sortcol">Fulfillment</th>
+            <th class="sortcol">Shipping Service</th>
+            <th class="sortcol">Ship Date</th>
+            <th class="sortcol">Expected Delivery Date</th>
+            <th class="sortcol">Returned</th>
             <th class="sortcol">Total</th>
           </tr>
         </thead>
         <tbody>
+          <% @fulfillments.each do |fulfillment| %>
+            <% track = fulfillment.tracker %>
+            <td><%= track.shipwire_order_id %></td>
+            <td><%= track.shipper_name %></td>
+            <td><%= track.ship_date %></td>
+            <td><%= track.expected_delivery_date%></td>
+            <td><%= track.returned %></td>
+            <td><%= track.total %></td>
+          <% end %>
         </tbody>
       </table>
 

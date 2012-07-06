@@ -4,6 +4,10 @@ class FulfillmentsController < ApplicationController
     @fulfillments = Fulfillment.all
   end
 
+  def show
+    @fulfillment = Fulfillment.find(params[:id])
+  end
+
 
   def create_line_item_fulfillment
     if Fulfillment.fulfill_line_items?(current_setting,params[:order_id],params[:line_item_ids],params[:shipping_method], params[:warehouse])
@@ -21,6 +25,12 @@ class FulfillmentsController < ApplicationController
       flash[:alert] = "Invalid fulfillment request."
     end
     redirect_to :back
+  end
+
+  private 
+
+  def get_paginated_fulfillments
+    #eventually paginate fulfillments
   end
 end
 
