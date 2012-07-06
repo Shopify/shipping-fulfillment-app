@@ -25,16 +25,15 @@ class Fulfillment < ActiveRecord::Base
       :do => [:update_fulfillment_status_with_shopify]
   end
 
-  ##eventually need to deal with email options and shipping_service options
-  def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method)
+  ##eventually need to deal with warehouse options
+  def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method, warehouse)
     order = ShopifyAPI::Order.find(order_id)
     
     options = 
     {
-      :order_date => order.created_at, 
-      :comment => "Thank you for your purchase", 
-      :email => order.email, 
-      :shipping_method => shipping_method
+      warehouse: warehouse,
+      email: order.email, 
+      shipping_method: shipping_method
     }
     
     fulfillment = Fulfillment.new(
@@ -62,16 +61,15 @@ class Fulfillment < ActiveRecord::Base
   end
 
 
-  def self.fulfill_orders?(current_setting, order_ids, shipping_method)
+  def self.fulfill_orders?(current_setting, order_ids, shipping_method, warehouse)
     order_ids.each do |order_id|
       order = ShopifyAPI::Order.find(order_id)
       
       options = 
       {
-        :order_date => order.created_at, 
-        :comment => "Thank you for your purchase", 
-        :email => order.email, :tracking_number => nil, 
-        :shipping_method => shipping_method
+        warehouse: warehouse,
+        email: order.email, 
+        shipping_method: shipping_method
       }
 
       fulfillment = Fulfillment.new(

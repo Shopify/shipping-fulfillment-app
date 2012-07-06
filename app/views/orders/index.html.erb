@@ -58,8 +58,8 @@
             <%= select_tag :shipping_method, options_for_select([['1 Day Service','1D'],['2 Day Service','2D'],['Ground Service','GD'],['Freight Service', 'FT'],['International', 'INTL']]), :id => "shipping_method" %>
           </td>
           <td>
-            <%= label_tag :tracking_number, 'Tracking Number: ' %>
-            <%= text_field_tag :tracking_number, nil, :id => "tracking_number" %>
+            <%= label_tag :warehouse, 'Warehouse :' %>
+            <%= select_tag :warehouse, options_for_select([['Optimized','00'],['CHI', 'Chicago'],['LAX', 'Los Angeles'],['REN', 'Reno'],['VAN', 'Vancouver'],['TOR', 'Toronto'],['UK', 'United Kingdom']]), id: => 'warehouse' %>
           </td>
           <td>
             <%= submit_tag("Fullfill",:class => "btn btn-success") %>
