@@ -1,10 +1,9 @@
-require 'secure random'
-
 class Fulfillment < ActiveRecord::Base
   attr_protected 
 
   belongs_to :setting
   has_many :line_items
+  has_one :tracker
 
   serialize :address
   validate :legal_shipping_method
@@ -31,12 +30,10 @@ class Fulfillment < ActiveRecord::Base
     order = ShopifyAPI::Order.find(order_id)
     options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :shipping_method => shipping_method}
     address = order.shipping_address.attributes
-    line_items = order.line_items.select{|item| line_item_ids.include? item.id}
     fulfillment = Fulfillment.new(
     {
       setting: current_setting,
       status: 'pending',
-      line_items: line_items, 
       address: address, 
       order_id: order.id, 
       message: options[:comment], 
@@ -44,6 +41,10 @@ class Fulfillment < ActiveRecord::Base
       shipping_method: shipping_method
     })
     if fulfillment.save
+      line_items = order.line_items.select{|item| line_item_ids.include? item.id}
+      line_items.each do |item|
+        Line_Item.create(item.attributes)
+      end
       Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
       true
     else
@@ -52,17 +53,14 @@ class Fulfillment < ActiveRecord::Base
   end
 
 
-
   def self.fulfill_orders?(current_setting, order_ids, shipping_method)
     order_ids.each do |order_id|
       order = ShopifyAPI::Order.find(order_id)
       options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
-
       fulfillment = Fulfillment.new(
       {
         setting: current_setting,
         status: 'pending',
-        line_items: order.line_items, 
         address: address, 
         order_id: order.id, 
         message: options[:comment], 
@@ -70,6 +68,9 @@ class Fulfillment < ActiveRecord::Base
         shipping_method: shipping_method
       })
       if fulfillment.save
+        order.line_items.each do |item|
+          LineItem.create(item.attributes)
+        end
         Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
       else
         return false
@@ -78,10 +79,6 @@ class Fulfillment < ActiveRecord::Base
   end
 
   private
-
-  def make_shipwire_key
-    self.shipwire_key = SecureRandom.base64(16)
-  end
 
   def update_fulfillment_status_with_shopify
     case status 

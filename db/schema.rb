@@ -11,19 +11,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120706131439) do
+ActiveRecord::Schema.define(:version => 20120706151252) do
 
   create_table "fulfillments", :force => true do |t|
     t.text     "line_items"
     t.text     "address"
-    t.integer  "order_id"
+    t.integer  "shopify_order_id"
+    t.string   "shipwire_order_id"
     t.string   "message"
     t.string   "email"
     t.string   "shipping_method"
     t.string   "status"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
     t.integer  "setting_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
   end
 
   add_index "fulfillments", ["setting_id"], :name => "index_fulfillments_on_setting_id"
@@ -59,13 +60,25 @@ ActiveRecord::Schema.define(:version => 20120706131439) do
     t.datetime "updated_at",            :null => false
   end
 
-  create_table "shipwire_items", :force => true do |t|
-    t.integer  "order_id"
-    t.string   "shipwire_id"
-    t.integer  "line_item_id"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+  create_table "trackers", :force => true do |t|
+    t.string   "tracking_carrier"
+    t.string   "tracking_link"
+    t.integer  "tracking_number"
+    t.datetime "ship_date"
+    t.datetime "expected_delivery_date"
+    t.datetime "return_date"
+    t.string   "return_condition"
+    t.string   "shipper_name"
+    t.string   "total"
+    t.string   "returned"
+    t.string   "returned_status"
+    t.string   "shipped"
+    t.integer  "fulfillment_id"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
   end
+
+  add_index "trackers", ["fulfillment_id"], :name => "index_trackers_on_fulfillment_id"
 
   create_table "variants", :force => true do |t|
     t.integer  "variant_id"

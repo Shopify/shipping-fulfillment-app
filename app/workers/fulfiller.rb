@@ -12,6 +12,3 @@ class Fulfiller
     end
   end
 end
-
-
-#might need to check if all line_items of an order are fulfilled
