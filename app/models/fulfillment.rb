@@ -25,9 +25,9 @@ class Fulfillment < ActiveRecord::Base
   end
 
   ##eventually need to deal with email options and shipping_service options
-  def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method, tracking_number)
+  def self.fulfill_line_items?(current_setting, order_id, line_item_ids, shipping_method)
     order = ShopifyAPI::Order.find(order_id)
-    options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
+    options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :shipping_method => shipping_method}
     address = order.shipping_address.attributes
     line_items = order.line_items.select{|item| line_item_ids.include? item.id}
     fulfillment = Fulfillment.new(
@@ -39,8 +39,7 @@ class Fulfillment < ActiveRecord::Base
       order_id: order.id, 
       message: options[:comment], 
       email: order.email, 
-      shipping_method: shipping_method, 
-      tracking_number: tracking_number
+      shipping_method: shipping_method
     })
     if fulfillment.save
       Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)
@@ -52,7 +51,7 @@ class Fulfillment < ActiveRecord::Base
 
 
 
-  def self.fulfill_orders?(current_setting, order_ids, shipping_method, tracking_number)
+  def self.fulfill_orders?(current_setting, order_ids, shipping_method)
     order_ids.each do |order_id|
       order = ShopifyAPI::Order.find(order_id)
       options = {:order_date => order.created_at, :comment => "Thank you for your purchase", :email => order.email, :tracking_number => nil, :shipping_method => shipping_method}
@@ -66,8 +65,7 @@ class Fulfillment < ActiveRecord::Base
         order_id: order.id, 
         message: options[:comment], 
         email: order.email, 
-        shipping_method: shipping_method, 
-        tracking_number: tracking_number
+        shipping_method: shipping_method
       })
       if fulfillment.save
         Resque.enqueue(Fulfiller, fulfillment.id, order.id, address, line_items, options)

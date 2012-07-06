@@ -1,6 +1,6 @@
 class FulfillmentsController < ApplicationController
   def create_line_item_fulfillment
-    if Fulfillment.fulfill_line_items? (current_setting, params[:order_id], params[:line_item_ids], params[:shipping_method], )
+    if Fulfillment.fulfill_line_items? (current_setting, params[:order_id], params[:line_item_ids], params[:shipping_method])
       flash[:notice] = "Fulfillment request sent."
     else
       flash[:alert] = "Invalid fulfillment request."
@@ -9,7 +9,7 @@ class FulfillmentsController < ApplicationController
   end
 
   def create_orders_fulfillment
-    if Fulfillment.fulfill_orders? (current_setting,)
+    if Fulfillment.fulfill_orders? (current_setting,params[:order_ids], params[:shipping_method])
       flash[:notice] = "Fulfillment request sent."
     else
       flash[:alert] = "Invalid fulfillment request."

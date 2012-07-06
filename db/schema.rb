@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120628182643) do
+ActiveRecord::Schema.define(:version => 20120706035506) do
 
   create_table "fulfillments", :force => true do |t|
     t.text     "line_items"
@@ -20,7 +20,6 @@ ActiveRecord::Schema.define(:version => 20120628182643) do
     t.string   "message"
     t.string   "email"
     t.string   "shipping_method"
-    t.string   "tracking_number"
     t.string   "status"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
