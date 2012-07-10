@@ -16,6 +16,7 @@
     <table class="table table-striped">
         <thead>
           <tr>
+            <th class="sortcol">Shipwire Order ID</th>
             <th class="sortcol">Shipping Service</th>
             <th class="sortcol">Ship Date</th>
             <th class="sortcol">Expected Delivery Date</th>
@@ -23,7 +24,7 @@
             <th class="sortcol">Tracking Link</th>      
             <th class="sortcol">Tracking Number</th>
             <th class="sortcol">Total</th>
-            <% if track.returned == "Yes" %>
+            <% if track.returned == "YES" %>
             <th class="sortcol">Returned</th>
             <th class="sortcol">Return Date</th>
             <th class="sortcol">Return Condition</th>
@@ -39,7 +40,7 @@
             <td><%= link_to "Tracking Link", track.tracking_link %></td>
             <td><%= track.tracking_number %></td>
             <td><%= track.total %></td>
-            <% if track.returned == "Yes" %>
+            <% if track.returned == "YES" %>
             <td><%= track.returned %></td>
             <td><%= track.return_date %></td>
             <td><%= track.return_condition %></td>

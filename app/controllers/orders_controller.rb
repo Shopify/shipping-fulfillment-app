@@ -21,6 +21,8 @@ class OrdersController < ApplicationController
 
 
   private
+
+  ## No model to put these in, eventually can put them in orders model
   
   def get_paginated_orders(page)
     ShopifyAPI::Order.find(:all, :params => {:limit => 10, :page => page})

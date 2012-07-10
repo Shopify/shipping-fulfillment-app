@@ -2,10 +2,10 @@ require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
   def setup 
-    #do I need this?
+    #do I need this? Yes for filters
     session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
     ShopifyAPI::Base.expects(:activate_session => true)
-
+    Setting.stubs(:exists?).returns(true)
     ApplicationController.stubs(:current_setting).returns([stub(:automatically_fulfill? => false)])
     
     @order1 = stub(fulfillment_status: nil,

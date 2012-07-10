@@ -8,7 +8,7 @@ ShipwireApp::Application.routes.draw do
   end
 
 
-  resources :fulfillments, :except => []
+  resources :fulfillments
 
   resources :orders, :only => [:index, :show] do
     collection do
@@ -24,10 +24,6 @@ ShipwireApp::Application.routes.draw do
   match "create_items_fulfillment" => 'fulfillments#create_line_items_fulfillment', :via => :post
 
   match "orderpaid" => "webhooks#order_paid", :via => :post
-
-  match "fulfill" => "fulfillments#create", :via => :post
-
-  match "fulfill/:id" => "fulfillments#create", :via => :post
 
   match 'auth/shopify/callback' => 'login#finalize'
 
