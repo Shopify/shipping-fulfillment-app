@@ -15,8 +15,9 @@ class Setting < ActiveRecord::Base
     return setting
   end
 
-  def self.present?
-    true if Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).present?
+  def self.exists?
+    return false if Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).blank?
+    true
   end
 
   def automatically_fulfill?
@@ -28,11 +29,13 @@ class Setting < ActiveRecord::Base
   def setup_webhooks
     shop = ShopifyAPI::Shop.current
     hooks = []
+    #need to change address for production
     hooks << ShopifyAPI::Webhook.new({topic: 'orders/paid', shop: shop.id, address: 'http://shipwireapp:3001/orderpaid', format: 'json'})
     #hooks << ShopifyAPI::Webhook.new({topic: 'orders/cancelled', shop: shop.id, address: 'http://shipwireapp:3001/orderpaid', format: 'json'})
     hooks.each do |hook|
       if !hook.save
-        raise(RuntimeError, hook.errors.inspect)
+        puts hook.errors.inspect
+        #raise(RuntimeError, hook.errors.inspect)
       end
     end
   end

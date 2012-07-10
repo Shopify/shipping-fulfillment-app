@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :fulfillment do
+    sequence(:id){|i| i}
     shipping_method '1D'
     address 'some serialized address'
     shopify_order_id 19232494

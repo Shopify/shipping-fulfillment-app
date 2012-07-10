@@ -1,5 +1,6 @@
 class LoginController < ApplicationController
   skip_around_filter :shopify_session
+  skip_before_filter :setting_exists
 
   def index
     if params[:shop].present?
@@ -21,7 +22,7 @@ class LoginController < ApplicationController
       session[:shopify] = sess
       session[:shop] = params['shop']
       flash[:notice] = "Logged in"
-      redirect_to return_address
+      redirect_to :controller => "settings", :action => "new"
       session[:return_to] = nil
     else
       redirect_to :action => 'index', :alert => "Could not log in to Shopify store."
@@ -33,10 +34,4 @@ class LoginController < ApplicationController
     redirect_to :action => 'index', :notice => "Successfully logged out."
   end
   
-  protected
-  
-  def return_address
-    session[:return_to] || '/orders'
-  end
-
 end

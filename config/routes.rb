@@ -1,5 +1,5 @@
 ShipwireApp::Application.routes.draw do
-  resource :settings #, :except => [:index, :destroy]
+  resource :setting #, :except => [:index, :destroy]
 
   resources :variants do
     member do
@@ -19,6 +19,9 @@ ShipwireApp::Application.routes.draw do
     end
   end
 
+  match "create_orders_fulfillment" => 'fulfillments#create_orders_fulfillment', :via => :post
+
+  match "create_items_fulfillment" => 'fulfillments#create_line_items_fulfillment', :via => :post
 
   match "orderpaid" => "webhooks#order_paid", :via => :post
 

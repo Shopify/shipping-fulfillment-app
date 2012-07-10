@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :tracker do 
+    sequence(:id){|i| i}
     association(:fulfillment)
     tracking_carrier "USPS"
     tracking_link "https://app.shipwire.com/c/t/xxx1:yyy3"

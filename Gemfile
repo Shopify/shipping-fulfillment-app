@@ -28,7 +28,7 @@ gem 'hiredis','~> 0.4.5' # Faster redis
 # gem 'capistrano'
 
 # To use debugger
-# gem 'debugger'
+gem 'debugger'
 
 
 # Gems used only for assets and not required

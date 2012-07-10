@@ -1,9 +1,11 @@
 FactoryGirl.define do 
   factory :line_item do
+    sequence(:id){|i| i}
+    association(:fulfillment)
     fulfillment_service "manual"
     fulfillment_status nil
     grams 0
-    line_item_id 217209322
+    sequence(:line_item_id){|j| j}
     price "8.00"
     product_id 93464918
     quantity 1
@@ -14,7 +16,6 @@ FactoryGirl.define do
     variant_title nil
     vendor "Nike"
     name "API NIKE BASKETBALL"
-    variant_inventory_management ""
-    association(:fulfillment)
+    variant_inventory_management "shipwire"
   end
 end

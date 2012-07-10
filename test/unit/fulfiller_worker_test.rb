@@ -1,9 +1,23 @@
 require 'test_helper'
 
 class FulfillerWorkerTest < ActiveSupport::TestCase
-  # test "perform should send valid " do
-  #   shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true}) 
-  #   Fulfiller.perform([18, {:address=>"some_address"},[{line_item1: "some_line_item"}], {options: "some_options"}])
-  #   assert FakeWeb.last_request, ""
-  # end
+  test "perform should send valid " do
+    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fulfill).with(
+      '18.adflafalalfkaf', 
+      {address: 'some shipping address'},
+      [{sku: '134141', quantity: 10}],
+      {warehouse: 'CHI', email: 'example@shopify.com', shipping_method: '1D'}
+    ).returns(stub({success?: true}))
+
+    Fulfillment.any_instance.expects(:success)
+    
+    fulfillment = FactoryGirl.create(:fulfillment)
+    Fulfiller.perform(
+      fulfillment.id,
+      '18.adflafalalfkaf',
+      {address: 'some shipping address'},
+      [{sku: '134141', quantity: 10}],
+      {warehouse: 'CHI', email: 'example@shopify.com', shipping_method: '1D'}
+    )
+  end
 end

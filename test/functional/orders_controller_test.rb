@@ -2,7 +2,8 @@ require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
   def setup 
-    session[:shopify] = ShopifyAPI::Session.new("example.myshopify.com")
+    #do I need this?
+    session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
     ShopifyAPI::Base.expects(:activate_session => true)
 
     ApplicationController.stubs(:current_setting).returns([stub(:automatically_fulfill? => false)])

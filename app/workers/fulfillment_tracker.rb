@@ -1,4 +1,4 @@
-class FulfillmentTracker
+class FulfillmentsTracker
   @queue = :fulfillment_que
 
   def self.perform

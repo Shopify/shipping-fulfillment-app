@@ -8,26 +8,20 @@ class FulfillmentsController < ApplicationController
     @fulfillment = Fulfillment.find(params[:id])
   end
 
+  # current_setting, shopify_order_id, line_item_ids, shipping_method, warehouse
+  # current_setting, shopify_order_ids, shipping_method, warehouse  <= note the difference between id and ids
 
-  def create_line_item_fulfillment
-    if Fulfillment.fulfill_line_items?(current_setting,params[:order_id],params[:line_item_ids],params[:shipping_method], params[:warehouse])
-      flash[:notice] = "Fulfillment request sent."
+  def create
+    puts params.inspect
+    throw RuntimeError
+    success = Fulfillment.fulfill(current_setting, params)
+    if success
+      flash[:notice] = "Your fulfillment request has been sent."
     else
-      flash[:alert] = "Invalid fulfillment request."
+      flash[:notice] = "There were errors with your fulfillment request that prevented it from being sent."
     end
-    redirect_to :back
+    redirect_to action: :index
   end
-
-  def create_orders_fulfillment
-    if Fulfillment.fulfill_orders?(current_setting,params[:order_ids], params[:shipping_method], params[:warehouse])
-      flash[:notice] = "Fulfillment request sent."
-    else
-      flash[:alert] = "Invalid fulfillment request."
-    end
-    redirect_to :back
-  end
-
-  private 
 
   def get_paginated_fulfillments
     #eventually paginate fulfillments

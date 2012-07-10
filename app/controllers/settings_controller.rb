@@ -1,9 +1,11 @@
 class SettingsController < ApplicationController
+  skip_before_filter :setting_exists, :on =>['new']
+
   def new
-    if Setting.present?
-      @setting = Setting.new
-    else
+    if Setting.exists?
       redirect_to :action => 'show'
+    else
+      @setting = Setting.new
     end
   end
 
@@ -31,4 +33,5 @@ class SettingsController < ApplicationController
       redirect_to '/settings', :alert => "Could not successfully update!"
     end
   end
+
 end
