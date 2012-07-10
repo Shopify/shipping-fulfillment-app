@@ -5,11 +5,11 @@
 
 
 
-      <%= form_tag 'create_items_fulfillment' do %>
+      <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
       <table class="table table-striped">
         <thead>
           <tr>
-            <% if current_setting.automatically_fulfill? %>
+            <% if !current_setting.automatically_fulfill? %>
             <th>Fulfill</th>
             <% end %>
             <th>Variant</th>
@@ -22,8 +22,8 @@
         </thead>
         <% @order.line_items.each do |item| %>
           <tr>
-            <% if current_setting.automatically_fulfill? %>
-            <td><%= check_box_tag 'items[]', item.id, false, :class => 'selector', :disabled => (item.fulfillment_status == 'fulfilled' && 'shipwire' == item.fulfillment_service) %></td>
+            <% if !current_setting.automatically_fulfill? %>
+              <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => (item.fulfillment_status == 'fulfilled' || 'shipwire' != item.fulfillment_service) %></td>
             <% end %>
             <td><%= item.name %></td>
             <td><%= item.sku %></td>
@@ -51,8 +51,9 @@
               </td>
               <td>
                 <%= label_tag :warehouse, 'Warehouse :' %>
-                <%= select_tag :warehouse, options_for_select([['Optimized','00'],['CHI', 'Chicago'],['LAX', 'Los Angeles'],['REN', 'Reno'],['VAN', 'Vancouver'],['TOR', 'Toronto'],['UK', 'United Kingdom']]), id: => 'warehouse' %>
+                <%= select_tag :warehouse, options_for_select([['Optimized','00'],['CHI', 'Chicago'],['LAX', 'Los Angeles'],['REN', 'Reno'],['VAN', 'Vancouver'],['TOR', 'Toronto'],['UK', 'United Kingdom']]), :id => 'warehouse' %>
               </td>
+                <%= hidden_field_tag 'shopify_order_id', :value => @order.id %>
               <td>
                 <%= submit_tag("Fullfill",:class => "btn btn-success") %>
               </td>

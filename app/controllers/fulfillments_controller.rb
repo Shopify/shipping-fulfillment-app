@@ -8,12 +8,8 @@ class FulfillmentsController < ApplicationController
     @fulfillment = Fulfillment.find(params[:id])
   end
 
-  # current_setting, shopify_order_id, line_item_ids, shipping_method, warehouse
-  # current_setting, shopify_order_ids, shipping_method, warehouse  <= note the difference between id and ids
-
+  
   def create
-    puts params.inspect
-    throw RuntimeError
     success = Fulfillment.fulfill(current_setting, params)
     if success
       flash[:notice] = "Your fulfillment request has been sent."

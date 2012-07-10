@@ -4,11 +4,11 @@
     <% if @orders.blank? %>
         <p>There are no orders in your store.</p>
     <% else %>
-      <%= form_tag '/create_orders_fulfillment' do %> 
+      <%= form_tag :controller => 'fulfillments', :action => 'create' do %> 
       <table class="table table-striped">
         <thead>
           <tr>
-            <% if current_setting.automatically_fulfill? %>
+            <% if !current_setting.automatically_fulfill? %>
             <th class="sortcol">Fulfill!</th>
             <% end %>
             <th class="sortcol">Order</th>
@@ -21,11 +21,11 @@
         </thead>
       <% @orders.each do |order| %>
         <tr id="<%= order.id %>">
-          <% if current_setting.automatically_fulfill? %>
+          <% if !current_setting.automatically_fulfill? %>
             <% if order.fulfillment_status == "fulfilled" || service_is_not_shipwire?(order) %>
-              <td><%= check_box_tag 'orders[]', order.id, false, :class => 'selector', :disabled => true %></td>
+              <td><%= check_box_tag 'shopify_order_ids[]', order.id, false, :class => 'selector', :disabled => true %></td>
             <% else %>
-              <td><%= check_box_tag 'orders[]', order.id, false, :class => 'selector', :disabled => false %></td>
+              <td><%= check_box_tag 'shopify_order_ids[]', order.id, false, :class => 'selector', :disabled => false %></td>
             <% end %>
           <% end %>
           <td><%= link_to order.name, "/orders/"+order.id.to_s %></td>
@@ -71,7 +71,6 @@
   <div class="span9 offset1">
     <div class="pagination">
     <ul> 
-      <p>Current Page: <%= @page %></p>
       <% (1..(@page_count)).each do |i| %>
         <li class="<%= "active" if i == @page %>"><a href="<%= orders_path + "/page/" + i.to_s %>"><%= i %></a></li>
       <% end %>

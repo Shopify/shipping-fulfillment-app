@@ -1,5 +1,5 @@
 class SettingsController < ApplicationController
-  skip_before_filter :setting_exists, :on =>['new']
+  skip_before_filter :setting_exists, :only =>['new','create']
 
   def new
     if Setting.exists?
