@@ -67,7 +67,10 @@
         </tr>
       </table>
     <% end %> 
-    <br/>
+    <hr>
+    <button class="btn btn-primary">Calculate Shipping Rate</button>
+  <% if @page_count > 1 %>
+  <hr>
   <div class="span9 offset1">
     <div class="pagination">
     <ul> 
@@ -77,5 +80,6 @@
     </ul>
     </div>
   </div>
+  <% end %>
 <% end %>
 </div>
