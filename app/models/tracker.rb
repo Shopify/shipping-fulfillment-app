@@ -5,13 +5,4 @@ class Tracker < ActiveRecord::Base
 
   validates_presence_of :shipwire_order_id
 
-  after_create :update_tracking
-
-
-  private
-
-  def update_tracking
-    return true
-    ## fill in later
-  end
 end

@@ -1,5 +1,4 @@
 class OrdersController < ApplicationController
-
   def index
     params[:page] = 1 unless params.has_key? :page 
     @page = params[:page].to_i
@@ -18,11 +17,7 @@ class OrdersController < ApplicationController
     @line_items = get_paginated_line_items
   end
 
-  def fetch_shipping_rates
-    #given json with order ids
-    ShippingRates.find_rates(destination, line_items)
-    #return rates with corresponding order
-  end
+
 
 
   private

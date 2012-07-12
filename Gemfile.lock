@@ -1,19 +1,20 @@
 GIT
+  remote: git://github.com/Shopify/active_fulfillment.git
+  revision: 2200cb8968463f5d7e972a92f669f4eecd88cfc2
+  ref: 2200cb8
+  specs:
+    active_fulfillment (1.0.3)
+      active_utils (>= 1.0.1)
+      activesupport (>= 2.3.11)
+      builder (>= 2.0.0)
+
+GIT
   remote: git://github.com/ssoroka/redis-rb.git
   revision: 949568e96092494cf30811a5ef3a7cffbe31118e
   ref: 949568e
   branch: srem_patch
   specs:
     redis (2.2.2)
-
-GIT
-  remote: git@github.com:Shopify/active_fulfillment.git
-  revision: 9c09d49076eb1358c75359e0a17cd921ee2cf557
-  specs:
-    active_fulfillment (1.0.3)
-      active_utils (>= 1.0.1)
-      activesupport (>= 2.3.11)
-      builder (>= 2.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -222,7 +223,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_fulfillment!
+  active_fulfillment (= 1.0.3)!
   active_shipping (~> 0.9.14)
   capybara
   coffee-rails (~> 3.2.1)

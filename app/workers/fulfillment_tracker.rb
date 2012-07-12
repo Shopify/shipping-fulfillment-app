@@ -1,5 +1,5 @@
 class FulfillmentsTracker
-  @queue = :tracker_que
+  @queue = :fulfillment_que
 
   def self.perform
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true}) 

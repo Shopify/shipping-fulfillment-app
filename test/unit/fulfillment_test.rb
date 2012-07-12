@@ -63,10 +63,10 @@ class FulfillmentTest < ActiveSupport::TestCase
   test "Fulfillment calls calls either fulfill_orders? or fulfill_line_items?" do
     setting = FactoryGirl.build(:setting)
     Fulfillment.expects(:fulfill_orders?)
-    Fulfillment.fulfill(setting, {shopify_order_ids: [1,2,3]})
+    Fulfillment.fulfillment(setting, {shopify_order_ids: [1,2,3]})
 
     Fulfillment.expects(:fulfill_line_items?)
-    Fulfillment.fulfill(setting, {shopify_order_id: 1})
+    Fulfillment.fulfillment(setting, {shopify_order_id: 1})
   end
 
   test "Fulfillment with invalid shipping_method does not save" do

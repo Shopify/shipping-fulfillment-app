@@ -24,7 +24,7 @@ class Fulfillment < ActiveRecord::Base
     after_transition :pending => any, :do => [:update_fulfillment_status_with_shopify]
   end
 
-  def self.fulfill(current_setting, params)
+  def self.fulfillment(current_setting, params)
     if params.has_key? :shopify_order_ids
       self.fulfill_orders?(current_setting, params)
     else

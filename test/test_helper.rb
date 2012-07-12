@@ -41,7 +41,8 @@ class ActiveSupport::TestCase
     method = options.delete(:method) || :get
     extension = ".#{options.delete(:extension) || 'json'}" unless options[:extension] == false
 
-    url = "https://localhost.myshopify.com/#{endpoint}#{extension}"
+    base_url = options.has_key?(:base_url) ? options[:base_url] : "https://localhost.myshopify.com/"
+    url = base_url + "#{endpoint}#{extension}"
     FakeWeb.register_uri(method, url, {:body => body, :status => 200, :content_type => "text/#{format}", :content_length => 1}.merge(options))
   end
 

@@ -6,7 +6,7 @@ gem 'rails', '3.2.6'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
-gem "active_fulfillment", :git => 'git@github.com:Shopify/active_fulfillment.git'
+gem 'active_fulfillment',    '1.0.3',  :git => 'git://github.com/Shopify/active_fulfillment.git', :ref => '2200cb8'
 gem "active_shipping", "~> 0.9.14"
 gem 'less-rails-bootstrap'
 gem 'jquery-rails'
