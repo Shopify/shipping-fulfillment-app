@@ -19,9 +19,7 @@ ShipwireApp::Application.routes.draw do
     end
   end
 
-  match "create_orders_fulfillment" => 'fulfillments#create_orders_fulfillment', :via => :post
-
-  match "create_items_fulfillment" => 'fulfillments#create_line_items_fulfillment', :via => :post
+  match "shippingrates" => "orders#shipping_rates"
 
   match "orderpaid" => "webhooks#order_paid", :via => :post
 

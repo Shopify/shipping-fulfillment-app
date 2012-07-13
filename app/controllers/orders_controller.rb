@@ -18,7 +18,11 @@ class OrdersController < ApplicationController
   end
 
 
-
+  def shipping_rates
+    destination = Destination.build_example
+    rates = ShippingRates.new()
+    rates.find_rates(destination, 133433068)#18)
+  end
 
   private
 

@@ -24,7 +24,7 @@ class Fulfillment < ActiveRecord::Base
     after_transition :pending => any, :do => [:update_fulfillment_status_with_shopify]
   end
 
-  def self.fulfillment(current_setting, params)
+  def self.fulfill(current_setting, params)
     if params.has_key? :shopify_order_ids
       self.fulfill_orders?(current_setting, params)
     else
@@ -37,7 +37,7 @@ class Fulfillment < ActiveRecord::Base
       order_id: shopify_order_id,
       test: false,
       shipping_method: shipping_method,
-      line_items: line_items.map{|item| item.line_item_id}
+      line_items: line_items.map(&:line_item_id)
     )
     fulfillment.save
   end
@@ -45,13 +45,11 @@ class Fulfillment < ActiveRecord::Base
 
   private
 
-  # current_setting, shopify_order_id, line_item_ids, shipping_method, warehouse
   def self.fulfill_line_items?(current_setting, params)
     order = ShopifyAPI::Order.find(params[:shopify_order_id])
     self.create_fulfillment(current_setting, order, params[:shipping_method], params[:warehouse], params[:line_item_ids])
   end
 
-  # current_setting, shopify_order_ids, shipping_method, warehouse  <= note the difference between id and ids
   def self.fulfill_orders?(current_setting, params)
     params[:shopify_order_ids].each do |shopify_order_id|
       order = ShopifyAPI::Order.find(shopify_order_id)    
@@ -103,10 +101,10 @@ class Fulfillment < ActiveRecord::Base
 
   def self.build_line_items(order, line_item_ids)
     if line_item_ids == 'all'
-      line_items = order.line_items.map{|item| item.attributes}
+      line_items = order.line_items.map(&:attributes)
     else
       line_items = order.line_items.select{|item| line_item_ids.include? item.id}
-      line_items = line_items.map{|item| item.attributes}
+      line_items = line_items.map(&:attributes)
     end
     line_items.each do |item|
       item[:line_item_id] = item[:id]
@@ -115,10 +113,8 @@ class Fulfillment < ActiveRecord::Base
     line_items.map{|item| LineItem.new(item)}
   end
 
-
-
+  #eventually make this sequenced
   def self.make_shipwire_order_id(shopify_order_id)
-    #eventually make this sequenced
     number = SecureRandom.hex(16) 
     "#{shopify_order_id}.#{number}"
   end
