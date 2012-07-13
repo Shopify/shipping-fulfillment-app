@@ -2,11 +2,10 @@ require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
   def setup 
-    #do I need this? Yes for filters
     session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
     ShopifyAPI::Base.expects(:activate_session => true)
     Setting.stubs(:exists?).returns(true)
-    ApplicationController.stubs(:current_setting).returns([stub(:automatically_fulfill? => false)])
+    OrdersController.any_instance.stubs(:current_setting).returns(stub(:automatically_fulfill? => false))
     
     @order1 = stub(fulfillment_status: nil,
       id: 35,
@@ -57,7 +56,6 @@ class OrdersControllerTest < ActionController::TestCase
   end 
 
   test "index: fulfill checkbox appears if automatic fulfillment set to false" do 
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.stubs(:all).returns([@order1, @order2])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])    
 
@@ -68,6 +66,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "index: no fulfill checkbox appears if automatic fulfillment set to true" do
+    OrdersController.any_instance.stubs(:current_setting).returns(stub(:automatically_fulfill? => true))
     Setting.stubs(:where).returns([stub(:automatically_fulfill? => true)])
     ShopifyAPI::Order.stubs(:all).returns([@order1, @order2])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])    
@@ -82,15 +81,21 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "index: get_paginated_orders is called and makes call to ShopifyAPI" do 
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.stubs(:all).returns([])
     ShopifyAPI::Order.expects(:find).with(:all, :params => {:limit => 10, :page => 1}).returns([@order1, @order2])
 
     get :index
   end
 
+  test "index: get_paginated_orders redirects to page 1 if page out of bounds" do
+    ShopifyAPI::Order.stubs(:all).returns([])
+    ShopifyAPI::Order.expects(:find).with(:all, :params => {:limit => 10, :page => 1}).returns([@order1, @order2])
+    
+    get :index, :page => 5
+    assert_select ".paginate", 0  
+  end
+
   test "index: has message and no form when no shop has no orders" do 
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.stubs(:all).returns([])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([])
 
@@ -102,18 +107,16 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "show renders as expected" do
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.expects(:find).with(@order1.id.to_s).returns(@order1)
-    OrdersController.any_instance.expects(:get_paginated_line_items).with(1).returns(@order1.line_items)
+    OrdersController.any_instance.expects(:get_paginated_line_items).returns(@order1.line_items)
 
     get :show, :id => @order1.id
     assert_template :show
   end
 
   test "show: get_paginated_line_items paginates correctly" do
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.expects(:find).with(@order1.id.to_s).returns(@order1)
-    OrdersController.any_instance.expects(:get_paginated_line_items).with(1).returns(@order1.line_items*4)
+    OrdersController.any_instance.expects(:get_paginated_line_items).returns(@order1.line_items*4)
     Array.any_instance.expects(:count).returns(12)
 
     get :show, :id => @order1.id
@@ -121,11 +124,10 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "show: get_paginated_line_items redirects to page 1 if page out of bounds" do
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => false)])
     ShopifyAPI::Order.expects(:find).with(@order1.id.to_s).returns(@order1)
-    OrdersController.any_instance.expects(:get_paginated_line_items).with(2).returns(@order1.line_items)
+    OrdersController.any_instance.expects(:get_paginated_line_items).returns(@order1.line_items)
 
-    get :show, :id => @order1.id, :page => 2
-    assert_select ".paginate > li", 1
+    get :show, :id => @order1.id, :page => 5
+    assert_select ".pagination", 0
   end
 end

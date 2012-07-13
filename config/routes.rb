@@ -10,7 +10,7 @@ ShipwireApp::Application.routes.draw do
 
   resources :fulfillments
 
-  resources :orders, :only => [:index, :show] do
+  resources :orders do
     collection do
       get '/page/:page', :action => :index
     end

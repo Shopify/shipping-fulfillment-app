@@ -20,12 +20,14 @@
         <tbody>
           <% @fulfillments.each do |fulfillment| %>
             <% track = fulfillment.tracker %>
+            <tr>
             <td><%= track.shipwire_order_id %></td>
             <td><%= track.shipper_name %></td>
             <td><%= track.ship_date %></td>
             <td><%= track.expected_delivery_date%></td>
             <td><%= track.returned %></td>
             <td><%= track.total %></td>
+            </tr>
           <% end %>
         </tbody>
       </table>
