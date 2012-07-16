@@ -1,5 +1,5 @@
- 
- <div class="span9 offset1"> 
+
+ <div class="span9 offset1">
    <h2>Order <%= @order.name %></h2>
 
 
@@ -41,7 +41,7 @@
         <% end %>
         </table>
         <br />
-          
+
           <% if shipwire_fulfillable?(@order) %>
 
           <hr>
@@ -69,7 +69,7 @@
         <% if @page_count > 1 %>
         <div class="span9 offset1">
           <div class="pagination">
-          <ul class="paginate"> 
+          <ul class="paginate">
             <% (1..(@page_count)).each do |i| %>
               <li <%= 'class="active"' if i == @page %>>
                 <a href="<%= order_path(@order) + "/page/" + i.to_s %>"><%= i %></a>

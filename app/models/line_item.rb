@@ -4,5 +4,4 @@ class LineItem < ActiveRecord::Base
   belongs_to :fulfillment
 
   validates_presence_of :product_id, :variant_id, :line_item_id
-  
 end

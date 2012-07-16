@@ -4,7 +4,7 @@
     <% if @orders.blank? %>
         <p>There are no orders in your store.</p>
     <% else %>
-      <%= form_tag :controller => 'fulfillments', :action => 'create' do %> 
+      <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -31,7 +31,7 @@
           <td><%= link_to order.name, "/orders/"+order.id.to_s %></td>
           <td><%= order.billing_address.name %></td>
           <td><%= time_ago_in_words order.created_at.to_s %> ago</td>
-          <td>  
+          <td>
             <span class="label  <% if order.financial_status  == 'paid' %>label-success<% end %> <% if order.financial_status  == 'refunded' %>label-important<% end %>"><%= order.financial_status %>
             </span>
           </td>
@@ -66,11 +66,11 @@
           </td>
         </tr>
       </table>
-    <% end %> 
+    <% end %>
     <br/>
   <div class="span9 offset1">
     <div class="pagination">
-    <ul> 
+    <ul>
       <% (1..(@page_count)).each do |i| %>
         <li class="<%= "active" if i == @page %>"><a href="<%= orders_path + "/page/" + i.to_s %>"><%= i %></a></li>
       <% end %>
