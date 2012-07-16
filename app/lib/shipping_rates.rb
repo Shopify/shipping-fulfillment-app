@@ -1,10 +1,12 @@
 class ShippingRates
 
+  LOGIN_CREDENTIALS = {:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true}
+
   def self.find_order_rates(order_id)
     items, destination = ShippingRates.destination_and_items(order_id)
       rates = Rails.cache.fetch(self.rates_cache_key(destination, order_id), :expires_in => 1.day) do
         # TODO: credentials
-        shipwire = ActiveMerchant::Shipping::Shipwire.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
+        shipwire = ActiveMerchant::Shipping::Shipwire.new(LOGIN_CREDENTIALS)
         begin
           response = shipwire.find_rates(nil, destination, nil, :items => items)
         rescue ActiveMerchant::Shipping::ResponseError

@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(:version => 20120716135624) do
     t.datetime "updated_at",             :null => false
     t.integer  "shopify_fulfillment_id"
     t.string   "warehouse"
+    t.integer  "tracker_id"
   end
 
   add_index "fulfillments", ["setting_id"], :name => "index_fulfillments_on_setting_id"

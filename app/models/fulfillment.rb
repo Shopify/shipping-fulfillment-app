@@ -1,27 +1,29 @@
 class Fulfillment < ActiveRecord::Base
 
-  attr_accessible :warehouse, :status, :address, :shopify_order, :email, :shipping_method
-
+  attr_accessible :warehouse, :address, :shopify_order_id, :email, :shipping_method, :line_items, :status
   belongs_to :setting
   has_many :line_items, :dependent => :destroy
   has_one :tracker, :dependent => :destroy
 
   serialize :address
+
   validate :legal_shipping_method
+  validate :order_fulfillment_status
   validates_presence_of :shopify_order_id
   validates_associated :tracker, :line_items
+
 
   before_create :build_tracker
   after_create :create_mirror_fulfillment_on_shopify
 
-  ## status: pending, cancelled, success, failure
+  # status: pending, cancelled, success, failure
   state_machine :status, :initial => :pending do
     event :success do
       transition :pending => :success
-    end  
+    end
     event :cancel do
       transition :pending => :cancelled
-    end    
+    end
     event :record_failure do
       transition :pending => :failure
     end
@@ -32,44 +34,12 @@ class Fulfillment < ActiveRecord::Base
     shopify_order_ids = params[:shopify_order_ids]
     shipping_method = params[:shipping_method]
     warehouse = params[:warehouse]
-    line_items = params[:line_item_ids]
-    self.fulfill_orders?(current_setting, shopify_order_ids, shipping_method, warehouse, line_items)
-  end
-
-
-  private
-  
-  def self.fulfill_orders?(current_setting, shopify_order_ids, shipping_method, warehouse, line_item_ids)
-    shopify_order_ids.each do |shopify_order_id|
-      order = ShopifyAPI::Order.find(shopify_order_id)    
-      return false unless self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids)
-    end
-    true
-  end
-
-  def self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids = [])
-
-    fulfillment = current_setting.fulfillments.new(
-      {
-        warehouse: warehouse,
-        status: 'pending',
-        address: order.shipping_address.attributes, 
-        shopify_order: order, 
-        email: order.email,
-        shipping_method: shipping_method
-      })
-    fulfillment.add_line_items(line_item_ids)
-
-    if fulfillment.save
-      Resque.enqueue(Fulfiller, fulfillment.id)
-      return true
-    end
-
-    false
+    line_items = params[:line_item_ids] || []
+    self.fulfill_orders(current_setting, shopify_order_ids, shipping_method, warehouse, line_items)
   end
 
   def add_line_items(line_item_ids)
-    items = shopify_order.line_items
+    items = ShopifyAPI::Order.find(shopify_order_id).line_items
     if line_item_ids.any?
       items = items.select{|item| line_item_ids.include? item.id}
     end
@@ -80,6 +50,38 @@ class Fulfillment < ActiveRecord::Base
       # TODO: use apps order object
       LineItem.new(data)
     end
+  end
+
+
+  private
+
+  def self.fulfill_orders(current_setting, shopify_order_ids, shipping_method, warehouse, line_item_ids)
+    shopify_order_ids.each do |shopify_order_id|
+      order = ShopifyAPI::Order.find(shopify_order_id)
+      return false unless self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids)
+    end
+    true
+  end
+
+  def self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids)
+
+    fulfillment = current_setting.fulfillments.new(
+      {
+        warehouse: warehouse,
+        address: order.shipping_address.attributes,
+        shopify_order_id: order.id,
+        email: order.email,
+        shipping_method: shipping_method,
+        status: 'pending'
+      })
+    fulfillment.add_line_items(line_item_ids)
+
+    if fulfillment.save
+      Resque.enqueue(Fulfiller, fulfillment.id)
+      return true
+    end
+    puts fulfillment.errors.inspect
+    false
   end
 
   def create_mirror_fulfillment_on_shopify
@@ -97,6 +99,12 @@ class Fulfillment < ActiveRecord::Base
     fulfillment.status = "#{status}" if [:success, :cancelled, :record_failure].include?(status)
 
     fulfillment.save
+  end
+
+  def order_fulfillment_status
+    order_status = ShopifyAPI::Order.find(shopify_order_id).fulfillment_status
+    return false if order_status == 'fulfilled' || order_status =='cancelled'
+    true
   end
 
   def legal_shipping_method
