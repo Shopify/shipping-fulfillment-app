@@ -11,10 +11,6 @@ module ActiveMerchant
         response = parse_tacking_updates_response(data)
       end
 
-      # TODO: ?
-      def fetch_tracking_values(shipwire_order_id)
-      end
-
       def build_tracking_updates_request
         xml = Builder::XmlMarkup.new
         xml.instruct!
