@@ -1,1 +1,6 @@
-alert(@rates);
+var responseTable = function(service, serviceCode, price, estimatedDeliveryDate, estimatedDeliveryRange){
+  return $("<table class='table table-striped'><thead><tr><th>Service</th><th>Service Code</th><th>Price</th><th>Estimated Delivery Date</th><th>Estimated Delivery Range</th></tr></thead><tbody><tr><td>" + service + "</td><td>" + serviceCode + "</td><td>" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimateDeliveryRange[1] + "</td></tr></tbody></table>");
+}
+
+$('.rates_table').append(responseTable(<%= @rates.service %>, <%= @rates.service_code %>, <%= @rates.price %>, <%= @rates.estimated_delivery_date %>, <%= @rates.estimated_delivery_range %>));
+$('button.calculate_shipping').remove();

@@ -31,5 +31,5 @@ class VariantTest < ActiveSupport::TestCase
     assert !synced_variant.save
   end
 
-  #how to test good_sku??????
+  #how to test good_sku?????? Mock all the things!
 end

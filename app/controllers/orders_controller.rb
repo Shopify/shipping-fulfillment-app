@@ -1,8 +1,11 @@
 class OrdersController < ApplicationController
+
+  # TODO: constant for per page
+
   def index
-    params[:page] = 1 unless params.has_key? :page 
+    params[:page] = 1 unless params.has_key? :page # TODO: before filter
     @page = params[:page].to_i
-    @page_count = (ShopifyAPI::Order.all.count/10.0).ceil
+    @page_count = (ShopifyAPI::Order.all.count/10.0).ceil # TODO: constant for page length
     @orders = get_paginated_orders
   end
 
@@ -15,10 +18,8 @@ class OrdersController < ApplicationController
     @line_items = get_paginated_line_items
   end
 
-
   def shipping_rates
-    destination = Destination.build_example
-    rates = ShippingRates.find_rates(destination, 133433068)#18)
+    @rates = ShippingRates.find_order_rates(params[:shopify_order_id])
     respond_to :js
   end
 
@@ -27,8 +28,8 @@ class OrdersController < ApplicationController
   ## No model to put these in, eventually can put them in orders model
   
   def get_paginated_orders
-    if @page <= @page_count+1 && @page > 0
-      ShopifyAPI::Order.find(:all, :params => {:limit => 10, :page => @page})
+    if @page <= @page_count+1 && @page > 0 # TODO: before filter as well
+      ShopifyAPI::Order.find(:all, :params => {:limit => 10, :page => @page}) # TODO: move to index
     else
       @page = 1
       get_paginated_orders
@@ -36,7 +37,7 @@ class OrdersController < ApplicationController
   end
 
   def get_paginated_line_items
-    per_page = 10
+    per_page = 10 # TODO: ditto above
     if @page < @page_count+1 && @page > 0
       return @order.line_items[(@page-1)*per_page, per_page]
     elsif @page == @page_count

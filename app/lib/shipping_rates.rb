@@ -1,24 +1,45 @@
 class ShippingRates
 
-  def self.find_rates(destination, order_id)
-    order = ShopifyAPI::Order.find(order_id)
-    items = order.line_items.select{ |item| item.requires_shipping && item.fulfillment_service == "shipwire"}
-    items = items.map(&:attributes)
-    #total_weight = items.inject{ |sum, item| sum + item.grams * item.quantity}
-    puts "Items: #{items.inspect}"
-    ## item only needs sku and quantity
-    rates = Rails.cache.fetch(self.rates_cache_key(destination, order_id), :expires_in => 1.day) do
-      shipwire = ActiveMerchant::Shipping::Shipwire.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
-      puts "midway"
-      response = shipwire.find_rates(nil, destination, nil, :items => items)
-      estimates = response.estimates
-      puts "Estimates: #{response.estimates.inspect}"
-      estimates.collect { |estimate| self.rate_from_estimate(estimate) }
-    end
+  def self.find_order_rates(order_id)
+    items, destination = ShippingRates.destination_and_items(order_id)
+      rates = Rails.cache.fetch(self.rates_cache_key(destination, order_id), :expires_in => 1.day) do
+        # TODO: credentials
+        shipwire = ActiveMerchant::Shipping::Shipwire.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
+        begin
+          response = shipwire.find_rates(nil, destination, nil, :items => items)
+        rescue ActiveMerchant::Shipping::ResponseError
+          return nil
+        else
+          estimates = response.estimates
+          estimates.collect { |estimate| self.rate_from_estimate(estimate) }
+        end
+      end
     rates.to_json
   end
 
   private 
+
+  def self.destination_and_items(order_id)
+    order = ShopifyAPI::Order.find(order_id)
+    address = order.shipping_address
+
+    location = {
+      country: address.country,
+      province: address.province,
+      city: address.city,
+      name: address.name,
+      address1: address.address1,
+      address2: nil,
+      address3: nil,
+      phone: address.phone,
+      fax: nil,
+      company: address.company
+    }
+
+    items = order.line_items.select{ |item| item.requires_shipping && item.fulfillment_service == "shipwire"}
+    items = items.map(&:attributes)
+    return items, ActiveMerchant::Shipping::Location.new(location)
+  end
 
   def self.rate_from_estimate(estimate)
     price = (estimate.total_price.to_f / 100).round(2).to_s

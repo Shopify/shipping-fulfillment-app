@@ -23,7 +23,7 @@
         <% @order.line_items.each do |item| %>
           <tr>
             <% if !current_setting.automatically_fulfill? %>
-              <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => (item.fulfillment_status == 'fulfilled' || 'shipwire' != item.fulfillment_service) %></td>
+              <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => disabled?(item) %></td>
             <% end %>
             <td><%= item.name %></td>
             <td><%= item.sku %></td>
@@ -41,17 +41,19 @@
         <% end %>
         </table>
         <br />
-        <hr>
-          <% if @order.fulfillment_status != 'fulfilled' %>
+          
+          <% if shipwire_fulfillable?(@order) %>
+
+          <hr>
           <table class="fulfill_submit">
             <tr>
               <td>
                 <%= label_tag :shipping_method, 'Shipping Method: ' %>
-                <%= select_tag :shipping_method, options_for_select([['1 Day Service','1D'],['2 Day Service','2D'],['Ground Service','GD'],['Freight Service', 'FT'],['International', 'INTL']]), :id => "shipping_method" %>
+                <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
               </td>
               <td>
                 <%= label_tag :warehouse, 'Warehouse :' %>
-                <%= select_tag :warehouse, options_for_select([['Optimized','00'],['CHI', 'Chicago'],['LAX', 'Los Angeles'],['REN', 'Reno'],['VAN', 'Vancouver'],['TOR', 'Toronto'],['UK', 'United Kingdom']]), :id => 'warehouse' %>
+                <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
               </td>
                 <%= hidden_field_tag 'shopify_order_id', :value => @order.id %>
               <td>
@@ -61,15 +63,35 @@
           </table>
           <% end %>
         <% end %>
+          <hr class="rates_table">
+          <button class='btn btn-primary calculate_shipping' data-order='<%= @order.id %>'>Calculate Shipping Rate</button>
         </div> <!-- span8 / right-column -->
         <% if @page_count > 1 %>
         <div class="span9 offset1">
           <div class="pagination">
           <ul class="paginate"> 
             <% (1..(@page_count)).each do |i| %>
-              <li <%= 'class="active"' if i == @page %>><a href="<%= order_path(@order) + "/page/" + i.to_s %>"><%= i %></a></li>
+              <li <%= 'class="active"' if i == @page %>>
+                <a href="<%= order_path(@order) + "/page/" + i.to_s %>"><%= i %></a>
+              </li>
             <% end %>
           </ul>
           </div>
         </div>
         <% end %>
+
+
+
+<script>
+$(document).ready(function(){
+  $('.calculate_shipping').click(function(){
+    var shopify_order_id = $(this).data('order');
+    alert(shopify_order_id)
+    $.ajax({
+      url: "<%= rates_path %>",
+      type: "GET",
+      data: {shopify_order_id: shopify_order_id}
+    });
+  });
+});
+</script>

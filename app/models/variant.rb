@@ -1,4 +1,5 @@
 class Variant < ActiveRecord::Base
+  # TODO: delegate method calls to the shopify variant in some cases
   attr_protected
 
   belongs_to :setting

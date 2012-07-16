@@ -29,7 +29,7 @@ class OrdersControllerTest < ActionController::TestCase
         name: "Basketball",
         sku: "GN-600-46",
         fulfillment_service: "manual",
-        fulfillment_status: nil,
+        fulfillment_status: nil, 
         requires_shipping: false,
         price: "40.00"
         ), 

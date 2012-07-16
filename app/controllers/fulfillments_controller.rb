@@ -10,6 +10,7 @@ class FulfillmentsController < ApplicationController
 
 
   def create
+    params[:shopify_order_ids] ||= [params[:shopify_order_id]]
     success = Fulfillment.fulfill(current_setting, params)
     if success
       flash[:notice] = "Your fulfillment request has been sent."

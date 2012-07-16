@@ -11,6 +11,7 @@ module ActiveMerchant
         response = parse_tacking_updates_response(data)
       end
 
+      # TODO: ?
       def fetch_tracking_values(shipwire_order_id)
       end
 
@@ -21,7 +22,7 @@ module ActiveMerchant
         xml.tag! 'TrackingUpdate' do
           add_credentials(xml)
           xml.tag! 'Server', test? ? 'Test' : 'Production'
-          xml.tag! 'Bookmark', 3
+          xml.tag! 'Bookmark', 3 # TODO: email about testing this
         end
       end
 

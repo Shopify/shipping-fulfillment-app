@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120709154835) do
+ActiveRecord::Schema.define(:version => 20120716135624) do
 
   create_table "fulfillments", :force => true do |t|
     t.text     "address"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(:version => 20120709154835) do
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
     t.integer  "shopify_fulfillment_id"
+    t.string   "warehouse"
   end
 
   add_index "fulfillments", ["setting_id"], :name => "index_fulfillments_on_setting_id"

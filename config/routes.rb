@@ -19,7 +19,7 @@ ShipwireApp::Application.routes.draw do
     end
   end
 
-  match "shippingrates" => "orders#shipping_rates"
+  match "shippingrates" => "orders#shipping_rates",   :as => :rates
 
   match "orderpaid" => "webhooks#order_paid", :via => :post
 

@@ -17,7 +17,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "Valid fulfillment saves along with its associations" do
-    fulfillment = FactoryGirl.build(:fulfillment)
+    fulfillment = FactoryGirl.build(:fulfillment) # TODO: helper method to setup objects
     fulfillment.tracker = FactoryGirl.build(:tracker)
     fulfillment.line_items = [FactoryGirl.build(:line_item)]
     

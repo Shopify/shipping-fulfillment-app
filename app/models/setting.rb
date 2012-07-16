@@ -1,4 +1,5 @@
 class Setting < ActiveRecord::Base
+  # TODO: rename setting?
   attr_protected
 
   has_many :variants
@@ -10,14 +11,13 @@ class Setting < ActiveRecord::Base
   after_create :setup_webhooks
 
   def self.build(base_attributes)
-    setting = Setting.new(base_attributes)
-    setting.shop_id = ShopifyAPI::Shop.current.myshopify_domain
-    return setting
+    setting = Setting.new(base_attributes) # just call super
+    setting.shop_id = ShopifyAPI::Shop.current.myshopify_domain # TODO: before create
+    return setting # TODO: don't need return, it's implicit
   end
 
-  def self.exists?
-    return false if Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).blank?
-    true
+  def self.exists? # TODO: can this be improved /refactored?
+    Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).any?
   end
 
   def automatically_fulfill?

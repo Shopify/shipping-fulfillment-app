@@ -1,7 +1,7 @@
 class SettingsController < ApplicationController
   skip_before_filter :setting_exists, :only =>['new','create']
 
-  def new
+  def new # TODO: clean this process up
     if Setting.exists?
       redirect_to :action => 'show'
     else
@@ -18,7 +18,7 @@ class SettingsController < ApplicationController
     end
   end 
 
-  def show
+  def show # TODO: merge show, edit and new
     current_setting
   end
 

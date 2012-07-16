@@ -26,10 +26,12 @@ class VariantsController < ApplicationController
         raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
       elsif params[:inventory_management] == 'shipwire'
         variant = Variant.new(variant_id: shopify_variant.id, setting_id: current_setting.id, activated: true, sku: params[:sku])
+        # TODO: instead of raising add validations and display errors
         raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
       else
-        raise StandardError.new('The variant must have a good sku.') unless Variant.good_sku?(sku)
+        raise StandardError.new('The variant must have a good sku.') unless Variant.good_sku?(sku) # TODO: happen earlier?
       end
+      # TODO: move to the variant model, after_save
       shopify_variant.inventory_management = params[:inventory_management] unless params[:inventory_management] == 'other'
       shopify_variant.sku = params[:sku]
       shopify_variant.save
@@ -48,6 +50,7 @@ class VariantsController < ApplicationController
 
   private 
 
+  # TODO: remove this
   def get_inventory_services(variant_service)
     case variant_service
 
