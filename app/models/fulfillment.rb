@@ -2,7 +2,7 @@ class Fulfillment < ActiveRecord::Base
 
   attr_accessible :warehouse, :address, :shopify_order_id, :email, :shipping_method, :line_items, :status
   belongs_to :setting
-  has_many :line_items, :dependent => :destroy
+  has_many :line_items, :through => :fulfillment_line_items
   has_one :tracker, :dependent => :destroy
 
   serialize :address

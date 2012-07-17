@@ -1,5 +1,7 @@
 class Setting < ActiveRecord::Base
   # TODO: rename setting?
+  HOOK_ADDRESS = 'http://shipwireapp:3001/'
+
   attr_protected
 
   has_many :variants
@@ -26,18 +28,21 @@ class Setting < ActiveRecord::Base
 
   private
 
+  ## hook address will need to change for production
   def setup_webhooks
-    shop = ShopifyAPI::Shop.current
-    hooks = []
-    #need to change address for production
-    hooks << ShopifyAPI::Webhook.new({topic: 'orders/paid', shop: shop.id, address: 'http://shipwireapp:3001/orderpaid', format: 'json'})
-    #hooks << ShopifyAPI::Webhook.new({topic: 'orders/cancelled', shop: shop.id, address: 'http://shipwireapp:3001/orderpaid', format: 'json'})
-    hooks.each do |hook|
-      if !hook.save
-        puts hook.errors.inspect
-        #raise(RuntimeError, hook.errors.inspect)
-      end
-    end
+    shop = ShopifyAPI::Shop.current # might be able to get this without api call
+    hooks = {
+      'orders/paid' => 'orderpaid',
+      'orders/cancelled' => 'ordercancelled',
+      'orders/created' => 'ordercreate',
+      'orders/updated' => 'orderupdated',
+      'orders/fulfilled' => 'orderfulfilled'
+    }
+    hooks.each { |topic, action| make_webhook(shop, topic, action) }
+  end
+
+  def make_webhook(shop, topic, action)
+    ShopifyAPI::Webhook.create({topic: topic, shop: shop.id, address: HOOK_ADDRESS + action, format: 'json'})
   end
 
 end

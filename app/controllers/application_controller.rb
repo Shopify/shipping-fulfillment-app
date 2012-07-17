@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
     redirect_to(login_path) unless Setting.exists?
   end
 
-  def current_setting 
+  def current_setting
     @setting ||= Setting.where('shop_id = ?', ShopifyAPI::Shop.current.myshopify_domain).first
   end
 

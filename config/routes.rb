@@ -23,6 +23,14 @@ ShipwireApp::Application.routes.draw do
 
   match "orderpaid" => "webhooks#order_paid", :via => :post
 
+  match "ordercancelled" => "webhooks#order_updated", :via => :post
+
+  match "orderfulfilled" => "webhooks#order_fulfilled", :via => :post
+
+  match "ordercreated" => "webhooks#order_created", :via => :post
+
+  match "orderupdated" => "webhooks#order_updated", :via => :post
+
   match 'auth/shopify/callback' => 'login#finalize'
 
   match 'login'              => 'login#index',        :as => :login

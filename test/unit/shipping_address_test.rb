@@ -1,7 +1,5 @@
 require 'test_helper'
 
 class ShippingAddressTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  should belong_to :order
 end

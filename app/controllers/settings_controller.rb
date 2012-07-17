@@ -9,14 +9,14 @@ class SettingsController < ApplicationController
     end
   end
 
-  def create 
+  def create
     @setting = Setting.build(params[:setting].merge({token: session[:shopify].token}))
     if @setting.save
       redirect_to @setting, :notice => "Your settings have been saved."
     else
       render action:"new", :alert => "Invalid settings, was not able to save."
     end
-  end 
+  end
 
   def show # TODO: merge show, edit and new
     current_setting

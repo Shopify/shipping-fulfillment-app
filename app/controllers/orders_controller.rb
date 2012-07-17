@@ -3,18 +3,20 @@ class OrdersController < ApplicationController
   # TODO: constant for per page
   before_filter :get_page, :except => [:shipping_rates]
 
-  ITEMS_PER_PAGE = 10
+  PER_PAGE = 10
 
   def index
-    @page_count = page_count(ShopifyAPI::Order.all.count)
-    @orders = get_paginated_orders
+    @page_count = (Order.all.count/(PER_PAGE.to_f)).ceil
+    set_order_pagination(params)
+    @orders = Order.get_paginated_orders(current_setting, @page)
   end
 
 
   def show
-    @order = ShopifyAPI::Order.find(params[:id])
-    @page_count = page_count(@order.line_items.count)
-    @line_items = get_paginated_line_items
+    @order = Order.find(params[:id]) ## not shopify_order_id, might need to fix in views
+    @page_count = (@order.line_items.count/(PER_PAGE.to_f)).ceil
+    set_item_pagination(params)
+    @line_items = LineItem.get_paginated_line_items(current_setting, order_id, page)
   end
 
   def shipping_rates
@@ -24,35 +26,14 @@ class OrdersController < ApplicationController
 
   private
 
-  ## No model to put these in, eventually can put them in orders model
-  def get_page
+  def set_order_pagination
     @page = params[:page] || 1
+    if @page < 1 || @page > @pagecount
+      @page = 1
+    end
   end
 
   def page_count(value)
-    return (value/ITEMS_PER_PAGE.to_f).ceil
-  end
-
-  def get_paginated_orders
-    if @page <= @page_count+1 && @page > 0 # TODO: before filter as well
-      ShopifyAPI::Order.find(:all, :params => {:limit => 10, :page => @page}) # TODO: move to index
-    else
-      @page = 1
-      get_paginated_orders
-    end
-  end
-
-  def get_paginated_line_items
-    per_page = ITEMS_PER_PAGE # TODO: ditto above
-    if @page < @page_count+1 && @page > 0
-      return @order.line_items[(@page-1)*per_page, per_page]
-    elsif @page == @page_count
-      return @order.line_items[((@page-1)*per_page)..-1]
-    else
-      flash[:alert] = "Invalid page number, you have been redirected to the first page."
-      @page = 1
-      get_paginated_line_items
-    end
+    return (value/PER_PAGE.to_f).ceil
   end
 end
-

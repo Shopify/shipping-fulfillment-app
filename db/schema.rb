@@ -11,7 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120716205617) do
+ActiveRecord::Schema.define(:version => 20120717035203) do
+
+  create_table "fulfillment_line_items", :force => true do |t|
+    t.integer  "line_item_id"
+    t.integer  "fulfillment_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
 
   create_table "fulfillments", :force => true do |t|
     t.text     "address"
@@ -47,6 +54,7 @@ ActiveRecord::Schema.define(:version => 20120716205617) do
     t.string   "variant_inventory_management"
     t.datetime "created_at",                   :null => false
     t.datetime "updated_at",                   :null => false
+    t.integer  "order_id"
   end
 
   create_table "orders", :force => true do |t|
@@ -66,6 +74,7 @@ ActiveRecord::Schema.define(:version => 20120716205617) do
     t.decimal  "total_price"
     t.datetime "created_at",                             :null => false
     t.datetime "updated_at",                             :null => false
+    t.integer  "setting_id"
   end
 
   create_table "settings", :force => true do |t|
@@ -88,6 +97,7 @@ ActiveRecord::Schema.define(:version => 20120716205617) do
     t.string   "country"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.integer  "order_id"
   end
 
   create_table "trackers", :force => true do |t|
