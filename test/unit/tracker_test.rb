@@ -4,7 +4,7 @@ class TrackerTest < ActiveSupport::TestCase
   should belong_to :fulfillment
 
   def setup
-    Setting.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:setup_webhooks)
     Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
     @fulfillment = create(:fulfillment, :line_items => [build(:line_item)])
   end

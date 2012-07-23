@@ -20,7 +20,7 @@
         <td><%= @variant.inventory_quantity %></td>
         <!-- TODO: selected option (or form_for) -->
         <td><%= select_tag :inventory_management, options_for_select(@inventory_services), :id => 'inventory_management' %></td>
-      </tr>  
+      </tr>
 </table>
   <br />
   <%= submit_tag :Update, :class => 'btn btn-success' %>

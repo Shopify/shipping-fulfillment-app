@@ -1,12 +1,12 @@
 require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
-  def setup 
+  def setup
     session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
     ShopifyAPI::Base.expects(:activate_session => true)
-    Setting.stubs(:exists?).returns(true)
-    OrdersController.any_instance.stubs(:current_setting).returns(stub(:automatically_fulfill? => false))
-    
+    Shop.stubs(:exists?).returns(true)
+    OrdersController.any_instance.stubs(:current_shop).returns(stub(:automatically_fulfill? => false))
+
     @order1 = stub(fulfillment_status: nil,
       id: 35,
       name: "#1029",
@@ -23,16 +23,16 @@ class OrdersControllerTest < ActionController::TestCase
         fulfillment_status: "fulfilled",
         requires_shipping: true,
         price: "10.00"
-        ), 
+        ),
       stub(
         id: 2,
         name: "Basketball",
         sku: "GN-600-46",
         fulfillment_service: "manual",
-        fulfillment_status: nil, 
+        fulfillment_status: nil,
         requires_shipping: false,
         price: "40.00"
-        ), 
+        ),
       stub(
         id: 3,
         name: "Bicycle",
@@ -53,11 +53,11 @@ class OrdersControllerTest < ActionController::TestCase
       currency: "CAD",
       billing_address: stub(name: "David Thomas")
     )
-  end 
+  end
 
-  test "index: fulfill checkbox appears if automatic fulfillment set to false" do 
+  test "index: fulfill checkbox appears if automatic fulfillment set to false" do
     ShopifyAPI::Order.stubs(:all).returns([@order1, @order2])
-    OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])    
+    OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])
 
     get :index
     assert_template :index
@@ -66,13 +66,13 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "index: no fulfill checkbox appears if automatic fulfillment set to true" do
-    OrdersController.any_instance.stubs(:current_setting).returns(stub(:automatically_fulfill? => true))
-    Setting.stubs(:where).returns([stub(:automatically_fulfill? => true)])
+    OrdersController.any_instance.stubs(:current_shop).returns(stub(:automatically_fulfill? => true))
+    Shop.stubs(:where).returns([stub(:automatically_fulfill? => true)])
     ShopifyAPI::Order.stubs(:all).returns([@order1, @order2])
-    OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])    
+    OrdersController.any_instance.stubs(:get_paginated_orders).returns([@order1, @order2])
 
     status = stub(:automatic_fulfillment => true)
-    Setting.stubs(:where).returns([status])
+    Shop.stubs(:where).returns([status])
 
     get :index
     assert_template :index
@@ -80,7 +80,7 @@ class OrdersControllerTest < ActionController::TestCase
           :attributes => {:class => 'selector'}
   end
 
-  test "index: get_paginated_orders is called and makes call to ShopifyAPI" do 
+  test "index: get_paginated_orders is called and makes call to ShopifyAPI" do
     ShopifyAPI::Order.stubs(:all).returns([])
     ShopifyAPI::Order.expects(:find).with(:all, :params => {:limit => 10, :page => 1}).returns([@order1, @order2])
 
@@ -90,12 +90,12 @@ class OrdersControllerTest < ActionController::TestCase
   test "index: get_paginated_orders redirects to page 1 if page out of bounds" do
     ShopifyAPI::Order.stubs(:all).returns([])
     ShopifyAPI::Order.expects(:find).with(:all, :params => {:limit => 10, :page => 1}).returns([@order1, @order2])
-    
+
     get :index, :page => 5
-    assert_select ".paginate", 0  
+    assert_select ".paginate", 0
   end
 
-  test "index: has message and no form when no shop has no orders" do 
+  test "index: has message and no form when no shop has no orders" do
     ShopifyAPI::Order.stubs(:all).returns([])
     OrdersController.any_instance.stubs(:get_paginated_orders).returns([])
 

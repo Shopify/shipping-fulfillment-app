@@ -1,7 +1,7 @@
 class Fulfillment < ActiveRecord::Base
 
   attr_accessible :warehouse, :address, :order_id, :email, :shipping_method, :line_items, :status
-  belongs_to :setting
+  belongs_to :shop
   belongs_to :order
   has_many :fulfillment_line_items
   has_many :line_items, :through => :fulfillment_line_items
@@ -32,22 +32,22 @@ class Fulfillment < ActiveRecord::Base
     after_transition :pending => any, :do => [:update_fulfillment_status_on_shopify]
   end
 
-  def self.fulfill(current_setting, params)
+  def self.fulfill(current_shop, params)
     order_ids = params[:order_ids]
     shipping_method = params[:shipping_method]
     warehouse = params[:warehouse] || '00'
     line_item_ids = params[:line_item_ids] || []
-    self.fulfill_orders(current_setting, order_ids, shipping_method, warehouse, line_item_ids)
+    self.fulfill_orders(current_shop, order_ids, shipping_method, warehouse, line_item_ids)
   end
 
 
   private
 
-  def self.fulfill_orders(current_setting, order_ids, shipping_method, warehouse, line_item_ids)
-    ids = order_ids.select { |id| current_setting.orders.map(&:id).include? id }
+  def self.fulfill_orders(current_shop, order_ids, shipping_method, warehouse, line_item_ids)
+    ids = order_ids.select { |id| current_shop.orders.map(&:id).include? id }
     ids.each do |id|
       order = Order.find(id)
-      return false unless self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids)
+      return false unless self.create_fulfillment(current_shop, order, shipping_method, warehouse, line_item_ids)
     end
     true
   end
@@ -62,10 +62,10 @@ class Fulfillment < ActiveRecord::Base
     fulfillment_items.map { |item| LineItem.find(item)}
   end
 
-  def self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids)
+  def self.create_fulfillment(current_shop, order, shipping_method, warehouse, line_item_ids)
     line_items = self.build_line_items(order, line_item_ids)
 
-    fulfillment = current_setting.fulfillments.new(
+    fulfillment = current_shop.fulfillments.new(
       {
         warehouse: warehouse,
         address: order.shipping_address.attributes,

@@ -5,16 +5,16 @@ class Order < ActiveRecord::Base
 
   has_many :line_items, :dependent => :destroy
   has_one :shipping_address, :dependent => :destroy
-  belongs_to :setting
+  belongs_to :shop
 
   accepts_nested_attributes_for :shipping_address
   accepts_nested_attributes_for :line_items
 
-  def self.create_order(params,setting)
+  def self.create_order(params,shop)
     options = order_options(params)
     options['shipping_address_attributes'] = get_shipping_attributes(params)
     options['line_items_attributes'] = get_line_items_attributes(params)
-    options['setting_id'] = setting.id
+    options['shop_id'] = shop.id
     order = create(options)
   end
 

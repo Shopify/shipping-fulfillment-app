@@ -2,7 +2,7 @@ require 'test_helper'
 
 class OrderTest < ActiveSupport::TestCase
 
-  should belong_to :setting
+  should belong_to :shop
   should have_many :line_items
   should have_one :shipping_address
 
@@ -13,7 +13,7 @@ class OrderTest < ActiveSupport::TestCase
   test "Create order makes order with apropriate attributes" do
     params = load_json('order_create.json')['order']
     assert_difference "Order.count", 1 do
-      Order.create_order(params, create(:setting))
+      Order.create_order(params, create(:shop))
     end
     assert LineItem.where("sku = ?","909090").present?
     assert ShippingAddress.where("address1 = ?","7318 Black Swan Place").present?, "Did"

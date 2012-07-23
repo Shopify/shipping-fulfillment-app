@@ -8,6 +8,6 @@ FactoryGirl.define do
     association :order
     email "david.thomas@shopify.com"
     status "pending"
-    association :setting
+    association :shop
   end
 end

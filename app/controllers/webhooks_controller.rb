@@ -1,7 +1,7 @@
 class WebhooksController < ApplicationController
 
   skip_before_filter :verify_authenticity_token
-  skip_before_filter :setting_exists
+  skip_before_filter :shop_exists
   skip_around_filter :shopify_session
 
   before_filter :verify_shopify_webhook
@@ -33,7 +33,7 @@ class WebhooksController < ApplicationController
   private
 
   def order_created
-    Resque.enqueue(OrderCreateJob, params, @setting)
+    Resque.enqueue(OrderCreateJob, params, @shop)
   end
 
   def order_updated
@@ -49,7 +49,7 @@ class WebhooksController < ApplicationController
   end
 
   def order_paid
-    if @order.setting.automatically_fulfill
+    if @order.shop.automatically_fulfill
       Resque.enqueue(OrderPaidJob, @order, params['id'], params['shipping_method'])
     end
     @order.update_attribute(:financial_status, "paid")
@@ -57,11 +57,11 @@ class WebhooksController < ApplicationController
 
 
   def find_or_create_order
-    @setting = Setting.where("shop_id = ?",request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN'])
-    if request.headers['HTTP_X_SHOPIFY_TOPIC'] != 'orders/create' && @setting.orders.where('shopify_order_id = ?', params['id']).blank?
+    @shop = Shop.where("domain = ?",request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN'])
+    if request.headers['HTTP_X_SHOPIFY_TOPIC'] != 'orders/create' && @shop.orders.where('shopify_order_id = ?', params['id']).blank?
       create_order
     else
-      @order = @setting.orders.where('shopify_order_id = ?', params['id']).first
+      @order = @shop.orders.where('shopify_order_id = ?', params['id']).first
     end
   end
 

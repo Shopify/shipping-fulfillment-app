@@ -4,7 +4,7 @@ class VariantsController < ApplicationController
   end
 
   def show 
-     @product_title = params[:product_title] 
+     @product_title = params[:product_title]
      @variant = ShopifyAPI::Variant.find(params[:id])
   end
 
@@ -25,7 +25,7 @@ class VariantsController < ApplicationController
         variant.sku = params[:sku]
         raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
       elsif params[:inventory_management] == 'shipwire'
-        variant = Variant.new(variant_id: shopify_variant.id, setting_id: current_setting.id, activated: true, sku: params[:sku])
+        variant = Variant.new(variant_id: shopify_variant.id, shop_id: current_shop.id, activated: true, sku: params[:sku])
         # TODO: instead of raising add validations and display errors
         raise StandardError.new('The variant can only be updated with a valid sku.') unless variant.save
       else

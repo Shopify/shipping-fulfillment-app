@@ -3,10 +3,10 @@ require 'test_helper'
 class FulfillmentsControllerTest < ActionController::TestCase
   
   def setup
-    FulfillmentsController.any_instance.stubs(:current_setting)
+    FulfillmentsController.any_instance.stubs(:current_shop)
     session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
     ShopifyAPI::Base.stubs(:activate_session => true)
-    Setting.stubs(:exists?).returns(true)
+    Shop.stubs(:exists?).returns(true)
   end
 
   test "index: page renders" do

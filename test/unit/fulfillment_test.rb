@@ -2,20 +2,19 @@ require 'test_helper'
 
 class FulfillmentTest < ActiveSupport::TestCase
 
-  should belong_to :setting
+  should belong_to :shop
   should have_many :line_items
   should have_one :tracker
-  should have_db_index :setting_id
   should validate_presence_of :order_id
   should validate_presence_of :line_items
 
   def setup
-    Setting.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:setup_webhooks)
 
     Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
 
-    @setting = build(:setting)
-    @order = create(:order, :setting_id => @setting.id)
+    @shop = build(:shop)
+    @order = create(:order, :shop_id => @shop.id)
   end
 
   test "Valid fulfillment saves and creates associated tracker" do
@@ -29,7 +28,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     Resque.expects(:enqueue)
     params = {order_ids: [@order.id], line_item_ids: [@order.line_items.first.id], shipping_method: '1D', warehouse: '00'}
 
-    assert Fulfillment.fulfill(@setting, params)
+    assert Fulfillment.fulfill(@shop, params)
     assert_equal @order.line_items.first.fulfillment_status, "fulfilled"
   end
 
@@ -37,17 +36,17 @@ class FulfillmentTest < ActiveSupport::TestCase
     Resque.expects(:enqueue)
     params = {order_ids: [@order.id], shipping_method: '1D', warehouse: '00'}
 
-    assert Fulfillment.fulfill(@setting, params)
+    assert Fulfillment.fulfill(@shop, params)
     assert_equal @order.reload.fulfillment_status, "fulfilled"
   end
 
   test "Fulfill multiple orders" do
     Resque.expects(:enqueue).times(3)
-    ids = [1,2,3].map{create(:order, :setting_id => @setting.id).id}
+    ids = [1,2,3].map{create(:order, :shop_id => @shop.id).id}
     params = {order_ids: ids, shipping_method: '1D', warehouse: '00'}
 
     assert_difference "Fulfillment.count", 3 do
-      assert Fulfillment.fulfill(@setting, params)
+      assert Fulfillment.fulfill(@shop, params)
     end
   end
 
@@ -58,7 +57,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     params = {order_ids: [@order.id], line_item_ids: [item1.id, item2.id], shipping_method: '1D', warehouse: '00'}
 
 
-    assert Fulfillment.fulfill(@setting, params)
+    assert Fulfillment.fulfill(@shop, params)
     assert_equal item1.reload.fulfillment_status, "fulfilled"
     assert_equal item2.reload.fulfillment_status, "fulfilled"
   end
@@ -87,7 +86,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     params = {order_ids: [@order.id], shipping_method: '1D', warehouse: '00'}
 
     assert_difference "FulfillmentLineItem.count", 5 do
-      Fulfillment.fulfill(@setting, params)
+      Fulfillment.fulfill(@shop, params)
     end
   end
 
@@ -95,20 +94,20 @@ class FulfillmentTest < ActiveSupport::TestCase
     Resque.expects(:enqueue)
     cancelled_item = create(:cancelled_item)
     fulfilled_item = create(:fulfilled_item)
-    order = create(:order, :line_items => [cancelled_item, fulfilled_item], :setting => @setting)
+    order = create(:order, :line_items => [cancelled_item, fulfilled_item], :shop => @shop)
     params = {order_ids: [order.id], shipping_method: '1D', warehouse: '00'}
 
-    assert Fulfillment.fulfill(@setting, params)
+    assert Fulfillment.fulfill(@shop, params)
     assert FulfillmentLineItem.where('line_item_id =?', cancelled_item.id).empty?
     assert FulfillmentLineItem.where('line_item_id=?', fulfilled_item.id).empty?
   end
 
-  test "Order is not fulfilled if not from current setting" do
+  test "Order is not fulfilled if not from current shop" do
     Resque.expects(:enqueue).times(1)
     order = create(:order)
     params = {order_ids: [@order.id, order.id], shipping_method: '1D', warehouse: '00'}
 
-    Fulfillment.fulfill(@setting, params)
+    Fulfillment.fulfill(@shop, params)
 
     assert Fulfillment.where('order_id =?', order.id).empty?
     assert Fulfillment.where('order_id=?', @order.id).present?
@@ -119,7 +118,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     other_item = create(:line_item)
     params = {order_ids: [@order.id], line_item_ids: [@order.line_items.first.id, other_item.id], shipping_method: '1D', warehouse: '00'}
 
-    assert Fulfillment.fulfill(@setting, params)
+    assert Fulfillment.fulfill(@shop, params)
     assert_equal other_item.reload.fulfillment_status, nil
   end
 
@@ -127,34 +126,34 @@ class FulfillmentTest < ActiveSupport::TestCase
     @order.line_items.destroy_all
     params = {order_ids: [@order.id], shipping_method: '1D', warehouse: '00'}
 
-    assert !Fulfillment.fulfill(@setting, params)
+    assert !Fulfillment.fulfill(@shop, params)
   end
 
   test "Fulfill returns false and does not save if the orders fulfillment status is cancelled" do
      Resque.expects(:enqueue).never
-     order = create(:order, :fulfillment_status => 'cancelled', :setting_id => @setting.id)
+     order = create(:order, :fulfillment_status => 'cancelled', :shop_id => @shop.id)
      params = {order_ids: [order.id], shipping_method: '1D', warehouse: '00'}
 
-     assert !Fulfillment.fulfill(@setting, params)
+     assert !Fulfillment.fulfill(@shop, params)
      assert Fulfillment.where('order_id = ?', order.id).empty?
    end
 
    test "Fulfill returns false and does not save if the orders fulfillment status is fulfilled" do
      Resque.expects(:enqueue).never
-     order = create(:order, :fulfillment_status => 'fulfilled', :setting_id => @setting.id)
+     order = create(:order, :fulfillment_status => 'fulfilled', :shop_id => @shop.id)
      params = {order_ids: [order.id], shipping_method: '1D', warehouse: '00'}
 
-     assert !Fulfillment.fulfill(@setting, params)
+     assert !Fulfillment.fulfill(@shop, params)
      assert Fulfillment.where('order_id = ?', order.id).empty?
   end
 end
 
 class AnotherOtherFulfillmentTest < ActiveSupport::TestCase
   def setup
-    Setting.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:setup_webhooks)
 
-    @setting = build(:setting)
-    @order = create(:order, :setting_id => @setting.id)
+    @shop = build(:shop)
+    @order = create(:order, :shop_id => @shop.id)
   end
 
   test "create_mirror_fulfillment_on_shopify" do
@@ -163,6 +162,6 @@ class AnotherOtherFulfillmentTest < ActiveSupport::TestCase
 
     ShopifyAPI::Fulfillment.expects(:create).returns(stub(:id=>20))
 
-    assert Fulfillment.fulfill(@setting, params)
+    assert Fulfillment.fulfill(@shop, params)
   end
 end

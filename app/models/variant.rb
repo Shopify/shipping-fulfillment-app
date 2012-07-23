@@ -2,12 +2,12 @@ class Variant < ActiveRecord::Base
   # TODO: delegate method calls to the shopify variant in some cases
   attr_protected
 
-  belongs_to :setting
+  belongs_to :shop
 
-  validates_presence_of :setting_id, :activated, :sku
+  validates_presence_of :activated, :sku
   validates_numericality_of :inventory, :greater_than_or_equal_to => 0
   validates :variant_id, :presence => true, :uniqueness => true
-  
+
   validate :good_sku?
 
 
@@ -21,7 +21,7 @@ class Variant < ActiveRecord::Base
     shopify_variant = ShopifyAPI::Variant.find(variant_id)
     shopify_variant.inventory_quantity = inventory
     shopify_variant.save
-  end 
+  end
 
 
   private

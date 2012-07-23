@@ -5,17 +5,9 @@ FakeWeb.allow_net_connect = true
 
 class WebhooksControllerTest < ActionController::TestCase
 
-  # def setup
-  #   super
-  #   @setting = create(:setting)
-  #   @order_create = load_json('order_create.json')['order']
-
-  #   WebhooksController.any_instance.stubs(:verify_shopify_webhook)
-  # end
-
   def setup
     super
-    @setting = create(:setting)
+    @shop = create(:shop)
     @order_create = load_json('order_create.json')['order']
 
     WebhooksController.any_instance.stubs(:verify_shopify_webhook)
@@ -40,6 +32,7 @@ class WebhooksControllerTest < ActionController::TestCase
   test "Order paid webhook" do
   end
 
+## NEED TO CHANGE SETTING TO SHOP IF USING THESE
 
   # test "Order paid does not fulfill if automatic_fulfillment is set to false" do
   #   order = create(:order, :shopify_order_id => 5, :setting => @setting)

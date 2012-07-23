@@ -1,4 +1,4 @@
-<%= form_for current_setting, :url => {:action => "update"} do |f| %>
+<%= form_for current_shop, :url => {:action => "update"} do |f| %>
   <div class="field">
     <%= f.label :login %>
     <%= f.text_field :login %>
@@ -9,7 +9,7 @@
   </div>
   <div class="field">
     <%= f.label :automatic_fulfillment %>
-    <%= select(:setting, :automatic_fulfillment, options_for_select([[true,true], [false,false]])) %>
+    <%= select(:shop, :automatic_fulfillment, options_for_select([[true,true], [false,false]])) %>
   </div>
   <div class="field">
     <%= f.label :submit %>

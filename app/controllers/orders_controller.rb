@@ -5,12 +5,12 @@ class OrdersController < ApplicationController
   before_filter :get_page, :except => [:shipping_rates]
 
   def index
-    @orders = current_setting.orders.paginate(:page => @page, :per_page => PER_PAGE)
+    @orders = current_shop.orders.paginate(:page => @page, :per_page => PER_PAGE)
   end
 
 
   def show
-    @order = current_setting.orders.where()
+    @order = current_shop.orders.where()
     @line_items = @order.line_items.paginate(:page => @page, :per_page => PER_PAGE)
   end
 

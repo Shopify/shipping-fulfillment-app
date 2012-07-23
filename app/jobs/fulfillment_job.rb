@@ -4,7 +4,7 @@ class FulfillmentJob
   LOGIN_CREDENTIALS = {:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true}
 
   def self.perform(fulfillment_id, options)
-    fulfillment = Fulfillment.includes(:line_items, :setting, :tracker).find(fulfillment_id)
+    fulfillment = Fulfillment.includes(:line_items, :shop, :tracker).find(fulfillment_id)
     line_items = fulfillment.line_items.map(&:attributes)
     options = {
       warehouse: fulfillment.warehouse,
