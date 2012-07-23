@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :tracker do 
+  factory :tracker do
     sequence(:id){|i| i}
     # association(:fulfillment)
     tracking_carrier "USPS"

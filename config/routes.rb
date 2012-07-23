@@ -19,17 +19,19 @@ ShipwireApp::Application.routes.draw do
     end
   end
 
+  # TODO: Clear up extra webhook routes
+
   match "shippingrates" => "orders#shipping_rates",   :as => :rates
 
-  match "orderpaid" => "webhooks#order_paid", :via => :post
+  match "orderpaid" => "webhooks#create", :via => :post
 
-  match "ordercancelled" => "webhooks#order_updated", :via => :post
+  match "ordercancelled" => "webhooks#create", :via => :post
 
-  match "orderfulfilled" => "webhooks#order_fulfilled", :via => :post
+  match "orderfulfilled" => "webhooks#create", :via => :post
 
-  match "ordercreated" => "webhooks#order_created", :via => :post
+  match "ordercreated" => "webhooks#create", :via => :post
 
-  match "orderupdated" => "webhooks#order_updated", :via => :post
+  match "orderupdated" => "webhooks#create", :via => :post
 
   match 'auth/shopify/callback' => 'login#finalize'
 

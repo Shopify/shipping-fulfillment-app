@@ -9,10 +9,13 @@ FakeWeb.allow_net_connect = false
 
 class ActiveSupport::TestCase
 
+  include FactoryGirl::Syntax::Methods
+
   fixtures :all
 
 
   def setup
+    Setting.any_instance.stubs(:setup_webhooks)
     ActiveResource::Base.format = :json
     ShopifyAPI.constants.each do |const|
       begin
@@ -28,7 +31,15 @@ class ActiveSupport::TestCase
   end
 
   def teardown
-    FakeWeb.clean_registry    
+    FakeWeb.clean_registry
+  end
+
+  def load_json(filename)
+    JSON.parse read_fixture(filename)
+  end
+
+  def read_fixture(filename)
+    File.read(Rails.root.join('test/fixtures', filename))
   end
 
   def load_fixture(name, format=:json)

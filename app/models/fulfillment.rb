@@ -2,6 +2,7 @@ class Fulfillment < ActiveRecord::Base
 
   attr_accessible :warehouse, :address, :shopify_order_id, :email, :shipping_method, :line_items, :status
   belongs_to :setting
+  belongs_to :order
   has_many :line_items, :through => :fulfillment_line_items
   has_one :tracker, :dependent => :destroy
 
@@ -31,17 +32,17 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def self.fulfill(current_setting, params)
-    shopify_order_ids = params[:shopify_order_ids]
+    shopify_order_ids = params[:order_ids]
     shipping_method = params[:shipping_method]
-    warehouse = params[:warehouse]
+    warehouse = params[:warehouse] || '00'
     line_items = params[:line_item_ids] || []
-    self.fulfill_orders(current_setting, shopify_order_ids, shipping_method, warehouse, line_items)
+    self.fulfill_orders(current_setting, order_ids, shipping_method, warehouse, line_items)
   end
 
   def add_line_items(line_item_ids)
-    items = ShopifyAPI::Order.find(shopify_order_id).line_items
+    items = Order.find(order_id).line_items
     if line_item_ids.any?
-      items = items.select{|item| line_item_ids.include? item.id}
+      items = items.select{|item| line_item_ids.include? item.id && item.fulfillment_service == 'shipwire'}
     end
 
     line_items = items.map do |item|
@@ -55,9 +56,9 @@ class Fulfillment < ActiveRecord::Base
 
   private
 
-  def self.fulfill_orders(current_setting, shopify_order_ids, shipping_method, warehouse, line_item_ids)
-    shopify_order_ids.each do |shopify_order_id|
-      order = ShopifyAPI::Order.find(shopify_order_id)
+  def self.fulfill_orders(current_setting, order_ids, shipping_method, warehouse, line_item_ids)
+    order_ids.each do |id|
+      order = Order.find(id)
       return false unless self.create_fulfillment(current_setting, order, shipping_method, warehouse, line_item_ids)
     end
     true
@@ -86,12 +87,15 @@ class Fulfillment < ActiveRecord::Base
 
   def create_mirror_fulfillment_on_shopify
     fulfillment = ShopifyAPI::Fulfillment.new(
-      order_id: shopify_order_id,
+      order_id: self.order.shopify_order_id,
       test: false,
       shipping_method: shipping_method,
       line_items: line_items.map(&:line_item_id)
     )
     fulfillment.save
+
+    self.shopify_fulfillment_id = fulfillment.id
+    self.save
   end
 
   def update_shopify_fulfillment_status

@@ -4,11 +4,11 @@ class LineItemTest < ActiveSupport::TestCase
   should validate_presence_of :product_id
   should validate_presence_of :variant_id
   should validate_presence_of :line_item_id
+  should validate_presence_of :quantity
 
-  should belong_to :fulfillment
+  should belong_to :order
 
   test "valid line_item saves" do
-    item = FactoryGirl.build(:line_item)
-    assert item.save, "Valid item did not save."
+    assert create(:line_item), "Valid item did not save."
   end
 end

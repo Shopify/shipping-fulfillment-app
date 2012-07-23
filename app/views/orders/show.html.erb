@@ -20,7 +20,7 @@
             <th>Price</th>
           </tr>
         </thead>
-        <% @order.line_items.each do |item| %>
+        <% @line_items.each do |item| %>
           <tr>
             <% if !current_setting.automatically_fulfill? %>
               <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => disabled?(item) %></td>
@@ -66,19 +66,8 @@
           <hr class="rates_table">
           <button class='btn btn-primary calculate_shipping' data-order='<%= @order.id %>'>Calculate Shipping Rate</button>
         </div> <!-- span8 / right-column -->
-        <% if @page_count > 1 %>
-        <div class="span9 offset1">
-          <div class="pagination">
-          <ul class="paginate">
-            <% (1..(@page_count)).each do |i| %>
-              <li <%= 'class="active"' if i == @page %>>
-                <a href="<%= order_path(@order) + "/page/" + i.to_s %>"><%= i %></a>
-              </li>
-            <% end %>
-          </ul>
-          </div>
-        </div>
-        <% end %>
+
+        <%= will_paginate @line_items, :container => false %>
 
 
 

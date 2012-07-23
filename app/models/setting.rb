@@ -6,6 +6,7 @@ class Setting < ActiveRecord::Base
 
   has_many :variants
   has_many :fulfillments
+  has_many :orders
 
   validates_presence_of :login, :password, :token
   validates :shop_id, :presence => true, :uniqueness => true

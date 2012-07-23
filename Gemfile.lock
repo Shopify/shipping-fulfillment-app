@@ -216,6 +216,7 @@ GEM
     tzinfo (0.3.33)
     vegas (0.1.11)
       rack (>= 1.0.0)
+    will_paginate (3.0.3)
     xpath (0.1.4)
       nokogiri (~> 1.3)
 
@@ -243,3 +244,4 @@ DEPENDENCIES
   sqlite3
   state_machine (= 0.9.4)
   therubyracer
+  will_paginate (~> 3.0.3)

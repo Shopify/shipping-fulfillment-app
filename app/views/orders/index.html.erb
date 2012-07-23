@@ -55,11 +55,11 @@
         <tr>
           <td>
             <%= label_tag :shipping_method, 'Shipping Method: ' %>
-            <%= select_tag :shipping_method, options_for_select([['1 Day Service','1D'],['2 Day Service','2D'],['Ground Service','GD'],['Freight Service', 'FT'],['International', 'INTL']]), :id => "shipping_method" %>
+            <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
           </td>
           <td>
             <%= label_tag :warehouse, 'Warehouse :' %>
-            <%= select_tag :warehouse, options_for_select([['Optimized','00'],['CHI', 'Chicago'],['LAX', 'Los Angeles'],['REN', 'Reno'],['VAN', 'Vancouver'],['TOR', 'Toronto'],['UK', 'United Kingdom']]), :id => 'warehouse' %>
+            <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
           </td>
           <td>
             <%= submit_tag("Fullfill",:class => "btn btn-success") %>
@@ -70,11 +70,8 @@
     <br/>
   <div class="span9 offset1">
     <div class="pagination">
-    <ul>
-      <% (1..(@page_count)).each do |i| %>
-        <li class="<%= "active" if i == @page %>"><a href="<%= orders_path + "/page/" + i.to_s %>"><%= i %></a></li>
-      <% end %>
-    </ul>
+      <!-- Stylize with twitter pagination at some point !-->
+      <%= will_paginate @orders, :container => false %>
     </div>
   </div>
 <% end %>
