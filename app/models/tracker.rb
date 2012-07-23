@@ -9,6 +9,6 @@ class Tracker < ActiveRecord::Base
 
   def create_shipwire_order_id
     number = SecureRandom.hex(16)
-    self.shipwire_order_id = "#{fulfillment.shopify_order_id}.#{number}"
+    self.shipwire_order_id = "#{fulfillment.order_id}.#{number}"
   end
 end

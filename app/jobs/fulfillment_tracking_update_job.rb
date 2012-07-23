@@ -3,6 +3,7 @@ class FulfillmentTrackingUpdateJob
 
   LOGIN_CREDENTIALS = {:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true}
 
+
   def self.perform
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(LOGIN_CREDENTIALS) 
     response = shipwire.fetch_tracking_updates

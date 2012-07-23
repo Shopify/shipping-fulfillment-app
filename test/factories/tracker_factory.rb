@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :tracker do
     sequence(:id){|i| i}
-    # association(:fulfillment)
     tracking_carrier "USPS"
     tracking_link "https://app.shipwire.com/c/t/xxx1:yyy3"
     tracking_number 9400110200793596422990
@@ -14,8 +13,5 @@ FactoryGirl.define do
     returned "YES"
     shipped "YES"
     shipwire_order_id "1212123.2"
-    factory :tracker_not_returned do
-        returned "NO"
-    end
   end
 end

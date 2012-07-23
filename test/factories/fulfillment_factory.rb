@@ -5,10 +5,9 @@ FactoryGirl.define do
     warehouse "CHI"
     shopify_fulfillment_id 12345
     address 'some serialized address'
-    shopify_order_id 19232494
+    association :order
     email "david.thomas@shopify.com"
     status "pending"
-    setting_id 121
-    line_items []
+    association :setting
   end
 end

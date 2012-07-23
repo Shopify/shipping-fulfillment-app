@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120718145606) do
+ActiveRecord::Schema.define(:version => 20120723192634) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -112,8 +112,6 @@ ActiveRecord::Schema.define(:version => 20120718145606) do
     t.datetime "updated_at",             :null => false
     t.string   "shipwire_order_id"
   end
-
-  add_index "trackers", ["fulfillment_id"], :name => "index_trackers_on_fulfillment_id"
 
   create_table "variants", :force => true do |t|
     t.integer  "variant_id"
