@@ -50,7 +50,7 @@ class WebhooksController < ApplicationController
 
   def order_paid
     if @order.shop.automatically_fulfill
-      Resque.enqueue(OrderPaidJob, @order, params['id'], params['shipping_method'])
+      Resque.enqueue(OrderPaidJob, @order, params['shipping_lines'])
     end
     @order.update_attribute(:financial_status, "paid")
   end

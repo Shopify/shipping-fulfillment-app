@@ -5,7 +5,7 @@ class FulfillmentTrackingUpdateJob
 
 
   def self.perform
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(LOGIN_CREDENTIALS) 
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(LOGIN_CREDENTIALS)
     response = shipwire.fetch_tracking_updates
     response.keys.each do |shipwire_order_id|
       tracker = Tracker.where('shipwire_order_id = ?', shipwire_order_id)

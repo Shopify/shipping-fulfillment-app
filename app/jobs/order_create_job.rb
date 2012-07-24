@@ -1,7 +1,7 @@
 class OrderCreateJob
 @queue = :default
 
-  def self.perform(params, setting)
-    Order.create_order(params, setting)
+  def self.perform(params, shop)
+    Order.create_order(params, shop)
   end
 end

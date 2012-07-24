@@ -16,5 +16,4 @@ class OrderCancelJobTest < ActiveSupport::TestCase
     assert_equal order.reload.line_items.first.fulfillment_status, 'fulfilled'
     assert_equal order.reload.line_items.last.fulfillment_status, 'fulfilled'
   end
-
 end

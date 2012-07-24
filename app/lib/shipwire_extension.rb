@@ -18,7 +18,7 @@ module ActiveMerchant
         xml.tag! 'TrackingUpdate' do
           add_credentials(xml)
           xml.tag! 'Server', test? ? 'Test' : 'Production'
-          xml.tag! 'Bookmark', 3 # TODO: email about testing this
+          xml.tag! 'Bookmark', 3
         end
       end
 
