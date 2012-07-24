@@ -4,7 +4,7 @@ FactoryGirl.define do
     login 'David'
     password 'password'
     automatic_fulfillment false
-    domain 'davidshop'
+    sequence(:domain){|i| "domain"+i.to_s }
     token '1391230123912301230132'
 
     factory :shop_true do

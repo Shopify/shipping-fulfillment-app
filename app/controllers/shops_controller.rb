@@ -1,29 +1,18 @@
 class ShopsController < ApplicationController
   skip_before_filter :shop_exists, :only =>['new','create']
 
-  def new # TODO: clean this process up
-    if Shop.exists?
-      redirect_to :action => 'show'
-    else
-      @shop = Shop.new
-    end
+  # need to merge new and edit view into show view
+  def show
+    @shop = current_shop #might be empty array
   end
 
   def create
-    @shop = Shop.build(params[:shop].merge({token: session[:shopify].token}))
+    @shop = Shop.new(params[:shop].merge({token: session[:shopify].token}))
     if @shop.save
       redirect_to @shop, :notice => "Your settings have been saved."
     else
       render action:"new", :alert => "Invalid settings, was not able to save."
     end
-  end
-
-  def show # TODO: merge show, edit and new
-    current_shop
-  end
-
-  def edit
-    current_shop
   end
 
   def update

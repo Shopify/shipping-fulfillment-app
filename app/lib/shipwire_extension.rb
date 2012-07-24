@@ -4,21 +4,21 @@ module ActiveMerchant
   module Fulfillment
     class ShipwireService < Service
 
-      def fetch_tracking_updates
-        request = buid_tracking_request
+      def fetch_tracking_updates(shipwire_order_id)
+        request = buid_tracking_request(shipwire_order_id)
         data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
 
         response = parse_tacking_updates_response(data)
       end
 
-      def build_tracking_updates_request
+      def build_tracking_updates_request(shipwire_order_id)
         xml = Builder::XmlMarkup.new
         xml.instruct!
         xml.declare! :DOCTYPE, :InventoryStatus, :SYSTEM, SCHEMA_URLS[:inventory]
         xml.tag! 'TrackingUpdate' do
           add_credentials(xml)
           xml.tag! 'Server', test? ? 'Test' : 'Production'
-          xml.tag! 'Bookmark', 3
+          xml.tag! 'OrderNo', shipwire_order_id
         end
       end
 

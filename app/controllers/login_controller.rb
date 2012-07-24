@@ -2,6 +2,7 @@ class LoginController < ApplicationController
   skip_around_filter :shopify_session
   skip_before_filter :shop_exists
 
+  #TODO: make less awkward
   def index
     if params[:shop].present?
       redirect_to authenticate_path(:shop => params[:shop])
@@ -22,7 +23,7 @@ class LoginController < ApplicationController
       session[:shopify] = sess
       session[:shop] = params['shop']
       flash[:notice] = "Logged in"
-      redirect_to :controller => "shops", :action => "new"
+      redirect_to :controller => "shops", :action => "show"
       session[:return_to] = nil
     else
       redirect_to :action => 'index', :alert => "Could not log in to Shopify store."

@@ -15,7 +15,6 @@ class ActiveSupport::TestCase
 
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
     ActiveResource::Base.format = :json
     ShopifyAPI.constants.each do |const|
       begin
