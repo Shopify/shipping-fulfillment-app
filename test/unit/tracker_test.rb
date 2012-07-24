@@ -2,6 +2,7 @@ require 'test_helper'
 
 class TrackerTest < ActiveSupport::TestCase
   should belong_to :fulfillment
+  should validate_presence_of :shipwire_order_id
 
   def setup
     Shop.any_instance.stubs(:setup_webhooks)
@@ -10,16 +11,6 @@ class TrackerTest < ActiveSupport::TestCase
   end
 
   test "valid tracker saves " do
-    tracker = Tracker.new(:fulfillment => @fulfillment)
-
-    assert tracker.save, "Valid tracker did not save."
-    assert tracker.reload.shipwire_order_id.present?
-  end
-
-  test "Presence of shipwire order id is validated" do
-    tracker = Tracker.new(:fulfillment => @fulfillment)
-    tracker.expects(:create_shipwire_order_id)
-
-    assert !tracker.save
+    assert create(:tracker)
   end
 end

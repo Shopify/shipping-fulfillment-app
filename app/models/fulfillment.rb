@@ -1,13 +1,12 @@
 class Fulfillment < ActiveRecord::Base
 
-  attr_accessible :warehouse, :address, :order_id, :email, :shipping_method, :line_items, :status
+  attr_accessible :warehouse, :order_id, :email, :shipping_method, :line_items, :status
   belongs_to :shop
   belongs_to :order
-  has_many :fulfillment_line_items
+  has_many :fulfillment_line_items, :dependent => :delete_all
   has_many :line_items, :through => :fulfillment_line_items
   has_one :tracker, :dependent => :destroy
 
-  serialize :address
 
   validates_presence_of :order_id, :line_items
   validate :legal_shipping_method
@@ -44,36 +43,24 @@ class Fulfillment < ActiveRecord::Base
   private
 
   def self.fulfill_orders(current_shop, order_ids, shipping_method, warehouse, line_item_ids)
-    ids = order_ids.select { |id| current_shop.orders.map(&:id).include? id }
-    ids.each do |id|
+    valid_order_ids = order_ids.select { |id| current_shop.orders.map(&:id).include? id }
+    valid_order_ids.each do |id|
       order = Order.find(id)
       return false unless self.create_fulfillment(current_shop, order, shipping_method, warehouse, line_item_ids)
     end
     true
   end
 
-  def self.build_line_items(order_id, line_item_ids)
-    order_items = Order.find(order_id).line_items.map(&:id)
-    if line_item_ids.empty?
-      fulfillment_items = order_items.select { |item| (LineItem.find(item).fulfillment_service == 'shipwire') }
-    else
-      fulfillment_items = line_item_ids.select { |item| (order_items.include? item) && (LineItem.find(item).fulfillment_service == 'shipwire') }
-    end
-    fulfillment_items.map { |item| LineItem.find(item)}
-  end
-
   def self.create_fulfillment(current_shop, order, shipping_method, warehouse, line_item_ids)
-    line_items = self.build_line_items(order, line_item_ids)
 
     fulfillment = current_shop.fulfillments.new(
       {
         warehouse: warehouse,
-        address: order.shipping_address.attributes,
         order_id: order.id,
         email: order.email,
         shipping_method: shipping_method,
         status: 'pending',
-        line_items: line_items
+        line_items: order.filter_fulfillable_items(line_item_ids)
       })
 
     if fulfillment.save
@@ -109,7 +96,12 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def build_tracker
-    self.tracker = Tracker.new(:fulfillment => self)
+    self.tracker = Tracker.new(:shipwire_order_id => shipwire_order_id)
+  end
+
+  def shipwire_order_id
+    number = SecureRandom.hex(16)
+    shipwire_order_id = "#{order.id}.#{number}"
   end
 
   def update_fulfillment_statuses

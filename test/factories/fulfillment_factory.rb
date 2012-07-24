@@ -4,10 +4,10 @@ FactoryGirl.define do
     shipping_method '1D'
     warehouse "CHI"
     shopify_fulfillment_id 12345
-    address 'some serialized address'
     association :order
     email "david.thomas@shopify.com"
     status "pending"
     association :shop
+    association :tracker
   end
 end

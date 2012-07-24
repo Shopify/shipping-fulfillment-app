@@ -10,6 +10,13 @@ class Order < ActiveRecord::Base
   accepts_nested_attributes_for :shipping_address
   accepts_nested_attributes_for :line_items
 
+  def filter_fulfillable_items(line_item_ids)
+    order_item_ids = self.line_items.map(&:id)
+    line_item_ids = order_item_ids if line_item_ids.empty?
+    valid_ids = line_item_ids.select { |id| (order_item_ids.include? id) && (LineItem.find(id).fulfillable?) }
+    valid_ids.map{ |id| LineItem.find(id) }
+  end
+
   def self.create_order(params,shop)
     options = order_options(params)
     options['shipping_address_attributes'] = get_shipping_attributes(params)

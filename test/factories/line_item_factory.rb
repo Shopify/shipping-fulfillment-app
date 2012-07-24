@@ -15,12 +15,11 @@ FactoryGirl.define do
     variant_title "used ball"
     vendor "Nike"
     name "API NIKE BASKETBALL"
-    order
-    factory :cancelled_item do
-        fulfillment_status "cancelled"
-    end
     factory :fulfilled_item do
         fulfillment_status "fulfilled"
+    end
+    factory :manual_service_item do
+        fulfillment_service "manual"
     end
   end
 end

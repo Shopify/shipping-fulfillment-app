@@ -19,4 +19,14 @@ class OrderTest < ActiveSupport::TestCase
     assert ShippingAddress.where("address1 = ?","7318 Black Swan Place").present?, "Did"
   end
 
+  test "Filter fulfillable line items" do
+    fulfilled_item = create(:fulfilled_item)
+    manual_service_item = create(:manual_service_item)
+    good_item = create(:line_item)
+
+    order = create(:order, :line_items => [manual_service_item, fulfilled_item, good_item])
+
+    assert_equal order.filter_fulfillable_items(order.line_items.map(&:id).push(create(:line_item))), [good_item]
+  end
+
 end

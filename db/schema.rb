@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120723203106) do
+ActiveRecord::Schema.define(:version => 20120723224141) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -21,7 +21,6 @@ ActiveRecord::Schema.define(:version => 20120723203106) do
   end
 
   create_table "fulfillments", :force => true do |t|
-    t.text     "address"
     t.string   "email"
     t.string   "shipping_method"
     t.string   "status"

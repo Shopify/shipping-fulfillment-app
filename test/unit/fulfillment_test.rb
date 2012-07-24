@@ -90,15 +90,14 @@ class FulfillmentTest < ActiveSupport::TestCase
     end
   end
 
-  test "Fulfill does not fulfill line_item if line_item status is fulfilled or cancelled" do
+  test "Fulfill does not fulfill line_item if line_item status is fulfilled" do
     Resque.expects(:enqueue)
-    cancelled_item = create(:cancelled_item)
     fulfilled_item = create(:fulfilled_item)
-    order = create(:order, :line_items => [cancelled_item, fulfilled_item], :shop => @shop)
-    params = {order_ids: [order.id], shipping_method: '1D', warehouse: '00'}
+    another_item = create(:line_item)
+    order = create(:order, :line_items => [fulfilled_item, another_item], :shop => @shop)
+    params = {order_ids: [order.id], line_item_ids: [fulfilled_item.id, another_item.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
-    assert FulfillmentLineItem.where('line_item_id =?', cancelled_item.id).empty?
     assert FulfillmentLineItem.where('line_item_id=?', fulfilled_item.id).empty?
   end
 
