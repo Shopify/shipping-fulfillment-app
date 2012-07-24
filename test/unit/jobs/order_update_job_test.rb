@@ -8,8 +8,8 @@ class OrderCancelJobTest < ActiveSupport::TestCase
   test "Order updates line_item attributes on the order" do
     order = create(:order)
 
-    item1 = {id: order.line_items.first.id, fulfillment_status: 'fulfilled'}
-    item2 = {id: order.line_items.last.id, fulfillment_status: 'fulfilled'}
+    item1 = {id: order.line_items.first.line_item_id, fulfillment_status: 'fulfilled'}
+    item2 = {id: order.line_items.last.line_item_id, fulfillment_status: 'fulfilled'}
 
     OrderUpdateJob.perform([item1,item2])
 

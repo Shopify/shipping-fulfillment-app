@@ -4,6 +4,7 @@ class FulfillmentJobTest < ActiveSupport::TestCase
 
   def setup
     Shop.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:set_domain)
 
     Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
   end
@@ -21,6 +22,7 @@ class FulfillmentJobTest < ActiveSupport::TestCase
 
 
   test "shipwire example api call" do
+
     FakeWeb.allow_net_connect = true
 
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})

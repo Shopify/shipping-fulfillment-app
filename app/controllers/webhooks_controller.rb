@@ -13,10 +13,8 @@ class WebhooksController < ApplicationController
   end
 
   def create
-    puts "here"
     case request['HTTP_X_SHOPIFY_TOPIC']
       when 'orders/create'
-        puts "yay"
         order_created
       when 'orders/updated'
         order_updated

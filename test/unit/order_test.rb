@@ -11,6 +11,7 @@ class OrderTest < ActiveSupport::TestCase
   end
 
   test "Create order makes order with apropriate attributes" do
+    Shop.any_instance.stubs(:setup_webhooks)
     params = load_json('order_create.json')['order']
     assert_difference "Order.count", 1 do
       Order.create_order(params, create(:shop))
