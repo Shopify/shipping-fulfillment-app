@@ -34,6 +34,7 @@ class ActiveSupport::TestCase
     FakeWeb.clean_registry
   end
 
+  # TODO: Get rid of these if not used
   def load_json(filename)
     JSON.parse read_fixture(filename)
   end
