@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   private
 
   def shop_exists
-    redirect_to(login_path) unless Shop.exists?
+    redirect_to(login_path) unless session.has_key?(:shop)
   end
 
   def current_shop
