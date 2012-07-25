@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120723224141) do
+ActiveRecord::Schema.define(:version => 20120725150009) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -30,6 +30,19 @@ ActiveRecord::Schema.define(:version => 20120723224141) do
     t.string   "warehouse"
     t.integer  "order_id"
     t.integer  "shop_id"
+    t.string   "tracking_carrier"
+    t.string   "tracking_link"
+    t.integer  "tracking_number"
+    t.datetime "ship_date"
+    t.datetime "expected_delivery_date"
+    t.datetime "return_date"
+    t.string   "return_condition"
+    t.string   "shipper_name"
+    t.string   "total"
+    t.string   "returned"
+    t.string   "shipped"
+    t.integer  "fulfillment_id"
+    t.string   "shipwire_order_id"
   end
 
   create_table "line_items", :force => true do |t|
@@ -90,24 +103,6 @@ ActiveRecord::Schema.define(:version => 20120723224141) do
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
     t.string   "domain"
-  end
-
-  create_table "trackers", :force => true do |t|
-    t.string   "tracking_carrier"
-    t.string   "tracking_link"
-    t.integer  "tracking_number"
-    t.datetime "ship_date"
-    t.datetime "expected_delivery_date"
-    t.datetime "return_date"
-    t.string   "return_condition"
-    t.string   "shipper_name"
-    t.string   "total"
-    t.string   "returned"
-    t.string   "shipped"
-    t.integer  "fulfillment_id"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-    t.string   "shipwire_order_id"
   end
 
   create_table "variants", :force => true do |t|

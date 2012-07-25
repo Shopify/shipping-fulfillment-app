@@ -4,12 +4,10 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   should belong_to :shop
   should have_many :line_items
-  should have_one :tracker
-  should validate_presence_of :order_id
-  should validate_presence_of :line_items
 
   def setup
     Shop.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:set_domain)
 
     Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
 
@@ -17,11 +15,22 @@ class FulfillmentTest < ActiveSupport::TestCase
     @order = create(:order, :shop_id => @shop.id)
   end
 
-  test "Valid fulfillment saves and creates associated tracker" do
+  test "Valid fulfillment saves" do
     fulfillment = build(:fulfillment, :line_items => [build(:line_item)])
 
     assert fulfillment.save
-    assert fulfillment.reload.tracker.present?
+    assert fulfillment.shipwire_order_id.present?
+  end
+
+  test "Updating fulfillment does not change shipwire_order_id" do
+    fulfillment = build(:fulfillment, :line_items => [build(:line_item)])
+    fulfillment.save
+
+    before = fulfillment.shipwire_order_id
+    fulfillment.update_attribute('expected_delivery_date', DateTime.now)
+    after = fulfillment.reload.shipwire_order_id
+
+    assert_equal before, after
   end
 
   test "Fulfill line item from order" do

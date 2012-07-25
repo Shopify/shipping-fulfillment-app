@@ -1,20 +1,18 @@
 class Fulfillment < ActiveRecord::Base
-
-  attr_accessible :warehouse, :order_id, :email, :shipping_method, :line_items, :status
+  ## TODO: attr_accessible
+  attr_protected
   belongs_to :shop
   belongs_to :order
   has_many :fulfillment_line_items, :dependent => :delete_all
   has_many :line_items, :through => :fulfillment_line_items
-  has_one :tracker, :dependent => :destroy
 
 
-  validates_presence_of :order_id, :line_items
+  validates_presence_of :order_id, :line_items, :shipwire_order_id
   validate :legal_shipping_method
   validate :order_fulfillment_status
-  validates_associated :tracker
 
 
-  before_create :build_tracker
+  before_validation :make_shipwire_order_id
   after_create :create_mirror_fulfillment_on_shopify, :update_fulfillment_statuses
 
   # status: pending, cancelled, success, failure
@@ -95,13 +93,9 @@ class Fulfillment < ActiveRecord::Base
     errors.add(:shipping_method, 'Must be one of the shipwire shipping methods.') unless ['1D', '2D', 'GD', 'FT', 'INTL'].include?(shipping_method)
   end
 
-  def build_tracker
-    self.tracker = Tracker.new(:shipwire_order_id => shipwire_order_id)
-  end
-
-  def shipwire_order_id
+  def make_shipwire_order_id
     number = SecureRandom.hex(16)
-    shipwire_order_id = "#{order.id}.#{number}"
+    self.shipwire_order_id ||= "#{self.order.id}.#{number}"
   end
 
   def update_fulfillment_statuses
