@@ -21,6 +21,7 @@ end
 class OrderCollectorJobTest < ActiveSupport::TestCase
   def setup
     Shop.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:set_domain)
     @shop = create(:shop)
   end
 
