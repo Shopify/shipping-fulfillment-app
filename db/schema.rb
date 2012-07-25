@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120725150009) do
+ActiveRecord::Schema.define(:version => 20120725203757) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -106,13 +106,23 @@ ActiveRecord::Schema.define(:version => 20120725150009) do
   end
 
   create_table "variants", :force => true do |t|
-    t.integer  "variant_id"
-    t.integer  "inventory"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.boolean  "activated"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
     t.string   "sku"
     t.integer  "shop_id"
+    t.integer  "shopify_variant_id"
+    t.string   "quantity"
+    t.string   "backordered"
+    t.string   "reserved"
+    t.string   "shipping"
+    t.string   "shipped"
+    t.string   "availableDate"
+    t.string   "shippedLastDay"
+    t.string   "shippedLastWeek"
+    t.string   "shippedLast4Weeks"
+    t.string   "orderedLastDay"
+    t.string   "orderedLastWeek"
+    t.string   "orderedLast4Weeks"
   end
 
 end

@@ -4,11 +4,8 @@ require 'test_helper'
 
 class VariantTest < ActiveSupport::TestCase
 
-#   should validate_uniqueness_of(:variant_id)
-
-#   should validate_presence_of(:setting_id)
-#   should validate_presence_of(:activated)
-#   should validate_presence_of(:sku)
+  should validate_presence_of(:shopify_variant_id)
+  should validate_presence_of(:sku)
 
 #   should validate_numericality_of(:inventory)
 

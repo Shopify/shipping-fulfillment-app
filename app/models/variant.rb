@@ -1,36 +1,30 @@
 class Variant < ActiveRecord::Base
   # TODO: delegate method calls to the shopify variant in some cases
   attr_protected
+  #attr_accessible :quantity, :backordered, :reserved, :shipping, :shipped, :availableDate, :shippedLastDay, :shippedLastWeek, :shippedLast4Weeks, :orderedLastDay, :orderedLastWeek, :orderedLast4Weeks
 
   belongs_to :shop
 
-  validates_presence_of :activated, :sku
-  validates_numericality_of :inventory, :greater_than_or_equal_to => 0
-  validates :variant_id, :presence => true, :uniqueness => true
+  after_create :fetch_quantity
 
-  validate :good_sku?
-
-
-  def fetch_stock_levels
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
-    response = shipwire.fetch_stock_levels(:sku => sku)
-
-    self.inventory = response.stock_levels[sku]
-    self.save
-
-    shopify_variant = ShopifyAPI::Variant.find(variant_id)
-    shopify_variant.inventory_quantity = inventory
-    shopify_variant.save
-  end
+  validates_presence_of :sku
+  validates :shopify_variant_id, :presence => true, :uniqueness => true
 
 
   private
 
-#use conditional validations
+#TODO: decide sku checking
 
   def good_sku?
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
     shipwire.fetch_stock_levels(:sku => sku).stock_levels[sku].present? ## clean up this line
   end
 
+  def update_shopify_variant
+    Resque.enqueue(ShopifyVariantUpdateJob, shopify_order_id, quantity)
+  end
+
+  def fetch_quantity
+    Resque.enqueue(FetchVariantQuantityJob, variant)
+  end
 end

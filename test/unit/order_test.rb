@@ -17,9 +17,11 @@ class OrderTest < ActiveSupport::TestCase
 
   test "Create order makes order with apropriate attributes" do
     params = load_json('order_create.json')['order']
+
     assert_difference "Order.count", 1 do
       Order.create_order(params, create(:shop))
     end
+
     assert LineItem.where("sku = ?","909090").present?
     assert ShippingAddress.where("address1 = ?","7318 Black Swan Place").present?, "Did"
   end
@@ -31,7 +33,7 @@ class OrderTest < ActiveSupport::TestCase
     other_orders_item = create(:line_item)
 
     order = create(:order, :line_items => [manual_service_item, fulfilled_item, good_item])
-    mixed_items = order.line_items.map(&:id).push(other_orders_item)
+    mixed_items = order.line_items.map(&:id).push(other_orders_item.id)
     good_items = order.filter_fulfillable_items(mixed_items)
 
     assert_equal good_items, [good_item]

@@ -3,7 +3,7 @@ class VariantsController < ApplicationController
     @products = ShopifyAPI::Product.all
   end
 
-  def show 
+  def show
      @product_title = params[:product_title]
      @variant = ShopifyAPI::Variant.find(params[:id])
   end
@@ -18,7 +18,7 @@ class VariantsController < ApplicationController
   ## need to push most of this to helpes and model, conditional validators
   def update
     shopify_variant = ShopifyAPI::Variant.find(params[:id])
-    begin 
+    begin
       if Variant.where('variant_id = ?', shopify_variant.id).present?
         variant = Variant.where('variant_id = ?', shopify_variant.id).first
         variant.activated = true unless params[:inventory_management] != 'shipwire'
@@ -48,7 +48,7 @@ class VariantsController < ApplicationController
   end
 
 
-  private 
+  private
 
   # TODO: remove this
   def get_inventory_services(variant_service)

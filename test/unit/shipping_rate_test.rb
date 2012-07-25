@@ -35,7 +35,7 @@ class ShippingRateTest < ActiveSupport::TestCase
       delivery_date: DateTime.parse("Wed, 01 Aug 2012 00:00:00 +0000"),
       delivery_range: [DateTime.parse("Thu, 26 Jul 2012 00:00:00 +0000"), DateTime.parse("Wed, 01 Aug 2012 00:00:00 +0000")]
     }
-    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order.shipping_address), 'UPS', 'UPS Second Day Air',options)
+    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order.shipping_address), 'UPS', 'UPS Second Day Air', options)
     ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
 
     rates = ShippingRates.find_order_rates(@shop, @order.id)
