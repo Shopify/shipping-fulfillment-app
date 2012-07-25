@@ -4,6 +4,7 @@ module ActiveMerchant
   module Fulfillment
     class ShipwireService < Service
 
+      # TODO: remove if not using
       def fetch_tracking_updates
         request = buid_tracking_updates_request
         data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
@@ -18,6 +19,7 @@ module ActiveMerchant
         response = parse_tracking_updates_response(data)
       end
 
+      # TODO: remove if not using
       def build_tracking_updates_request
         xml = Builder::XmlMarkup.new
         xml.instruct!
