@@ -4,27 +4,16 @@ require 'test_helper'
 
 class VariantTest < ActiveSupport::TestCase
 
+
+  should belong_to(:shop)
   should validate_presence_of(:shopify_variant_id)
   should validate_presence_of(:sku)
 
-#   should validate_numericality_of(:inventory)
+  def setup
+    Variant.any_instance.stubs(:fetch_quantity)
+  end
 
-#   should belong_to(:shop)
-
-#   def setup
-#     Variant.any_instance.stubs(:good_sku?).returns(true)
-#     Variant.any_instance.stubs(:fetch_stock_levels).returns(true)
-#   end
-
-#   test "valid variant saves" do
-#     good = Variant.new(setting_id: 2, variant_id: 11, inventory: 15, activated:true, sku:"4E2-9552")
-#     assert good.save
-#   end
-
-#   test "inventory must be non-negative number" do
-#     synced_variant = Variant.new(setting_id: 3, variant_id: 12, inventory: -1, activated:true, sku:"4E2-9552")
-#     assert !synced_variant.save
-#   end
-
-#   #how to test good_sku?????? Mock all the things!
+  test "valid variant saves" do
+    assert create(:variant)
+  end
 end
