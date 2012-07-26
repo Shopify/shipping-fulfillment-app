@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   end
 
   def current_shop
-    @shop ||= Shop.where('domain = ?', ShopifyAPI::Shop.current.myshopify_domain).first
+    @shop ||= Shop.where('domain = ?', session[:shop]).first
   end
 
   helper_method :current_shop

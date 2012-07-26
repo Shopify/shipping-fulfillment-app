@@ -3,23 +3,23 @@ class ShopsController < ApplicationController
 
   # need to merge new and edit view into show view
   def show
-    @shop = current_shop #might be empty array
+    current_shop.present? ? @shop = current_shop : @shop = Shop.new
   end
 
   def create
-    @shop = Shop.new(params[:shop].merge({token: session[:shopify].token}))
+    @shop = Shop.new(params[:shop].merge({token: session[:shopify].token, domain: session[:shop]}))
     if @shop.save
-      redirect_to @shop, :notice => "Your settings have been saved."
+      redirect_to shop_path, :notice => "Your settings have been saved."
     else
-      render action:"new", :alert => "Invalid settings, was not able to save."
+      redirect_to shop_path, :alert => "Invalid settings, was not able to save."
     end
   end
 
   def update
     if current_shop.update_attributes(params[:shop])
-      redirect_to '/shops', :notice => "Your settings have been updated."
+      redirect_to shop_path, :notice => "Your settings have been updated."
     else
-      redirect_to '/shops', :alert => "Could not successfully update!"
+      redirect_to shop_path, :alert => "Could not successfully update!"
     end
   end
 

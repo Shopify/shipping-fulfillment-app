@@ -12,7 +12,6 @@
             <th class="sortcol">Fulfill!</th>
             <% end %>
             <th class="sortcol">Order</th>
-            <th class="sortcol">Placed by</th>
             <th class="sortcol">Date</th>
             <th class="sortcol">Paid</th>
             <th class="sortcol">Fulfillment</th>
@@ -29,7 +28,6 @@
             <% end %>
           <% end %>
           <td><%= link_to order.name, "/orders/"+order.id.to_s %></td>
-          <td><%= order.billing_address.name %></td>
           <td><%= time_ago_in_words order.created_at.to_s %> ago</td>
           <td>
             <span class="label  <% if order.financial_status  == 'paid' %>label-success<% end %> <% if order.financial_status  == 'refunded' %>label-important<% end %>"><%= order.financial_status %>
@@ -71,7 +69,7 @@
   <div class="span9 offset1">
     <div class="pagination">
       <!-- Stylize with twitter pagination at some point !-->
-      <%= will_paginate @orders, :container => false %>
+      <%= will_paginate @orders %>
     </div>
   </div>
 <% end %>

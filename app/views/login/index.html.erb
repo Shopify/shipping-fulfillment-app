@@ -4,7 +4,7 @@
 </div>
 
 <div style="width:340px; margin:0 auto;">
-  <%= form_tag '/login/authenticate', :class => 'form-search' do %>
+  <%= form_tag login_path, :class => 'form-search' do %>
     <%= text_field_tag 'shop', nil, :placeholder => 'Shop URL', :class => 'btn-large' %>
     <%= submit_tag 'Install', :class => 'btn btn-primary btn-large' %>
   <% end %>
@@ -12,10 +12,4 @@
 
 <p align="center" style="margin-top:30px">
   <%= image_tag '../assets/shopify.png' %>
-</p>
-
-<br/>
-
-<p align="center" class="muted">
-  Don't have a shop? <a href="https://app.shopify.com/services/partners/api_clients/test_shops">Create a Test Shop</a>
 </p>

@@ -1,5 +1,5 @@
 ShipwireApp::Application.routes.draw do
-  resource :shops #, :except => [:index, :destroy]
+  resource :shop #, :except => [:index, :destroy]
 
   resources :variants do
     member do
