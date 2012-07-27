@@ -6,7 +6,7 @@ class FetchVariantQuantityJobTest < ActiveSupport::TestCase
     Shop.any_instance.stubs(:setup_webhooks)
     Shop.any_instance.stubs(:set_domain)
     Variant.any_instance.stubs(:fetch_quantity)
-
+    Variant.any_instance.stubs(:update_shopify_variant)
     @shop = create(:shop)
     @variant = create(:variant, shop: @shop)
   end

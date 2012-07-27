@@ -12,13 +12,14 @@ class Variant < ActiveRecord::Base
 
   def self.good_sku?(shop,sku)
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
-    !shipwire.fetch_stock_levels(:sku => variant.sku).stock_levels[variant.sku].nil?
+    !shipwire.fetch_stock_levels(:sku => sku).stock_levels[sku].nil?
   end
 
   def update_shopify_variant
     Resque.enqueue(ShopifyVariantUpdateJob, shopify_order_id, quantity)
   end
 
+  private
   def fetch_quantity
     Resque.enqueue(FetchVariantQuantityJob, self)
     #will destroy variant if bad sku

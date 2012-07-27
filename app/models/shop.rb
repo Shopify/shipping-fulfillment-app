@@ -33,7 +33,7 @@ class Shop < ActiveRecord::Base
     hooks = {
       'orders/paid' => 'orderpaid',
       'orders/cancelled' => 'ordercancelled',
-      'orders/created' => 'ordercreate',
+      'orders/create' => 'ordercreate',
       'orders/updated' => 'orderupdated',
       'orders/fulfilled' => 'orderfulfilled'
     }

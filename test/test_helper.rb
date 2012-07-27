@@ -15,25 +15,14 @@ class ActiveSupport::TestCase
 
 
   def setup
-    ActiveResource::Base.format = :json
-    ShopifyAPI.constants.each do |const|
-      begin
-        const = "ShopifyAPI::#{const}".constantize
-        const.format = :json if const.respond_to?(:format=)
-      rescue NameError
-      end
-    end
-
-    ShopifyAPI::Base.site = "http://localhost:3000/admin"
-    ShopifyAPI::Base.password = nil
-    ShopifyAPI::Base.user = nil
+    stub_shop_callbacks
+    @shop = create(:shop)
   end
 
   def teardown
     FakeWeb.clean_registry
   end
 
-  # TODO: Get rid of these if not used
   def load_json(filename)
     JSON.parse read_fixture(filename)
   end
@@ -53,15 +42,25 @@ class ActiveSupport::TestCase
     FakeWeb.register_uri(method, url, {:body => body, :status => 200, :content_type => "text/#{format}", :content_length => 1}.merge(options))
   end
 
-end
-
-
-class ActionDispatch::IntegrationTest
-  include Capybara::DSL
-
-
-  def teardown
-    Capybara.reset_sessions!
-    Capybara.use_default_driver
+  def stub_shop_callbacks
+    Shop.any_instance.stubs(:setup_webhooks)
+    Shop.any_instance.stubs(:set_domain)
   end
+
+  def stub_variant_callbacks
+    Variant.any_instance.stubs(:fetch_quantity)
+  end
+
+
 end
+
+## No integration tests yet
+# class ActionDispatch::IntegrationTest
+#   include Capybara::DSL
+
+
+#   def teardown
+#     Capybara.reset_sessions!
+#     Capybara.use_default_driver
+#   end
+# end

@@ -7,8 +7,7 @@ class OrderTest < ActiveSupport::TestCase
   should have_one :shipping_address
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
+    super
   end
 
   test "Valid order saves" do
