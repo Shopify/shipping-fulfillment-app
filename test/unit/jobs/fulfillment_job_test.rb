@@ -3,10 +3,8 @@ require 'test_helper'
 class FulfillmentJobTest < ActiveSupport::TestCase
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-
-    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+    super
+    stub_fulfillment_callbacks
   end
 
   test "fulfillment job makes the shipwire api call" do

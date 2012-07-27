@@ -22,20 +22,20 @@ class OrderTest < ActiveSupport::TestCase
     end
 
     assert LineItem.where("sku = ?","909090").present?
-    assert ShippingAddress.where("address1 = ?","7318 Black Swan Place").present?, "Did"
+    assert ShippingAddress.where("address1 = ?","7318 Black Swan Place").present?
   end
 
   test "Filter fulfillable line items" do
-    fulfilled_item = create(:fulfilled_item)
-    manual_service_item = create(:manual_service_item)
-    good_item = create(:line_item)
-    other_orders_item = create(:line_item)
+    fulfilled = create(:fulfilled_item)
+    manual = create(:manual_service_item)
+    good = create(:line_item)
+    other = create(:line_item)
+    order = create(:order, :line_items => [manual, fulfilled, good])
 
-    order = create(:order, :line_items => [manual_service_item, fulfilled_item, good_item])
-    mixed_items = order.line_items.map(&:id).push(other_orders_item.id)
-    good_items = order.filter_fulfillable_items(mixed_items)
+    mixed = order.line_items.map(&:id).push(other.id)
+    fulfillable = order.filter_fulfillable_items(mixed)
 
-    assert_equal good_items, [good_item]
+    assert_equal fulfillable, [good]
   end
 
 end

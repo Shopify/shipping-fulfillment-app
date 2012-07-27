@@ -11,5 +11,4 @@ class OrderCancelJobTest < ActiveSupport::TestCase
     assert_equal order.reload.cancelled_at, time
     assert_equal order.reload.cancel_reason, reason
   end
-
 end

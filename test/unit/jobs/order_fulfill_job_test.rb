@@ -2,7 +2,7 @@ require 'test_helper'
 
 class OrderFulfillTest < ActiveSupport::TestCase
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
+    super
     @order = create(:order)
   end
 

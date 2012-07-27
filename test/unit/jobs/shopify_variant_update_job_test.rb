@@ -2,8 +2,7 @@ require 'test_helper'
 
 class ShopifyVariantUpdateJobTest < ActiveSupport::TestCase
   def setup
-    Variant.any_instance.stubs(:fetch_quantity)
-
+    stub_variant_callbacks
     @variant = create(:variant)
   end
 

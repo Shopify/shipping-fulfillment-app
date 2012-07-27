@@ -3,9 +3,7 @@ require 'test_helper'
 class OrderCreateJobTest < ActiveSupport::TestCase
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    @shop = create(:shop)
+    super
   end
 
   test "Perform creates new order" do

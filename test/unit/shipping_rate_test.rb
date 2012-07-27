@@ -3,10 +3,7 @@ require 'test_helper'
 
 class ShippingRateTest < ActiveSupport::TestCase
   def setup
-    Shop.any_instance.expects(:setup_webhooks)
-    Shop.any_instance.expects(:set_domain)
-
-    @shop = create(:shop)
+    super
     @order = create(:order, shop: @shop)
   end
 

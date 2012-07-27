@@ -1,28 +1,8 @@
 require 'test_helper'
 
-class Hash
-  def attributes
-    return self
-  end
-
-  def id
-    return self['id']
-  end
-
-  def shipping_address
-    return self['shipping_address']
-  end
-
-  def line_items
-    return self['line_items']
-  end
-end
-
 class OrderCollectorJobTest < ActiveSupport::TestCase
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    @shop = create(:shop)
+    super
   end
 
   test "Perform makes api call" do
@@ -42,3 +22,20 @@ class OrderCollectorJobTest < ActiveSupport::TestCase
   end
 end
 
+class Hash
+  def attributes
+    return self
+  end
+
+  def id
+    return self['id']
+  end
+
+  def shipping_address
+    return self['shipping_address']
+  end
+
+  def line_items
+    return self['line_items']
+  end
+end

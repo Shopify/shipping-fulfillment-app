@@ -51,7 +51,9 @@ class ActiveSupport::TestCase
     Variant.any_instance.stubs(:fetch_quantity)
   end
 
-
+  def stub_fulfillment_callbacks
+    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+  end
 end
 
 ## No integration tests yet

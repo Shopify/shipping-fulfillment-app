@@ -2,7 +2,7 @@ require 'test_helper'
 
 class OrderCancelJobTest < ActiveSupport::TestCase
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
+    super
   end
 
   test "Order updates line_item attributes on the order" do

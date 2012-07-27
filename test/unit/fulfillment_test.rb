@@ -6,12 +6,8 @@ class FulfillmentTest < ActiveSupport::TestCase
   should have_many :line_items
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-
-    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
-
-    @shop = build(:shop)
+    super
+    stub_fulfillment_callbacks
     @order = create(:order, :shop_id => @shop.id)
   end
 

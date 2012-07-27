@@ -3,11 +3,8 @@ require 'test_helper'
 class FetchVariantQuantityJobTest < ActiveSupport::TestCase
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    Variant.any_instance.stubs(:fetch_quantity)
-    Variant.any_instance.stubs(:update_shopify_variant)
-    @shop = create(:shop)
+    super
+    stub_variant_callbacks
     @variant = create(:variant, shop: @shop)
   end
 

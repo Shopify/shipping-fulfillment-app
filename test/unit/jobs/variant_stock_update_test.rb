@@ -3,12 +3,9 @@ require 'test_helper'
 class VariantStockUpdateJobTest < ActiveSupport::TestCase
 
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
+    super
+    stub_variant_callbacks
 
-    Variant.any_instance.stubs(:fetch_quantity)
-
-    @shop = create(:shop)
     @variant1 = create(:variant, shop: @shop)
     @variant2 = create(:variant, shop: @shop)
 

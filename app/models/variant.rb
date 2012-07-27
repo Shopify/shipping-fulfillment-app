@@ -22,6 +22,6 @@ class Variant < ActiveRecord::Base
   private
   def fetch_quantity
     Resque.enqueue(FetchVariantQuantityJob, self)
-    #will destroy variant if bad sku
+    #destroys variant if bad sku
   end
 end

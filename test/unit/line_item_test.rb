@@ -12,11 +12,11 @@ class LineItemTest < ActiveSupport::TestCase
     assert create(:line_item), "Valid item did not save."
   end
 
-  test "Fulfillable" do
-    fulfilled_item = create(:fulfilled_item)
-    manual_service_item = create(:manual_service_item)
+  test "Items that are fulfilled or have other fulfillment service are not fulfillable" do
+    fulfilled = create(:fulfilled_item)
+    manual = create(:manual_service_item)
 
-    assert !fulfilled_item.fulfillable?
-    assert !manual_service_item.fulfillable?
+    assert !fulfilled.fulfillable?
+    assert !manual.fulfillable?
   end
 end
