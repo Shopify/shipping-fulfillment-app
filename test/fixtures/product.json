@@ -1,0 +1,67 @@
+{
+  "product": {
+    "body_html": "\u003Cp\u003E\u0026nbsp;Used \u003Cfont color=\"#ff9900\"\u003Enike\u003C/font\u003E \u003Cfont color=\"#ff9900\"\u003Ebasketball\u003C/font\u003E. At the moment it is kind of flat, but will be in fair playing condition once pumped.\u003C/p\u003E\r\n",
+    "created_at": "2012-06-04T10:21:27-04:00",
+    "handle": "nike-basketball",
+    "id": 93464918,
+    "product_type": "Sports Equipment",
+    "published_at": "2012-06-04T10:21:27-04:00",
+    "template_suffix": null,
+    "title": "API NIKE BASKETBALL",
+    "updated_at": "2012-07-05T16:00:31-04:00",
+    "vendor": "Nike",
+    "tags": "Basketball",
+    "variants": [{
+      "compare_at_price": null,
+      "created_at": "2012-06-04T10:21:27-04:00",
+      "fulfillment_service": "manual",
+      "grams": 0,
+      "id": 218594758,
+      "inventory_management": "",
+      "inventory_policy": "deny",
+      "option1": "Default Title",
+      "option2": null,
+      "option3": null,
+      "position": 1,
+      "price": "8.00",
+      "product_id": 93464918,
+      "requires_shipping": true,
+      "sku": "77777777",
+      "taxable": true,
+      "title": "Default Title",
+      "updated_at": "2012-06-29T11:04:55-04:00",
+      "inventory_quantity": 1
+    }, {
+      "compare_at_price": null,
+      "created_at": "2012-07-05T12:50:48-04:00",
+      "fulfillment_service": "manual",
+      "grams": 0,
+      "id": 224585106,
+      "inventory_management": "",
+      "inventory_policy": "deny",
+      "option1": "Deluxe Basketball",
+      "option2": null,
+      "option3": null,
+      "position": 2,
+      "price": "8.00",
+      "product_id": 93464918,
+      "requires_shipping": true,
+      "sku": "gagaee",
+      "taxable": true,
+      "title": "Deluxe Basketball",
+      "updated_at": "2012-07-05T12:50:48-04:00",
+      "inventory_quantity": 1
+    }],
+    "images": [{
+      "created_at": "2012-06-04T10:21:27-04:00",
+      "id": 186930144,
+      "position": 1,
+      "product_id": 93464918,
+      "updated_at": "2012-06-04T10:21:27-04:00",
+      "src": "http://cdn.shopify.com/s/files/1/0162/0490/products/nikebasketball.jpg?471"
+    }],
+    "options": [{
+      "name": "Title"
+    }]
+  }
+}

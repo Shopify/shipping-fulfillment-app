@@ -42,10 +42,6 @@ class ActiveSupport::TestCase
     File.read(Rails.root.join('test/fixtures', filename))
   end
 
-  def load_fixture(name, format=:json)
-    File.read(File.dirname(__FILE__) + "/fixtures/#{name}.#{format}")
-  end
-
   def fake(endpoint, options={})
     body = options.has_key?(:body) ? options.delete(:body) : nil
     format = options.delete(:format) || :json

@@ -1,6 +1,6 @@
 class Variant < ActiveRecord::Base
   # TODO: delegate method calls to the shopify variant in some cases
-  attr_accessible :quantity, :backordered, :reserved, :shipping, :shipped, :availableDate, :shippedLastDay, :shippedLastWeek, :shippedLast4Weeks, :orderedLastDay, :orderedLastWeek, :orderedLast4Weeks
+  attr_accessible :shopify_variant_id, :sku, :quantity, :backordered, :reserved, :shipping, :shipped, :availableDate, :shippedLastDay, :shippedLastWeek, :shippedLast4Weeks, :orderedLastDay, :orderedLastWeek, :orderedLast4Weeks
 
   belongs_to :shop
 
@@ -10,18 +10,17 @@ class Variant < ActiveRecord::Base
   validates :shopify_variant_id, :presence => true, :uniqueness => true
 
 
-  def self.good_sku?
-
+  def self.good_sku?(shop,sku)
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
+    !shipwire.fetch_stock_levels(:sku => variant.sku).stock_levels[variant.sku].nil?
   end
-  
-  private
 
   def update_shopify_variant
     Resque.enqueue(ShopifyVariantUpdateJob, shopify_order_id, quantity)
   end
 
   def fetch_quantity
-    Resque.enqueue(FetchVariantQuantityJob, variant)
+    Resque.enqueue(FetchVariantQuantityJob, self)
     #will destroy variant if bad sku
   end
 end

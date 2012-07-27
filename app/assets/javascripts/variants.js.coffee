@@ -3,5 +3,5 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 $(document).ready ->
-  $("inventory_item").click ->
+  $(".inventory_item").click ->
     $.get('/variants/:id')

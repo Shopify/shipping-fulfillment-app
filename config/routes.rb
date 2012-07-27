@@ -43,7 +43,6 @@ ShipwireApp::Application.routes.draw do
 
   match 'login/logout'       => 'login#logout',       :as => :logout
 
-  match 'variants/sync'     => 'variants#sync'
 
   root :to                   => 'login#index'
 
