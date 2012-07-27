@@ -49,6 +49,7 @@ class ActiveSupport::TestCase
 
   def stub_variant_callbacks
     Variant.any_instance.stubs(:fetch_quantity)
+    Variant.any_instance.stubs(:update_shopify_variant)
   end
 
   def stub_fulfillment_callbacks
