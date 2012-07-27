@@ -25,13 +25,13 @@
         <td><%= variant.sku %></td>
         <td><%= variant.inventory_quantity %></td>
         <td><%= variant.inventory_management %></td>
-        <td><%= link_to 'edit', {:controller => 'variants', :action => 'edit', :id => variant.id, :product_title => product.title} %></td>
-      </tr> 
+        <td><%= link_to 'view', {:controller => 'variants', :action => 'show', :id => variant.id, :product_title => product.title} %></td>
+      </tr>
       <% end %>
     <% end %>
 </table>
 <br />
-</div> 
+</div>
 
 <div class="span9 offset1">
 <hr>

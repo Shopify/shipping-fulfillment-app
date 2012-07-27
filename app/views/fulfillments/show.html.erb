@@ -1,7 +1,5 @@
-<% track = @fulfillment.tracker %>
-
 <div class="span9 offset1">
-    <h2>Fulfillment: <%= track.shipwire_order_id %></h2>
+    <h2>Fulfillment: <%= @fulfillment.shipwire_order_id %></h2>
     <hr>
 
     <h3>Line Items</h3>
@@ -21,10 +19,10 @@
             <th class="sortcol">Ship Date</th>
             <th class="sortcol">Expected Delivery Date</th>
             <th class="sortcol">Tracking Carrier</th>
-            <th class="sortcol">Tracking Link</th>      
+            <th class="sortcol">Tracking Link</th>
             <th class="sortcol">Tracking Number</th>
             <th class="sortcol">Total</th>
-            <% if track.returned == "YES" %>
+            <% if @fulfillment.returned == "YES" %>
             <th class="sortcol">Returned</th>
             <th class="sortcol">Return Date</th>
             <th class="sortcol">Return Condition</th>
@@ -32,18 +30,18 @@
           </tr>
         </thead>
         <tbody>
-            <td><%= track.shipwire_order_id %></td>
-            <td><%= track.shipper_name %></td>
-            <td><%= track.ship_date %></td>
-            <td><%= track.expected_delivery_date%></td>
-            <td><%= track.tracking_carrier %></td>
-            <td><%= link_to "Tracking Link", track.tracking_link %></td>
-            <td><%= track.tracking_number %></td>
-            <td><%= track.total %></td>
-            <% if track.returned == "YES" %>
-            <td><%= track.returned %></td>
-            <td><%= track.return_date %></td>
-            <td><%= track.return_condition %></td>
+            <td><%= @fulfillment.shipwire_order_id %></td>
+            <td><%= @fulfillment.shipper_name %></td>
+            <td><%= @fulfillment.ship_date %></td>
+            <td><%= @fulfillment.expected_delivery_date%></td>
+            <td><%= @fulfillment.tracking_carrier %></td>
+            <td><%= link_to "Tracking Link", @fulfillment.tracking_link %></td>
+            <td><%= @fulfillment.tracking_number %></td>
+            <td><%= @fulfillment.total %></td>
+            <% if @fulfillment.returned == "YES" %>
+            <td><%= @fulfillment.returned %></td>
+            <td><%= @fulfillment.return_date %></td>
+            <td><%= @fulfillment.return_condition %></td>
             <% end %>
         </tbody>
     </table>

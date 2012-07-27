@@ -2,7 +2,7 @@
 <h2>Credentials</h2>
 
   <% if @shop.new_record? %>
-      <%= form_for current_shop, :url => {:action => "update"} do |f| %>
+      <%= form_for @shop, :url => {:action => "create"}, id: 'shop_form' do |f| %>
         <div class="field">
           <%= f.label :login %>
           <%= f.text_field :login %>
@@ -23,13 +23,14 @@
 
   <% else %>
 
-    <%= form_tag(controller: 'shops', action: 'update', method: 'put') %>
+    <%= form_tag(controller: 'shops', action: 'update', method: 'put', class: 'shop_update_form') do %>
         <ul>
-          <li>Shipwire Login: <input value="<%= @shop.login %>" />
+          <li>Shipwire Login: <input value="<%= @shop.login %>" /></li>
           <li>Shipwire Password: <input value="<%= @shop.password %>" /></li>
           <li>Automatic Fulfillment: <input value="<%= @shop.automatic_fulfillment %>" /></li>
         </ul>
 
         <%= submit_tag('Update' , :class => 'btn btn-primary') %>
+    <% end %>
   <% end %>
 </div>

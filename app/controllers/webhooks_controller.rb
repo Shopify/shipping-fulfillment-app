@@ -5,15 +5,12 @@ class WebhooksController < ApplicationController
   skip_around_filter :shopify_session
 
   before_filter :verify_shopify_webhook
-  before_filter :sanitized_order_webhook_params
   before_filter :find_or_create_order
 
-  rescue_from Exception do
-    head :ok
-  end
+  rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
 
   def create
-    case request['HTTP_X_SHOPIFY_TOPIC']
+    case request.headers['HTTP_X_SHOPIFY_TOPIC']
       when 'orders/create'
         order_created
       when 'orders/updated'
@@ -31,7 +28,7 @@ class WebhooksController < ApplicationController
   private
 
   def order_created
-    Resque.enqueue(OrderCreateJob, params, @shop)
+    Resque.enqueue(OrderCreateJob, sanitized_params, @shop)
   end
 
   def order_updated
@@ -47,17 +44,17 @@ class WebhooksController < ApplicationController
   end
 
   def order_paid
-    if @order.shop.automatically_fulfill
+    if @order.shop.automatically_fulfill?
       Resque.enqueue(OrderPaidJob, @order, params['shipping_lines'])
     end
-    @order.update_attribute(:financial_status, "paid")
+    @order.update_attribute(:financial_status, 'paid')
   end
 
 
   def find_or_create_order
-    @shop = Shop.where("domain = ?",request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN'])
-    if request.headers['HTTP_X_SHOPIFY_TOPIC'] != 'orders/create' && @shop.orders.where('shopify_order_id = ?', params['id']).blank?
-      create_order
+    @shop = Shop.where("domain = ?",request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']).first
+    if @shop.orders.where('shopify_order_id = ?', params['id']).blank?
+      request.headers['HTTP_X_SHOPIFY_TOPIC'] = 'orders/create'
     else
       @order = @shop.orders.where('shopify_order_id = ?', params['id']).first
     end
@@ -75,7 +72,7 @@ class WebhooksController < ApplicationController
     request.body.rewind
   end
 
-  def sanitized_order_webhook_params
+  def sanitized_params
     params.except(:action, :controller) # json webhook data does not have root node
   end
 end

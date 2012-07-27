@@ -10,6 +10,10 @@ class Variant < ActiveRecord::Base
   validates :shopify_variant_id, :presence => true, :uniqueness => true
 
 
+  def self.good_sku?
+
+  end
+  
   private
 
   def update_shopify_variant

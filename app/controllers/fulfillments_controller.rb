@@ -1,11 +1,11 @@
 class FulfillmentsController < ApplicationController
 
   def index
-    @fulfillments = Fulfillment.all
+    @fulfillments = current_shop.fulfillments.all
   end
 
   def show
-    @fulfillment = Fulfillment.find(params[:id])
+    @fulfillment = current_shop.fulfillments.find(params[:id])
   end
 
 

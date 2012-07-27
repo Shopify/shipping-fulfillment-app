@@ -27,7 +27,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     fulfillment.save
 
     before = fulfillment.shipwire_order_id
-    fulfillment.update_attribute('expected_delivery_date', DateTime.now)
+    fulfillment.update_attribute(:expected_delivery_date, DateTime.now)
     after = fulfillment.reload.shipwire_order_id
 
     assert_equal before, after

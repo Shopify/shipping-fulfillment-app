@@ -2,16 +2,16 @@ class OrdersController < ApplicationController
 
   PER_PAGE = 10
 
-  before_filter :get_page, :except => [:shipping_rates]
+  before_filter :get_page, {except: [:shipping_rates]}
 
   def index
-    @orders = current_shop.orders.paginate(:page => @page, :per_page => PER_PAGE)
+    @orders = current_shop.orders.paginate({page: @page, per_page: PER_PAGE})
   end
 
 
   def show
-    @order = current_shop.orders.where()
-    @line_items = @order.line_items.paginate(:page => @page, :per_page => PER_PAGE)
+    @order = current_shop.orders.find(params[:id])
+    @line_items = @order.line_items.paginate({page: @page, per_page: PER_PAGE})
   end
 
 

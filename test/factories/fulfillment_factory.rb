@@ -18,7 +18,7 @@ FactoryGirl.define do
     return_condition "GOOD"
     shipper_name "USPS First-Class Mail Parcel + Delivery Confirmation"
     total "4.47"
-    returned "YES"
+    returned "NO"
     shipped "YES"
   end
 end

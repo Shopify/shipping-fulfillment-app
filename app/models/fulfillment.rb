@@ -76,12 +76,12 @@ class Fulfillment < ActiveRecord::Base
       line_items: line_items.map(&:line_item_id)
     )
 
-    self.update_attribute('shopify_fulfillment_id',fulfillment.id)
+    self.update_attribute(:shopify_fulfillment_id,fulfillment.id)
   end
 
   def update_fulfillment_status_on_shopify
     fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id)
-    fulfillment.update_attribute('status',"#{status}") if [:success, :cancelled, :record_failure].include?(status)
+    fulfillment.update_attribute(:status,"#{status}") if [:success, :cancelled, :record_failure].include?(status)
   end
 
   def order_fulfillment_status
@@ -99,7 +99,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def update_fulfillment_statuses
-    line_items.each { |item| item.update_attribute('fulfillment_status', 'fulfilled')}
-    order.update_attribute('fulfillment_status','fulfilled') if Order.find(order.id).line_items.all?{ |item| item.fulfillment_status == 'fulfilled'}
+    line_items.each { |item| item.update_attribute(:fulfillment_status, 'fulfilled')}
+    order.update_attribute(:fulfillment_status,'fulfilled') if Order.find(order.id).line_items.all?{ |item| item.fulfillment_status == 'fulfilled'}
   end
 end
