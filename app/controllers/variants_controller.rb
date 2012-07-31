@@ -9,19 +9,20 @@ class VariantsController < ApplicationController
   end
 
   def create
-    if !Variant.good_sku?(current_shop, params[:sku])
-      redirect_to(variants_path, alert: "The sku is not recognized by Shipwire. Please enter a valid sku.")
-    elsif current_shop.variants.create(shopify_variant_id: params[:shopify_variant_id], sku: params[:sku])
-      redirect_to variants_path, notice: "The variants inventory will now be managed by shipwire."
+    if current_shop.variants.create(shopify_variant_id: params[:shopify_variant_id], sku: params[:sku])
+      redirect_to variants_path, notice: "The variant is now managa by shipwire."
     else
       redirect_to variants_path, alert: "The variant is invalid and is not managed by shipwire."
     end
+
   end
 
   def destroy
-    @variant = current_shop.variants.find(params[:id])
-    @variant.destroy
-    head :ok
+    variant = current_shop.variants.find_by_shopify_variant_id(params[:id])
+    shopify_variant = ShopifyAPI::Variant.find(variant.shopify_variant_id)
+    shopify_variant.update_attribute('inventory_management','shopify')
+    variant.destroy
+    redirect_to variants_path, notice: "The variant will no longer be managed by shipwire."
   end
 
   # TODO: eventually shopify will also be given/able to request the inventories from the app via variant_id

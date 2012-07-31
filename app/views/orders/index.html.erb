@@ -8,7 +8,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <% if !current_shop.automatically_fulfill? %>
+            <% if !current_shop.automatic_fulfillment? %>
             <th class="sortcol">Fulfill!</th>
             <% end %>
             <th class="sortcol">Order</th>
@@ -20,7 +20,7 @@
         </thead>
       <% @orders.each do |order| %>
         <tr id="<%= order.id %>">
-          <% if !current_shop.automatically_fulfill? %>
+          <% if !current_shop.automatic_fulfillment? %>
             <% if order.fulfillment_status == "fulfilled" || service_is_not_shipwire?(order) %>
               <td><%= check_box_tag 'shopify_order_ids[]', order.id, false, :class => 'selector', :disabled => true %></td>
             <% else %>

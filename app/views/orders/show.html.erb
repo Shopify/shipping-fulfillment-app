@@ -9,7 +9,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <% if !current_shop.automatically_fulfill? %>
+            <% if !current_shop.automatic_fulfillment? %>
             <th>Fulfill</th>
             <% end %>
             <th>Variant</th>
@@ -22,7 +22,7 @@
         </thead>
         <% @line_items.each do |item| %>
           <tr>
-            <% if !current_shop.automatically_fulfill? %>
+            <% if !current_shop.automatic_fulfillment? %>
               <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => disabled?(item) %></td>
             <% end %>
             <td><%= item.name %></td>

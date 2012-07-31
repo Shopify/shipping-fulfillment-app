@@ -28,7 +28,7 @@ class WebhooksController < ApplicationController
   private
 
   def order_created
-    Resque.enqueue(OrderCreateJob, sanitized_params, @shop)
+    Resque.enqueue(OrderCreateJob, sanitized_params, @shop.id)
   end
 
   def order_updated
@@ -36,30 +36,28 @@ class WebhooksController < ApplicationController
   end
 
   def order_cancelled
-    Resque.enqueue(OrderCancelJob, @order, params['cancelled_at'], params['cancel_reason'])
+    Resque.enqueue(OrderCancelJob, @order.id, params['cancelled_at'], params['cancel_reason'])
   end
 
   def order_fulfilled
-    Resque.enqueue(OrderFulfillJob, @order)
+    Resque.enqueue(OrderFulfillJob, @order.id)
   end
 
   def order_paid
-    if @order.shop.automatically_fulfill?
-      Resque.enqueue(OrderPaidJob, @order, params['shipping_lines'])
+    if @order.shop.automatic_fulfillment?
+      Resque.enqueue(OrderPaidJob, @order.id, @shop.id, params['shipping_lines'])
     end
     @order.update_attribute(:financial_status, 'paid')
   end
 
-
   def find_or_create_order
-    @shop = Shop.where("domain = ?",request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']).first
+    @shop = Shop.find_by_domain(request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN'])
     if @shop.orders.where('shopify_order_id = ?', params['id']).blank?
       request.headers['HTTP_X_SHOPIFY_TOPIC'] = 'orders/create'
     else
-      @order = @shop.orders.where('shopify_order_id = ?', params['id']).first
+      @order = @shop.orders.find_by_shopify_order_id(params['id'])
     end
   end
-
 
   def verify_shopify_webhook
     data = request.body.read.to_s

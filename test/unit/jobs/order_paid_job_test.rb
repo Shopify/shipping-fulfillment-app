@@ -7,8 +7,8 @@ class OrderPaidJobTest < ActiveSupport::TestCase
   end
 
   test "Perform calls Fulfillment.fulfill with appropriate parameters" do
-    Fulfillment.expects(:fulfill).with(@order.shop, {order_id: @order.id, shipping_method: 'Ground'})
+    Fulfillment.expects(:fulfill).with(@shop, {order_ids: [@order.id], shipping_method: 'Ground'})
     params = [{"code"=>'Ground', "price"=>"10.00", "source"=>"shopify", "title"=>"Generic Shipping"}]
-    OrderPaidJob.perform(@order, params)
+    OrderPaidJob.perform(@order.id, @shop.id, params)
   end
 end

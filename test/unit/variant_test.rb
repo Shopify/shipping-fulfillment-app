@@ -5,26 +5,31 @@ require 'test_helper'
 class VariantTest < ActiveSupport::TestCase
 
 
-  should belong_to(:shop)
-  should validate_presence_of(:shopify_variant_id)
-  should validate_presence_of(:sku)
-
   def setup
     super
   end
+
+  should belong_to(:shop)
 
   test "Valid variant saves" do
     stub_variant_callbacks
     assert create(:variant)
   end
 
-  test "good_sku? checks sku" do
-    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_stock_levels).with({sku: 'AAA-999'}).returns(stub({stock_levels: {sku: nil}}))
-    Variant.good_sku?(@shop, 'AAA-999')
+  test "confirm_sku checks sku" do
+    Variant.any_instance.stubs(:update_shopify)
+    variant = build(:variant, shop: @shop)
+    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_stock_levels).with({sku: variant.sku}).returns(stub({stock_levels: {variant.sku => 10}, success: true}))
+
+    assert variant.save
+    assert_equal 10, variant.quantity
   end
 
-  test "fetch_quantity" do
-    Resque.expects(:enqueue).returns(nil)
-    variant = create(:variant)
+  test "update_shopify makes update_attributes call to shopify" do
+    Variant.any_instance.stubs(:confirm_sku)
+    variant = build(:variant)
+    ShopifyAPI::Variant.expects(:find).with(variant.shopify_variant_id).returns(nil)
+    NilClass.any_instance.expects(:update_attributes).with({quantity: variant.quantity, inventory_management: 'shipwire'})
+    assert variant.save
   end
 end

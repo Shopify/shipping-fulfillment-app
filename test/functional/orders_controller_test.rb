@@ -2,13 +2,9 @@ require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
   def setup
-    session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
-    ShopifyAPI::Base.expects(:activate_session => true)
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    OrdersController.any_instance.stubs(:shop_exists)
-    @shop = create(:shop)
-    OrdersController.any_instance.stubs(:current_shop).returns(@shop)
+    super
+    session[:shopify] = stub_api_session
+    stub_controller_filters(OrdersController)
 
     @order1 = create(:order, shop: @shop)
     @order2 = create(:order, shop: @shop)

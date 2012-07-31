@@ -2,7 +2,7 @@ class Shop < ActiveRecord::Base
   Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:3001/' : HOOK_ADDRESS = 'production root url'
   #TODO: set production url
 
-  attr_protected
+  attr_accessible :login, :password, :automatic_fulfillment
 
   has_many :variants
   has_many :fulfillments
@@ -14,10 +14,6 @@ class Shop < ActiveRecord::Base
   before_create :set_domain
   after_create :setup_webhooks
 
-  def automatically_fulfill?
-    automatic_fulfillment
-  end
-
   def credentials
     return {login: login, password: password}
   end
@@ -28,7 +24,6 @@ class Shop < ActiveRecord::Base
     domain = ShopifyAPI::Shop.current.myshopify_domain
   end
 
-  ## hook address will need to change for production
   def setup_webhooks
     hooks = {
       'orders/paid' => 'orderpaid',

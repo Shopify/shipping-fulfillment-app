@@ -3,13 +3,9 @@ require 'test_helper'
 class ShopsControllerTest < ActionController::TestCase
 
   def setup
-    session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
-    ShopifyAPI::Base.expects(:activate_session => true)
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    @shop = create(:shop)
-    ShopsController.any_instance.stubs(:current_shop).returns(@shop)
-    ShopsController.any_instance.stubs(:shop_exists)
+    super
+    session[:shopify] = stub_api_session
+    stub_controller_filters(ShopsController)
   end
 
   test "show: presents form with current shop info filled in" do
@@ -45,7 +41,7 @@ class ShopsControllerTest < ActionController::TestCase
   end
 
   test "update: if not save flash alert" do
-    params = {shop: {domain: nil}}
+    params = {shop: {login: nil}}
     get :update, params
     assert_redirected_to shop_path, alert: 'Could not successfully update!'
   end

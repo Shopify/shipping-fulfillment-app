@@ -1,7 +1,5 @@
 class Order < ActiveRecord::Base
-  # TODO: get methods from include OrderMaker
-
-  attr_protected
+  attr_protected #?
 
   has_many :line_items, :dependent => :destroy
   has_one :shipping_address, :dependent => :destroy
@@ -20,8 +18,8 @@ class Order < ActiveRecord::Base
 
   def self.create_order(params,shop)
     options = order_options(params)
-    options['shipping_address_attributes'] = get_shipping_attributes(params)
-    options['line_items_attributes'] = get_line_items_attributes(params)
+    options['shipping_address_attributes'] = shipping_attributes(params)
+    options['line_items_attributes'] = line_items_attributes(params)
     options['shop_id'] = shop.id
     order = create(options)
   end
@@ -32,13 +30,13 @@ class Order < ActiveRecord::Base
     options
   end
 
-  def self.get_shipping_attributes(params)
+  def self.shipping_attributes(params)
     options = params['shipping_address'].slice(*ShippingAddress.column_names)
     options.delete('id')
     options
   end
 
-  def self.get_line_items_attributes(params)
+  def self.line_items_attributes(params)
     params['line_items'].map do |item|
       options = item.slice(*LineItem.column_names)
       options['line_item_id'] = options.delete('id')

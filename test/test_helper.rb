@@ -48,12 +48,22 @@ class ActiveSupport::TestCase
   end
 
   def stub_variant_callbacks
-    Variant.any_instance.stubs(:fetch_quantity)
-    Variant.any_instance.stubs(:update_shopify_variant)
+    Variant.any_instance.stubs(:confirm_sku)
+    Variant.any_instance.stubs(:update_shopify)
   end
 
   def stub_fulfillment_callbacks
     Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+  end
+
+  def stub_api_session
+    ShopifyAPI::Base.stubs(:activate_session => true)
+    ShopifyAPI::Session.new("http://localhost:3000/admin","123")
+  end
+
+  def stub_controller_filters(controller)
+    controller.any_instance.stubs(:shop_exists)
+    controller.any_instance.stubs(:current_shop).returns(@shop)
   end
 end
 

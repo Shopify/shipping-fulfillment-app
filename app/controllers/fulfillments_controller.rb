@@ -17,7 +17,7 @@ class FulfillmentsController < ApplicationController
     else
       flash[:alert] = "There were errors with your fulfillment request that prevented it from being sent."
     end
-    redirect_to action: :index
+    redirect_to action: 'index'
   end
 
 end

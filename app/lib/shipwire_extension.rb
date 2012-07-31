@@ -5,12 +5,12 @@ module ActiveMerchant
     class ShipwireService < Service
 
       # TODO: remove if not using
-      def fetch_tracking_updates
-        request = buid_tracking_updates_request
-        data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
+      # def fetch_tracking_updates
+      #   request = buid_tracking_updates_request
+      #   data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
 
-        response = parse_tacking_updates_response(data)
-      end
+      #   response = parse_tacking_updates_response(data)
+      # end
 
       def fetch_shop_tracking_info(shipwire_order_ids)
         request = build_tracking_request(shipwire_order_ids)
@@ -36,16 +36,16 @@ module ActiveMerchant
       end
 
       # TODO: remove if not using
-      def build_tracking_updates_request
-        xml = Builder::XmlMarkup.new
-        xml.instruct!
-        xml.declare! :DOCTYPE, :InventoryStatus, :SYSTEM, SCHEMA_URLS[:inventory]
-        xml.tag! 'TrackingUpdate' do
-          add_credentials(xml)
-          xml.tag! 'Server', test? ? 'Test' : 'Production'
-          xml.tag! 'Bookmark', 3
-        end
-      end
+      # def build_tracking_updates_request
+      #   xml = Builder::XmlMarkup.new
+      #   xml.instruct!
+      #   xml.declare! :DOCTYPE, :InventoryStatus, :SYSTEM, SCHEMA_URLS[:inventory]
+      #   xml.tag! 'TrackingUpdate' do
+      #     add_credentials(xml)
+      #     xml.tag! 'Server', test? ? 'Test' : 'Production'
+      #     xml.tag! 'Bookmark', 3
+      #   end
+      # end
 
       def parse_tracking_update_response(xml)
 
@@ -87,7 +87,6 @@ module ActiveMerchant
         document = REXML::Document.new(xml)
         document.root.elements.each do |node|
           if node.name == 'Product'
-            #test in irb
             response[:stock_levels][node.attributes['code']] = {}
             base = response[:stock_levels][node.attributes['code']]
             node.attributes.except('code','good','consuming','consumed','creating','created').each do |attribute|

@@ -6,7 +6,10 @@ class ShopsController < ApplicationController
   end
 
   def create
-    if @shop = Shop.create(params[:shop].merge({token: session[:shopify].token, domain: session[:shop]}))
+    @shop = Shop.new(params[:shop])
+    @shop.token = session[:shopify].token
+    @shop.domain = session[:shop]
+    if @shop.save
       redirect_to shop_path, notice: 'Your settings have been saved.'
     else
       redirect_to shop_path, alert: 'Invalid settings, was not able to save.'
@@ -14,7 +17,7 @@ class ShopsController < ApplicationController
   end
 
   def update
-    if current_shop.update_attributes(params[:shop])
+    if current_shop.update_attributes(params.slice(:login, :password, :automatic_fulfillment))
       redirect_to shop_path, notice: 'Your settings have been updated.'
     else
       redirect_to shop_path, alert: 'Could not successfully update!'

@@ -1,7 +1,7 @@
 <div class="span9 offset1">
 <h2><%= @product_title + ' - ' + @variant.title %></h2>
 
-<%= form_for @variant, :as => :post, :url => {action: 'update', method: 'put'}, :html => {class: 'variant_form'} do |f|%>
+<%= form_for @variant, :as => :post, :url => {action: 'create', method: 'post'}, :html => {class: 'variant_form'} do |f|%>
 <%= hidden_field_tag 'shopify_variant_id', @variant.id %>
 <table class="table table-striped">
   <thead>
@@ -18,10 +18,10 @@
         <td><%= @variant.title %></td>
         <td><%= f.text_field @variant.sku, {value: @variant.sku} %></td>
         <td><%= @variant.inventory_quantity %></td>
-        <% if @variant.inventory_management %>
+        <% if @variant.inventory_management != 'shipwire' %>
           <td><input type="submit" class="btn btn-success" value="Manage with Shipwire"/></td>
         <% else %>
-          <td><%= link_to "Manage with Other", @variant, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => 'btn btn-danger' %></td>
+          <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :confirm => 'Are you sure?'} %></td>
         <% end %>
       </tr>
 </table>

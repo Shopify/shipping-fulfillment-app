@@ -5,6 +5,7 @@ class VariantStockUpdateJobTest < ActiveSupport::TestCase
   def setup
     super
     stub_variant_callbacks
+    stub_shopify_update
 
     @variant1 = create(:variant, shop: @shop)
     @variant2 = create(:variant, shop: @shop)
@@ -13,6 +14,11 @@ class VariantStockUpdateJobTest < ActiveSupport::TestCase
     @response[:stock_levels] = {}
     @response[:stock_levels][@variant1.sku] = {quantity: "10"}
     @response[:stock_levels][@variant2.sku] = {shippedLastWeek: "200"}
+  end
+
+  def stub_shopify_update
+    ShopifyAPI::Variant.stubs(:find)
+    NilClass.any_instance.stubs(:update_attribute)
   end
 
   test "Perform calls fetch_shop_inventory and updates variants" do

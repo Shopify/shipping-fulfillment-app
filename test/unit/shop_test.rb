@@ -36,4 +36,13 @@ class ShopTest < ActiveSupport::TestCase
     shop = create(:shop)
   end
 
+  test "automatic fulfillment setting for a shop" do
+    stub_shop_callbacks
+    shop = create(:shop)
+    assert !shop.automatic_fulfillment?
+
+    shop.automatic_fulfillment = true
+    assert shop.automatic_fulfillment?
+  end
+
 end

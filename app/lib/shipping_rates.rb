@@ -1,32 +1,30 @@
 class ShippingRates
 
-  def self.find_order_rates(shop, order_id)
-    order = shop.orders.find(order_id)
-    destination = self.destination(order.shipping_address)
-    items = order.line_items.select { |item| item.requires_shipping && item.fulfillment_service == "shipwire" }
-    items_attributes = items.map(&:attributes)
-    rates = self.rate_request(shop, order_id, destination, items_attributes)
+  def initialize(shop, shopify_order_id)
+    @order = shop.orders.find_by_shopify_order_id(shopify_order_id)
+    @shipment_destination = destination
   end
 
-## rates = [{:service=>"UPS Second Day Air", :service_code=>"1D", :price=>"17.44", :estimated_delivery_date=>Wed, 01 Aug 2012 00:00:00 +0000, :estimated_delivery_range=>[Thu, 26 Jul 2012 00:00:00 +0000, Wed, 01 Aug 2012 00:00:00 +0000]}]
+  def find_order_rates
+    items = @order.line_items.select { |item| item.requires_shipping && item.fulfillment_service == "shipwire" }
+    items_attributes = items.map(&:attributes)
+    rates = rate_request(items_attributes)
+  end
 
   private
 
-  def self.rate_request(shop, order_id, destination, items_attributes)
-    Rails.cache.fetch(self.rates_cache_key(order_id), expires_in: 1.day) do
-      shipwire = ActiveMerchant::Shipping::Shipwire.new(shop.credentials)
-      begin
-        response = shipwire.find_rates(nil, destination, nil, items: items_attributes)
-      rescue ActiveMerchant::Shipping::ResponseError
-        return nil
-      else
-        estimates = response.estimates
-        estimates.collect { |estimate| self.rate_from_estimate(estimate) }
-      end
+  def rate_request(items_attributes)
+    Rails.cache.fetch(rates_cache_key, expires_in: 1.day) do
+      shipwire = ActiveMerchant::Shipping::Shipwire.new(@order.shop.credentials)
+      response = shipwire.find_rates(nil, @shipment_destination, nil, items: items_attributes)
+      response.estimates.collect { |estimate| rate_from_estimate(estimate) }
     end
+  rescue ActiveMerchant::Shipping::ResponseError
+    nil
   end
 
-  def self.destination(address)
+  def destination
+    address = @order.shipping_address
 
     location = {
       country: address.country,
@@ -44,7 +42,7 @@ class ShippingRates
     ActiveMerchant::Shipping::Location.new(location)
   end
 
-  def self.rate_from_estimate(estimate)
+  def rate_from_estimate(estimate)
     price = (estimate.total_price.to_f / 100).round(2).to_s
     {
       service: estimate.service_name,
@@ -55,8 +53,8 @@ class ShippingRates
     }
   end
 
-  def self.rates_cache_key(order_id)
-    "#{order_id}"
+  def rates_cache_key
+    "ShippingRates:#{@order.id}"
   end
 
 end

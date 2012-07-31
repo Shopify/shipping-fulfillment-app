@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   end
 
   def current_shop
-    @shop ||= Shop.where('domain = ?', session[:shop]).first
+    @shop ||= Shop.find_by_domain(session[:shop])
   end
 
   helper_method :current_shop

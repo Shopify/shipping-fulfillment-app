@@ -2,9 +2,7 @@ require 'test_helper'
 
 class LoginControllerTest < ActionController::TestCase
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    @shop = create(:shop)
+    super
   end
 
   test "index: authenticates if shop it is passed the shop" do

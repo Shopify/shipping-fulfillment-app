@@ -6,10 +6,7 @@ FakeWeb.allow_net_connect = true
 class WebhooksControllerTest < ActionController::TestCase
 
   def setup
-    # TODO: Use super in test setups
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    @shop = create(:shop)
+    super
     @order = create(:order, shop: @shop)
     WebhooksController.any_instance.stubs(:verify_shopify_webhook)
   end
@@ -30,7 +27,7 @@ class WebhooksControllerTest < ActionController::TestCase
 
   test "Order created webhook" do
     webhook('orders/create')
-    expect(OrderCreateJob, {'id' => @order.shopify_order_id.to_s}, @shop)
+    expect(OrderCreateJob, {'id' => @order.shopify_order_id.to_s}, @shop.id)
     ping
   end
 
@@ -42,13 +39,13 @@ class WebhooksControllerTest < ActionController::TestCase
 
   test "Order cancelled webhook" do
     webhook('orders/cancelled')
-    expect(OrderCancelJob, @order, 'cancelled_at', 'cancel_reason')
+    expect(OrderCancelJob, @order.id, 'cancelled_at', 'cancel_reason')
     ping({cancelled_at: 'cancelled_at', cancel_reason: 'cancel_reason'})
   end
 
   test "Order fulfilled webhook" do
     webhook('orders/fulfilled')
-    expect(OrderFulfillJob, @order)
+    expect(OrderFulfillJob, @order.id)
     ping
   end
 
@@ -62,7 +59,7 @@ class WebhooksControllerTest < ActionController::TestCase
     @shop.update_attribute(:automatic_fulfillment, true)
     webhook('orders/paid')
     Order.any_instance.expects(:update_attribute).with(:financial_status, 'paid')
-    expect(OrderPaidJob, @order, 'shipping_lines')
+    expect(OrderPaidJob, @order.id, @shop.id, 'shipping_lines')
     ping({shipping_lines: 'shipping_lines'})
   end
 end

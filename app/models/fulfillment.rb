@@ -1,6 +1,9 @@
 class Fulfillment < ActiveRecord::Base
-  ## TODO: attr_accessible
-  attr_protected
+
+  SHIPPING_CODES = %w{1D 2D GD FT INTL}
+
+  attr_accessible :email, :shipping_method, :warehouse, :tracking_carrier, :tracking_link, :tracking_number, :ship_date, :expected_delivery_date, :return_date, :return_condition, :shipper_name, :total, :returned, :shipped, :line_items, :order_id, :status
+
   belongs_to :shop
   belongs_to :order
   has_many :fulfillment_line_items, :dependent => :delete_all
@@ -11,11 +14,10 @@ class Fulfillment < ActiveRecord::Base
   validate :legal_shipping_method
   validate :order_fulfillment_status
 
-
   before_validation :make_shipwire_order_id
   after_create :create_mirror_fulfillment_on_shopify, :update_fulfillment_statuses
 
-  # status: pending, cancelled, success, failure
+
   state_machine :status, :initial => :pending do
     event :success do
       transition :pending => :success
@@ -30,11 +32,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def self.fulfill(current_shop, params)
-    order_ids = params[:order_ids]
-    shipping_method = params[:shipping_method]
-    warehouse = params[:warehouse] || '00'
-    line_item_ids = params[:line_item_ids] || []
-    self.fulfill_orders(current_shop, order_ids, shipping_method, warehouse, line_item_ids)
+    self.fulfill_orders(current_shop, params[:order_ids], params[:shipping_method], params[:warehouse] || '00', params[:line_item_ids] || [])
   end
 
 
@@ -71,12 +69,10 @@ class Fulfillment < ActiveRecord::Base
   def create_mirror_fulfillment_on_shopify
     fulfillment = ShopifyAPI::Fulfillment.create(
       order_id: self.order.shopify_order_id,
-      test: false,
       shipping_method: shipping_method,
       line_items: line_items.map(&:line_item_id)
     )
-
-    self.update_attribute(:shopify_fulfillment_id,fulfillment.id)
+    self.update_attribute(:shopify_fulfillment_id, fulfillment.id)
   end
 
   def update_fulfillment_status_on_shopify
@@ -85,12 +81,16 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def order_fulfillment_status
-    errors.add(:order, 'Fulfillment status cannot be fulfilled or cancelled.') if (order.fulfillment_status == 'fulfilled') || (order.fulfillment_status =='cancelled')
+    if (order.fulfillment_status == 'fulfilled') || (order.fulfillment_status =='cancelled')
+      errors.add(:order, 'Fulfillment status cannot be fulfilled or cancelled.')
+    end
     rescue NoMethodError
   end
 
   def legal_shipping_method
-    errors.add(:shipping_method, 'Must be one of the shipwire shipping methods.') unless ['1D', '2D', 'GD', 'FT', 'INTL'].include?(shipping_method)
+    unless SHIPPING_CODES.include?(shipping_method)
+      errors.add(:shipping_method, 'Must be one of the shipwire shipping methods.')
+    end
   end
 
   def make_shipwire_order_id
@@ -100,6 +100,8 @@ class Fulfillment < ActiveRecord::Base
 
   def update_fulfillment_statuses
     line_items.each { |item| item.update_attribute(:fulfillment_status, 'fulfilled')}
-    order.update_attribute(:fulfillment_status,'fulfilled') if Order.find(order.id).line_items.all?{ |item| item.fulfillment_status == 'fulfilled'}
+    if Order.find(order.id).line_items.all?{ |item| item.fulfillment_status == 'fulfilled'}
+      order.update_attribute(:fulfillment_status,'fulfilled')
+    end
   end
 end
