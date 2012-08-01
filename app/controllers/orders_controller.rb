@@ -8,7 +8,6 @@ class OrdersController < ApplicationController
 
   def index
     @orders = current_shop.orders.all
-    puts "ORDERS: #{@orders.inspect}"
     # @orders = current_shop.orders.paginate({page: @page, per_page: params[:limit] || PER_PAGE})
   end
 

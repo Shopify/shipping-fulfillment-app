@@ -9,7 +9,7 @@ class VariantsControllerTest < ActionController::TestCase
   end
 
   def stub_products_and_variants
-    shopify_variant1 = stub({id: 1, title: 'Red Razor', sku: 'GA8-94K', inventory_quantity: 20, inventory_management: 'shipwire'})
+    shopify_variant1 = stub({id: 1, title: 'Red Razor', sku: 'GA8-94K', inventory_quantity: 20, inventory_management: 'shopify', class: ShopifyAPI::Variant})
     product = stub({title: 'Bicycle', variants: [shopify_variant1]})
     ShopifyAPI::Product.stubs(:all).returns([product])
     ShopifyAPI::Variant.stubs(:find).returns(shopify_variant1)
@@ -25,6 +25,12 @@ class VariantsControllerTest < ActionController::TestCase
     stub_products_and_variants
     get :show, {id: 1, product_title: 'Bicycle'}
     assert_template :show
+  end
+
+  test "show: renders extra statistics if variant is shipwire" do
+    variant = create(:variant, shop: @shop)
+    get :show, {id: variant.shopify_variant_id, product_title: 'Baseball'}
+    assert_select '.shipwire_variant_statistics'
   end
 
   test "create: redirects with alert if bad sku" do
