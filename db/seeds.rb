@@ -1,26 +1,19 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
+
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-# require 'factory_girl'
-# Dir[Rails.root.join("test/factories/*.rb")].each {|f| require f}
+require 'factory_girl_rails'
+require 'mocha'
 
-# setting = Setting.where("shop_id = ?", "shop1.localhost")
-# setting.orders = [FactoryGirl.create(:order, :id => 1),
-#                   FactoryGirl.create(:order, :id => 2),
-#                   FactoryGirl.create(:order, :id => 3),
-#                   FactoryGirl.create(:order, :id => 4),
-#                   FactoryGirl.create(:order, :id => 5),
-#                   FactoryGirl.create(:order, :id => 6),
-#                   FactoryGirl.create(:order, :id => 7),
-#                   FactoryGirl.create(:order, :id => 8),
-#                   FactoryGirl.create(:order, :id => 9),
-#                   FactoryGirl.create(:order, :id => 10),
-#                   FactoryGirl.create(:order, :id => 11),
-#                   FactoryGirl.create(:order, :id => 12),
-#                 ]
-# setting.save
+Shop.any_instance.stubs(:setup_webhooks)
+Shop.any_instance.stubs(:set_domain)
+Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+Variant.any_instance.stubs(:update_shopify)
+Variant.any_instance.stubs(:confirm_sku)
+
+
+
+shop = FactoryGirl.create(:shop, domain: 'shop1.localhost')
+order = FactoryGirl.create(:order, shop:shop)
+fulfillment = FactoryGirl.create(:fulfillment, shop: shop, line_items: [order.line_items.first])
+variant = FactoryGirl.create(:variant, shopify_variant_id: 4, shop: shop)

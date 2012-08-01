@@ -2,9 +2,14 @@
     <h2>Shipwire Fulfillments</h2>
     <hr>
 
+    <div id="map_container">
+    </div>
+
     <% if @fulfillments.blank? %>
         <p>You have not made any fulfillments yet.</p>
     <% else %>
+
+
 
     <table class="table table-striped">
         <thead>
@@ -33,3 +38,7 @@
 
     <% end %>
 </div>
+
+<%= javascript_include_tag "map" %>
+<%= javascript_include_tag "http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false" %>
+<%= javascript_include_tag "http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js" %>

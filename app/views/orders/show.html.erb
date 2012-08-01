@@ -1,9 +1,5 @@
-
  <div class="span9 offset1">
    <h2>Order <%= @order.name %></h2>
-
-
-
 
       <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
       <table class="table table-striped">
@@ -52,7 +48,7 @@
                 <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
               </td>
               <td>
-                <%= label_tag :warehouse, 'Warehouse :' %>
+                <%= label_tag :warehouse, 'Warehouse: ' %>
                 <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
               </td>
                 <%= hidden_field_tag 'shopify_order_id', :value => @order.id %>
@@ -68,8 +64,6 @@
         </div> <!-- span8 / right-column -->
 
         <%= will_paginate @line_items, :container => false %>
-
-
 
 <script>
 $(document).ready(function(){

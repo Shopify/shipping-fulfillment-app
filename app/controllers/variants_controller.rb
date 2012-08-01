@@ -5,11 +5,11 @@ class VariantsController < ApplicationController
 
   def show
     @product_title = params[:product_title]
-    @variant = ShopifyAPI::Variant.find(params[:id])
+    @variant = current_shop.variants.find_by_shopify_variant_id(params[:id]) || ShopifyAPI::Variant.find(params[:id])
   end
 
   def create
-    if current_shop.variants.create(shopify_variant_id: params[:shopify_variant_id], sku: params[:sku])
+    if current_shop.variants.create(shopify_variant_id: params[:shopify_variant_id], sku: params[:sku], title: params[:title])
       redirect_to variants_path, notice: "The variant is now managa by shipwire."
     else
       redirect_to variants_path, alert: "The variant is invalid and is not managed by shipwire."

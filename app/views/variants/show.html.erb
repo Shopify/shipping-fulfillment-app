@@ -3,6 +3,7 @@
 
 <%= form_for @variant, :as => :post, :url => {action: 'create', method: 'post'}, :html => {class: 'variant_form'} do |f|%>
 <%= hidden_field_tag 'shopify_variant_id', @variant.id %>
+<%= hidden_field_tag 'title', @variant.title %>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -17,10 +18,11 @@
         <td><%= @product_title %></td>
         <td><%= @variant.title %></td>
         <td><%= f.text_field @variant.sku, {value: @variant.sku} %></td>
-        <td><%= @variant.inventory_quantity %></td>
-        <% if @variant.inventory_management != 'shipwire' %>
+        <% if @variant.class == ShopifyAPI::Variant %>
+          <td><%= @variant.inventory_quantity %></td>
           <td><input type="submit" class="btn btn-success" value="Manage with Shipwire"/></td>
         <% else %>
+          <td><%= @variant.quantity %></td>
           <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :confirm => 'Are you sure?'} %></td>
         <% end %>
       </tr>
@@ -28,4 +30,20 @@
   <br />
 <% end %>
 
+<% if @variant.class == Variant %>
+  <ul>
+    <li>Quantity: <%= @variant.quantity %></li>
+    <li>Backordered: <%= @variant.backordered %></li>
+    <li>Reserved: <%= @variant.reserved %></li>
+    <li>Shipping: <%= @variant.shipping %></li>
+    <li>Shipped: <%= @variant.shipped %></li>
+    <li>Available Date: <%= @variant.availableDate %></li>
+    <li>Shipped Last Day: <%= @variant.shippedLastDay %></li>
+    <li>Shipped Last Week: <%= @variant.shippedLastWeek %></li>
+    <li>Shipped Last 4 Weeks: <%= @variant.shippedLast4Weeks %></li>
+    <li>Ordered Last Day: <%= @variant.orderedLastDay %></li>
+    <li>Ordered Last Week: <%= @variant.orderedLastWeek %></li>
+    <li>Ordered Last 4 Weeks: <%= @variant.orderedLast4Weeks %></li>
+  </ul>
+<% end %>
 </div>

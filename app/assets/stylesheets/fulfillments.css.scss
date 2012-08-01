@@ -5,3 +5,13 @@
 .content{
   height: 750px;
 }
+
+#map_container{
+  width:800px;
+  height:400px;
+  margin: 10px auto;
+}
+
+#map_container img {
+  max-width: none;
+}
