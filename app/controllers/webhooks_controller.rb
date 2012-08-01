@@ -4,6 +4,7 @@ class WebhooksController < ApplicationController
   skip_before_filter :shop_exists
   skip_around_filter :shopify_session
 
+  before_filter :sanitized_params
   before_filter :verify_shopify_webhook
   before_filter :find_or_create_order
   before_filter :hook
@@ -29,15 +30,15 @@ class WebhooksController < ApplicationController
   private
 
   def order_created
-    Resque.enqueue(OrderCreateJob, sanitized_params, @shop.id)
+    Resque.enqueue(OrderCreateJob, @params, @shop.id)
   end
 
   def order_updated
-    Resque.enqueue(OrderUpdateJob, params['line_items'])
+    Resque.enqueue(OrderUpdateJob, @params[:line_items])
   end
 
   def order_cancelled
-    Resque.enqueue(OrderCancelJob, @order.id, params['cancelled_at'], params['cancel_reason'])
+    Resque.enqueue(OrderCancelJob, @order.id, @params[:cancelled_at], @params[:cancel_reason])
   end
 
   def order_fulfilled
@@ -46,17 +47,17 @@ class WebhooksController < ApplicationController
 
   def order_paid
     if @order.shop.automatic_fulfillment?
-      Resque.enqueue(OrderPaidJob, @order.id, @shop.id, params['shipping_lines'])
+      Resque.enqueue(OrderPaidJob, @order.id, @shop.id, @params[:shipping_lines])
     end
     @order.update_attribute(:financial_status, 'paid')
   end
 
   def find_or_create_order
     @shop = Shop.find_by_domain(shop_domain)
-    if @shop.orders.where('shopify_order_id = ?', params['id']).blank?
+    if @shop.orders.where('shopify_order_id = ?', @params['id']).blank?
       @hook = 'orders/create'
     else
-      @order = @shop.orders.find_by_shopify_order_id(params['id'])
+      @order = @shop.orders.find_by_shopify_order_id(@params['id'])
     end
   end
 
@@ -64,14 +65,12 @@ class WebhooksController < ApplicationController
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
     calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
-    unless calculated_hmac == hmac_header
-      head :unauthorized
-    end
+    head :unauthorized unless calculated_hmac == hmac
     request.body.rewind
   end
 
   def sanitized_params
-    params.except(:action, :controller) # json webhook data does not have root node
+    @params = params.except(:action, :controller).with_indifferent_access # json webhook data does not have root node
   end
 
   def hook
@@ -82,7 +81,7 @@ class WebhooksController < ApplicationController
     request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']
   end
 
-  def hmac_header
+  def hmac
     request.headers['HTTP_X_SHOPIFY_HMAC_SHA256']
   end
 

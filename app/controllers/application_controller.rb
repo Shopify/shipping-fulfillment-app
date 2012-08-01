@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   around_filter :shopify_session
   before_filter :shop_exists
 
+
   private
 
   def shop_exists

@@ -18,28 +18,28 @@ class Order < ActiveRecord::Base
 
   def self.create_order(params,shop)
     options = order_options(params)
-    options['shipping_address_attributes'] = shipping_attributes(params)
-    options['line_items_attributes'] = line_items_attributes(params)
-    options['shop_id'] = shop.id
+    options[:shipping_address_attributes] = shipping_attributes(params)
+    options[:line_items_attributes] = line_items_attributes(params)
+    options[:shop_id] = shop.id
     order = create(options)
   end
 
   def self.order_options(params)
     options = params.slice(*Order.column_names)
-    options['shopify_order_id'] = params['id']
+    options[:shopify_order_id] = params[:id]
     options
   end
 
   def self.shipping_attributes(params)
-    options = params['shipping_address'].slice(*ShippingAddress.column_names)
-    options.delete('id')
+    options = params[:shipping_address].slice(*ShippingAddress.column_names)
+    options.delete(:id)
     options
   end
 
   def self.line_items_attributes(params)
-    params['line_items'].map do |item|
+    params[:line_items].map do |item|
       options = item.slice(*LineItem.column_names)
-      options['line_item_id'] = options.delete('id')
+      options[:line_item_id] = options.delete(:id)
       options
     end
   end

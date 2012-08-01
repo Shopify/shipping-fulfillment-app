@@ -20,6 +20,7 @@ class ShopsControllerTest < ActionController::TestCase
   end
 
   test "create: if save then flash notice" do
+    Resque.expects(:enqueue)
     params = {shop: {login: 'david', password: 'pass', automatic_fulfillment: true}}
     session = {shopify: stub(token: 'token'), shop: 'domain'}
     get :create, params, session

@@ -10,32 +10,10 @@ class OrderCollectorJobTest < ActiveSupport::TestCase
     OrderCollectorJob.perform(@shop)
   end
 
-  test "Build_line_item builds line item" do
-    item = load_json('item.json')
-    line_item = OrderCollectorJob.build_line_item(item)
-    assert line_item.valid?
-  end
-
   test "Create_order creates a new order" do
-    order = load_json('order1.json')
-    OrderCollectorJob.create_order(@shop, order)
-  end
-end
-
-class Hash
-  def attributes
-    return self
-  end
-
-  def id
-    return self['id']
-  end
-
-  def shipping_address
-    return self['shipping_address']
-  end
-
-  def line_items
-    return self['line_items']
+    order = load_json('order1.json').with_indifferent_access
+    assert_difference "Order.count", 1 do
+      Order.create_order(order,@shop)
+    end
   end
 end

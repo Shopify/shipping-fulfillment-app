@@ -68,11 +68,11 @@
 <script>
 $(document).ready(function(){
   $('#rates_button').click(function(){
-    var shopify_order_id = $(this).data('order');
+    var id = $(this).data('order');
     $.ajax({
       url: "<%= rates_path %>",
       type: "GET",
-      data: {shopify_order_id: shopify_order_id}
+      data: {id: id}
     });
   });
 });

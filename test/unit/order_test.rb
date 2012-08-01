@@ -15,7 +15,7 @@ class OrderTest < ActiveSupport::TestCase
   end
 
   test "Create order makes order with apropriate attributes" do
-    params = load_json('order_create.json')['order']
+    params = load_json('order_create.json')['order'].with_indifferent_access
 
     assert_difference "Order.count", 1 do
       Order.create_order(params, create(:shop))
@@ -37,5 +37,4 @@ class OrderTest < ActiveSupport::TestCase
 
     assert_equal [good], fulfillable
   end
-
 end

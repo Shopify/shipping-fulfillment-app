@@ -1,48 +1,59 @@
+# Calculates rates for an order or hashes of line_items
 class ShippingRates
-
-  def initialize(shop, shopify_order_id)
-    @order = shop.orders.find_by_shopify_order_id(shopify_order_id)
-    @shipment_destination = destination
+  def initialize(credentials, params)
+    @credentials = credentials
+    @order = Order.find(params[:id]) if params.has_key?(:id)
+    @items = prepare_items(params)
+    @destination = prepare_destination(params)
   end
 
-  def find_order_rates
-    items = @order.line_items.select { |item| item.requires_shipping && item.fulfillment_service == "shipwire" }
-    items_attributes = items.map(&:attributes)
-    rates = rate_request(items_attributes)
-  end
-
-  private
-
-  def rate_request(items_attributes)
-    Rails.cache.fetch(rates_cache_key, expires_in: 1.day) do
-      shipwire = ActiveMerchant::Shipping::Shipwire.new(@order.shop.credentials)
-      response = shipwire.find_rates(nil, @shipment_destination, nil, items: items_attributes)
-      response.estimates.collect { |estimate| rate_from_estimate(estimate) }
+  def fetch_rates
+    Rails.cache.fetch(rates_cache_key, expires_in: 1.day) do |shipwire|
+      shipwire = ActiveMerchant::Shipping::Shipwire.new(@credentials)
+      response = shipwire.find_rates(nil, @destination, nil, items: @items)
+      response.estimates.collect { |estimate| extract_rate(estimate) }
     end
   rescue ActiveMerchant::Shipping::ResponseError
     nil
   end
 
-  def destination
-    address = @order.shipping_address
+  private
 
-    location = {
-      country: address.country,
-      province: address.province,
-      city: address.city,
-      name: nil,
-      address1: address.address1,
-      address2: nil,
-      address3: nil,
-      phone: nil,
-      fax: nil,
-      company: nil
-    }
+  def rates_cache_key
+    return "ShippingRates:#{@order.id}" if @order
+    "ShippingRates:#{item_ids}"
+  end
 
+  def item_ids
+    @items.map(&:id).map(&:to_s).join('-')
+  end
+
+  def prepare_items(params)
+    if @order
+      items = @order.line_items.select { |item| item.requires_shipping && item.fulfillment_service == "shipwire" }
+    else
+      items = params[:items].select{ |item| item[:requires_shipping] && item[:fulfillment_service] == "shipwire" }
+    end
+    items.map(&:attributes)
+  end
+
+  def prepare_destination(params)
+    if @order
+      address = @order.shipping_address
+
+      location = {
+        country: address.country,
+        province: address.province,
+        city: address.city,
+        address1: address.address1,
+      }
+    else
+      location = params[:destination].slice(:country, :province, :city, :address1)
+    end
     ActiveMerchant::Shipping::Location.new(location)
   end
 
-  def rate_from_estimate(estimate)
+  def extract_rate(estimate)
     price = (estimate.total_price.to_f / 100).round(2).to_s
     {
       service: estimate.service_name,
@@ -52,9 +63,4 @@ class ShippingRates
       estimated_delivery_range: estimate.delivery_range
     }
   end
-
-  def rates_cache_key
-    "ShippingRates:#{@order.id}"
-  end
-
 end

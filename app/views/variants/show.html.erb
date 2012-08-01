@@ -23,7 +23,7 @@
           <td><input type="submit" class="btn btn-success" value="Manage with Shipwire"/></td>
         <% else %>
           <td><%= @variant.quantity %></td>
-          <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :confirm => 'Are you sure?'} %></td>
+          <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :data => {:confirm => 'Are you sure?'}} %></td>
         <% end %>
       </tr>
 </table>

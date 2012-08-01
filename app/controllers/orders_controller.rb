@@ -7,8 +7,7 @@ class OrdersController < ApplicationController
   before_filter :get_page, {except: [:shipping_rates]}
 
   def index
-    @orders = current_shop.orders.all
-    # @orders = current_shop.orders.paginate({page: @page, per_page: params[:limit] || PER_PAGE})
+    @orders = current_shop.orders.paginate({page: @page, per_page: params[:limit] || PER_PAGE})
   end
 
   def show
@@ -17,7 +16,7 @@ class OrdersController < ApplicationController
   end
 
   def shipping_rates
-    @rates = ShippingRates.new(current_shop, params[:shopify_order_id]).find_order_rates if Rails.env == 'production'
+    @rates = OrderShippingRates.new(current_shop.credentials, params[:id]).fetch_rates if Rails.env == 'production'
   end
 
   private
