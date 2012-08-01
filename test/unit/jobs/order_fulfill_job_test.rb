@@ -9,7 +9,7 @@ class OrderFulfillTest < ActiveSupport::TestCase
   test "Perform updates the order and corresponding line item fulfillment statuses" do
     OrderFulfillJob.perform(@order)
 
-    assert_equal @order.reload.fulfillment_status, 'fulfilled'
-    @order.line_items.each {|item| assert_equal item.fulfillment_status, 'fulfilled'}
+    assert_equal 'fulfilled', @order.reload.fulfillment_status
+    @order.line_items.each {|item| assert_equal 'fulfilled', item.fulfillment_status}
   end
 end

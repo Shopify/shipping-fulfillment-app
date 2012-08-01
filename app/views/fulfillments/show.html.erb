@@ -5,9 +5,11 @@
     <h3>Line Items</h3>
     <ul>
       <% @fulfillment.line_items.each do |item| %>
-        <li><%= item.title %> - <%= item.quantity %></li>
+        <li class="items_list"><%= item.title %> - <%= item.quantity %>x</li>
       <% end %>
     </ul>
+
+<hr />
 
     <h3>Tracking</h3>
 

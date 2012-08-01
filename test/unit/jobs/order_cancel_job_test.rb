@@ -8,7 +8,7 @@ class OrderCancelJobTest < ActiveSupport::TestCase
 
     OrderCancelJob.perform(order, time, reason)
 
-    assert_equal order.reload.cancelled_at, time
-    assert_equal order.reload.cancel_reason, reason
+    assert_equal time, order.reload.cancelled_at
+    assert_equal reason, order.reload.cancel_reason
   end
 end

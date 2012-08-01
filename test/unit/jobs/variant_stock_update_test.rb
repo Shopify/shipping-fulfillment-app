@@ -26,8 +26,8 @@ class VariantStockUpdateJobTest < ActiveSupport::TestCase
     ActiveMerchant::Fulfillment::ShipwireService.any_instance.stubs(:fetch_shop_inventory).with(@shop).returns(@response)
 
     VariantStockUpdateJob.perform
-    assert_equal @variant1.reload.quantity, "10"
-    assert_equal @variant2.reload.shippedLastWeek, "200"
+    assert_equal "10", @variant1.reload.quantity
+    assert_equal "200", @variant2.reload.shippedLastWeek
   end
 
   test "Perform updates the inventory for multiple shops" do
@@ -49,9 +49,9 @@ class VariantStockUpdateJobTest < ActiveSupport::TestCase
 
     VariantStockUpdateJob.perform
 
-    assert_equal @variant1.reload.quantity, "10"
-    assert_equal @variant2.reload.shippedLastWeek, "200"
-    assert_equal variant3.reload.orderedLastWeek, "250"
-    assert_equal variant4.reload.backordered, "5"
+    assert_equal "10", @variant1.reload.quantity
+    assert_equal "200", @variant2.reload.shippedLastWeek
+    assert_equal "250", variant3.reload.orderedLastWeek
+    assert_equal "5", variant4.reload.backordered
   end
 end

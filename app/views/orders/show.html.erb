@@ -59,17 +59,16 @@
           </table>
           <% end %>
         <% end %>
-          <hr class="rates_table">
-          <button class='btn btn-primary calculate_shipping' data-order='<%= @order.id %>'>Calculate Shipping Rate</button>
+          <hr>
+          <div id='rates_table'>
+            <button id="rates_button" class='btn btn-primary' data-order='<%= @order.id %>'>Calculate Shipping Rate</button>
+          </div>
         </div> <!-- span8 / right-column -->
-
-        <%= will_paginate @line_items, :container => false %>
 
 <script>
 $(document).ready(function(){
-  $('.calculate_shipping').click(function(){
+  $('#rates_button').click(function(){
     var shopify_order_id = $(this).data('order');
-    alert(shopify_order_id)
     $.ajax({
       url: "<%= rates_path %>",
       type: "GET",

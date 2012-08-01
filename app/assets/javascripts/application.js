@@ -13,8 +13,6 @@
 //= require jquery-ui
 //= require jquery_ujs
 //= require twitter/bootstrap
+// = require googlemapv3
+// = require markercluster
 //= require_tree .
-
-$(document).ready(function(){
-  $(".fadeout").animate({'opacity' : 0}, 8000)
-});

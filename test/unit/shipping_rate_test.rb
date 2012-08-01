@@ -36,6 +36,6 @@ class ShippingRateTest < ActiveSupport::TestCase
     ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
 
     rates = ShippingRates.new(@shop, @order.shopify_order_id).find_order_rates
-    assert_equal rates.first[:price], "17.44"
+    assert_equal "17.44", rates.first[:price]
   end
 end

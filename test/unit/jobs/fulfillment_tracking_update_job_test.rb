@@ -13,7 +13,7 @@ class FulfillmentTrackingUpdateJobTest < ActiveSupport::TestCase
     ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_shop_tracking_info).with(active_order_ids).returns(response)
 
     FulfillmentTrackingUpdateJob.perform
-    assert_equal fulfillment.reload.returned, "YES"
+    assert_equal "YES", fulfillment.reload.returned
   end
 
   test "Perform only updates recent fulfillments" do

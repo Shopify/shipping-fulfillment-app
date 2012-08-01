@@ -34,7 +34,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     params = {order_ids: [@order.id], line_item_ids: [@order.line_items.first.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
-    assert_equal @order.line_items.first.fulfillment_status, "fulfilled"
+    assert_equal "fulfilled", @order.line_items.first.fulfillment_status
   end
 
   test "Fulfill order" do
@@ -42,7 +42,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     params = {order_ids: [@order.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
-    assert_equal @order.reload.fulfillment_status, "fulfilled"
+    assert_equal "fulfilled", @order.reload.fulfillment_status
   end
 
   test "Fulfill multiple orders" do
@@ -63,8 +63,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
 
     assert Fulfillment.fulfill(@shop, params)
-    assert_equal item1.reload.fulfillment_status, "fulfilled"
-    assert_equal item2.reload.fulfillment_status, "fulfilled"
+    assert_equal "fulfilled", item1.reload.fulfillment_status
+    assert_equal "fulfilled", item2.reload.fulfillment_status
   end
 
   test "Fulfillment with invalid shipping_method does not save" do
@@ -123,7 +123,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     params = {order_ids: [@order.id], line_item_ids: [@order.line_items.first.id, other_item.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
-    assert_equal other_item.reload.fulfillment_status, nil
+    assert_equal nil, other_item.reload.fulfillment_status
   end
 
   test "Fulfillment with no line_items is not saved" do

@@ -35,7 +35,7 @@ class OrderTest < ActiveSupport::TestCase
     mixed = order.line_items.map(&:id).push(other.id)
     fulfillable = order.filter_fulfillable_items(mixed)
 
-    assert_equal fulfillable, [good]
+    assert_equal [good], fulfillable
   end
 
 end
