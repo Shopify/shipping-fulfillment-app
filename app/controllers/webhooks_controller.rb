@@ -6,11 +6,12 @@ class WebhooksController < ApplicationController
 
   before_filter :verify_shopify_webhook
   before_filter :find_or_create_order
+  before_filter :hook
 
   rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
 
   def create
-    case request.headers['HTTP_X_SHOPIFY_TOPIC']
+    case @hook
       when 'orders/create'
         order_created
       when 'orders/updated'
@@ -51,9 +52,9 @@ class WebhooksController < ApplicationController
   end
 
   def find_or_create_order
-    @shop = Shop.find_by_domain(request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN'])
+    @shop = Shop.find_by_domain(shop_domain)
     if @shop.orders.where('shopify_order_id = ?', params['id']).blank?
-      request.headers['HTTP_X_SHOPIFY_TOPIC'] = 'orders/create'
+      @hook = 'orders/create'
     else
       @order = @shop.orders.find_by_shopify_order_id(params['id'])
     end
@@ -61,7 +62,6 @@ class WebhooksController < ApplicationController
 
   def verify_shopify_webhook
     data = request.body.read.to_s
-    hmac_header = request.headers['HTTP_X_SHOPIFY_HMAC_SHA256']
     digest = OpenSSL::Digest::Digest.new('sha256')
     calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
     unless calculated_hmac == hmac_header
@@ -73,4 +73,17 @@ class WebhooksController < ApplicationController
   def sanitized_params
     params.except(:action, :controller) # json webhook data does not have root node
   end
+
+  def hook
+    @hook = request.headers['HTTP_X_SHOPIFY_TOPIC']
+  end
+
+  def shop_domain
+    request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']
+  end
+
+  def hmac_header
+    request.headers['HTTP_X_SHOPIFY_HMAC_SHA256']
+  end
+
 end

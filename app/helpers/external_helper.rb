@@ -1,0 +1,2 @@
+module ExternalHelper
+end

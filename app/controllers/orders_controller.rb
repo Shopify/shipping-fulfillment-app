@@ -17,7 +17,7 @@ class OrdersController < ApplicationController
   end
 
   def shipping_rates
-    #@rates = ShippingRates.new(current_shop, params[:shopify_order_id]).find_order_rates
+    @rates = ShippingRates.new(current_shop, params[:shopify_order_id]).find_order_rates if Rails.env == 'production'
   end
 
   private

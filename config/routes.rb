@@ -2,26 +2,19 @@ ShipwireApp::Application.routes.draw do
 
   #TODO Routing
 
+  #resource routes
+
   resource :shop #, :except => [:index, :destroy]
 
-  resources :variants do
-    member do
-      get '/inventory', :action => :fetch_inventory
-    end
-  end
-
-  resources :fulfillments
-
-  resources :orders do
-    collection do
-      get '/page/:page', :action => :index
-    end
-    member do
-      get '/page/:page', :action => :show
-    end
-  end
+  resources :fulfillments, :orders, :variants
 
   match "shippingrates" => "orders#shipping_rates",   :as => :rates
+
+  #external routes
+
+  match "external/shipping_rates" => "external#shipping_rates", :via => :post
+
+  #webhook routes
 
   match "orderpaid" => "webhooks#create", :via => :post
 
@@ -33,6 +26,8 @@ ShipwireApp::Application.routes.draw do
 
   match "orderupdated" => "webhooks#create", :via => :post
 
+  #login routes
+
   match 'auth/shopify/callback' => 'login#finalize'
 
   match 'login'              => 'login#index',        :as => :login
@@ -43,7 +38,10 @@ ShipwireApp::Application.routes.draw do
 
   match 'login/logout'       => 'login#logout',       :as => :logout
 
+  #other routes
+
   root :to                   => 'login#index'
 
   mount Resque::Server, :at =>  '/resque' if Rails.env == 'development'
+
 end
