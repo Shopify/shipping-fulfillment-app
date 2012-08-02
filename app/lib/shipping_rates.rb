@@ -13,7 +13,7 @@ class ShippingRates
       response = shipwire.find_rates(nil, @destination, nil, items: @items)
       response.estimates.collect { |estimate| extract_rate(estimate) }
     end
-  rescue ActiveMerchant::Shipping::ResponseError
+  rescue ActiveMerchant::Shipping::ResponseError, ActiveMerchant::ConnectionError
     nil
   end
 

@@ -12,7 +12,7 @@ class Shop < ActiveRecord::Base
   validates :domain, :presence => true, :uniqueness => true
 
   before_create :set_domain
-  after_create :setup_webhooks
+  after_create :setup_webhooks, :create_carrier_service
 
   def credentials
     return {login: login, password: password}
@@ -37,6 +37,10 @@ class Shop < ActiveRecord::Base
 
   def make_webhook(topic, action)
     ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
+  end
+
+  def create_carrier_service
+    carrier_service = ShopifyAPI::CarrierService.create
   end
 
 end

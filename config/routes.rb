@@ -4,9 +4,13 @@ ShipwireApp::Application.routes.draw do
 
   #resource routes
 
-  resource :shop #, :except => [:index, :destroy]
+  resource :shop, :except => [:new, :edit, :destroy]
 
-  resources :fulfillments, :orders, :variants
+  resources :fulfillments, :only => [:index, :show, :create]
+
+  resources :orders, :only => [:index, :show] 
+
+  resources :variants, :except => [:update, :new, :edit]
 
   match "shippingrates" => "orders#shipping_rates",   :as => :rates
 

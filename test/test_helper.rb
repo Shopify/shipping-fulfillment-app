@@ -45,6 +45,7 @@ class ActiveSupport::TestCase
   def stub_shop_callbacks
     Shop.any_instance.stubs(:setup_webhooks)
     Shop.any_instance.stubs(:set_domain)
+    Shop.any_instance.stubs(:create_carrier_service)
   end
 
   def stub_variant_callbacks

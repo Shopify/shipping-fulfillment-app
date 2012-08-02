@@ -31,6 +31,7 @@ class ShopTest < ActiveSupport::TestCase
   end
 
   test "Webhooks created after save" do
+    Shop.any_instance.stubs(:create_carrier_service)
     Shop.any_instance.stubs(:set_domain)
     ['paid','cancelled','create','updated','fulfilled'].each{ |name| expect_webhook(name) }
     shop = create(:shop)

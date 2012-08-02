@@ -3,14 +3,11 @@ require 'test_helper'
 class FulfillmentsControllerTest < ActionController::TestCase
 
   def setup
+    super
     session[:shopify] = ShopifyAPI::Session.new("http://localhost:3000/admin","123")
-    ShopifyAPI::Base.expects(:activate_session => true)
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
-    FulfillmentsController.any_instance.stubs(:shop_exists)
-    @shop = create(:shop)
-    FulfillmentsController.any_instance.stubs(:current_shop).returns(@shop)
+    stub_api_session
+    stub_fulfillment_callbacks
+    stub_controller_filters(FulfillmentsController)
   end
 
   test "index: page renders" do
