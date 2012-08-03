@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120801144805) do
+ActiveRecord::Schema.define(:version => 20120803131839) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -43,6 +43,10 @@ ActiveRecord::Schema.define(:version => 20120801144805) do
     t.string   "shipped"
     t.integer  "fulfillment_id"
     t.string   "shipwire_order_id"
+    t.decimal  "origin_lat"
+    t.decimal  "origin_long"
+    t.decimal  "destination_lat"
+    t.decimal  "destination_long"
   end
 
   create_table "line_items", :force => true do |t|

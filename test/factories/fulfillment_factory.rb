@@ -20,5 +20,9 @@ FactoryGirl.define do
     total "4.47"
     returned "NO"
     shipped "YES"
+    origin_lat 3.5694
+    origin_long 86.7
+    destination_lat 9.432
+    destination_long 51.342
   end
 end
