@@ -12,6 +12,17 @@ module ActiveMerchant
       #   response = parse_tacking_updates_response(data)
       # end
 
+      # def build_tracking_updates_request
+      #   xml = Builder::XmlMarkup.new
+      #   xml.instruct!
+      #   xml.declare! :DOCTYPE, :InventoryStatus, :SYSTEM, SCHEMA_URLS[:inventory]
+      #   xml.tag! 'TrackingUpdate' do
+      #     add_credentials(xml)
+      #     xml.tag! 'Server', test? ? 'Test' : 'Production'
+      #     xml.tag! 'Bookmark', 3
+      #   end
+      # end
+
       def fetch_shop_tracking_info(shipwire_order_ids)
         request = build_tracking_request(shipwire_order_ids)
         data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
@@ -35,17 +46,44 @@ module ActiveMerchant
         end
       end
 
-      # TODO: remove if not using
-      # def build_tracking_updates_request
-      #   xml = Builder::XmlMarkup.new
-      #   xml.instruct!
-      #   xml.declare! :DOCTYPE, :InventoryStatus, :SYSTEM, SCHEMA_URLS[:inventory]
-      #   xml.tag! 'TrackingUpdate' do
-      #     add_credentials(xml)
-      #     xml.tag! 'Server', test? ? 'Test' : 'Production'
-      #     xml.tag! 'Bookmark', 3
-      #   end
-      # end
+      #######
+      ####### has to respond to new geo stuff
+      def build_fulfillment_request(order_id, shipping_address, line_items, options)
+        xml = Builder::XmlMarkup.new :indent => 2
+        xml.instruct!
+        xml.declare! :DOCTYPE, :OrderList, :SYSTEM, SCHEMA_URLS[:fulfillment]
+        xml.tag! 'OrderList' do
+          xml.tag? 'AffiliateId', 1894
+          add_credentials(xml)
+          xml.tag! 'Referer', 'Active Fulfillment'
+          add_order(xml, order_id, shipping_address, line_items, options)
+        end
+        xml.target!
+      end
+
+      def parse_fulfillment_response(xml)
+        response = {}
+
+        document = REXML::Document.new(xml)
+        document.root.elements.each do |node|
+          response[node.name.underscore.to_sym] = node.text
+        end
+
+        #Order information
+        #Routing
+        #Origin
+        #Latitude
+        #Longitude
+        #.. Destination
+        #Latitude
+        #Longitude
+
+        response[:success] = response[:status] == '0'
+        response[:message] = response[:success] ? "Successfully submitted the order" : message_from(response[:error_message])
+        response
+      end
+      #######
+      #######
 
       def parse_tracking_update_response(xml)
 
