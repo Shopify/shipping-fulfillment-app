@@ -10,9 +10,10 @@ class Shop < ActiveRecord::Base
 
   validates_presence_of :login, :password, :token
   validates :domain, :presence => true, :uniqueness => true
+  validate :check_shipwire_credentials
 
   before_create :set_domain
-  after_create :setup_webhooks, :create_carrier_service
+  after_create :setup_webhooks, :create_carrier_service, :create_fulfillment_service
 
   def credentials
     return {login: login, password: password}
@@ -35,6 +36,12 @@ class Shop < ActiveRecord::Base
     hooks.each { |topic, action| make_webhook(topic, action) }
   end
 
+  def check_shipwire_credentials
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
+    response = shipwire.fetch_stock_levels()
+    response.success?
+  end
+
   def make_webhook(topic, action)
     ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
   end
@@ -43,4 +50,7 @@ class Shop < ActiveRecord::Base
     carrier_service = ShopifyAPI::CarrierService.create
   end
 
+  def create_fulfillment_service
+    true
+  end
 end

@@ -19,8 +19,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "Updating fulfillment does not change shipwire_order_id" do
-    fulfillment = build(:fulfillment, :line_items => [build(:line_item)])
-    fulfillment.save
+    fulfillment = create_fulfillment
 
     before = fulfillment.shipwire_order_id
     fulfillment.update_attribute(:expected_delivery_date, DateTime.now)
@@ -76,7 +75,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   test "State machine transitions call update_fulfillment_status_with_shopify" do
     Fulfillment.any_instance.expects(:update_fulfillment_status_on_shopify).times(3)
 
-    fulfillment = create(:fulfillment, :line_items => [build(:line_item)])
+    fulfillment = create_fulfillment
     fulfillment.success
 
     fulfillment.status = 'pending'

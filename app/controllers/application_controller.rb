@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   private
 
   def shop_exists
-    redirect_to(login_path) unless session.has_key?(:shop)
+    redirect_to(login_path, :alert => "You must create an account") unless session.has_key?(:shop)
   end
 
   def current_shop

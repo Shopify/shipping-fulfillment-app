@@ -43,18 +43,15 @@ class ActiveSupport::TestCase
   end
 
   def stub_shop_callbacks
-    Shop.any_instance.stubs(:setup_webhooks)
-    Shop.any_instance.stubs(:set_domain)
-    Shop.any_instance.stubs(:create_carrier_service)
+    stub_callbacks(Shop, %w{setup_webhooks set_domain create_carrier_service create_fulfillment_service check_shipwire_credentials})
   end
 
   def stub_variant_callbacks
-    Variant.any_instance.stubs(:confirm_sku)
-    Variant.any_instance.stubs(:update_shopify)
+    stub_callbacks(Variant, %w{confirm_sku update_shopify})
   end
 
   def stub_fulfillment_callbacks
-    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+    stub_callbacks(Fulfillment, %w{create_mirror_fulfillment_on_shopify update_fulfillment_status_on_shopify})
   end
 
   def stub_api_session
@@ -65,6 +62,14 @@ class ActiveSupport::TestCase
   def stub_controller_filters(controller)
     controller.any_instance.stubs(:shop_exists)
     controller.any_instance.stubs(:current_shop).returns(@shop)
+  end
+
+  def stub_callbacks(klass, callbacks)
+    callbacks.each { |callback| klass.any_instance.stubs(callback.to_sym) }
+  end
+
+  def create_fulfillment
+    create(:fulfillment, :line_items => [build(:line_item)])
   end
 end
 

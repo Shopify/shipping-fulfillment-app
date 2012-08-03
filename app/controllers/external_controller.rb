@@ -10,8 +10,23 @@ class ExternalController < ApplicationController
   rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
 
   def shipping_rates
-    @rates = ItemShippingRates(credentials, @params[:items],@params[:destination]).rate_from_estimate
+    @rates = ShippingRates(@shop.credentials, @params[:items],@params[:destination]).rate_from_estimate
     @rates.to_json
+  end
+
+  def fetch_stock
+    shipwire = ActiveMerchant::Shipping::Shipwire.new(@shop.credentials)
+    shipwire.fetch_stock_levels(@params[:options])
+  end
+
+  def fetch_tracking_numbers
+    shipwire = ActiveMerchant::Shipping::Shipwire.new(@shop.credentials)
+    shipwire.fetch_tracking_numbers(@params[:order_ids])
+  end
+
+  def fulfill_order
+    @params[:order_ids].map! { |order_id| Order.find_by_shopify_order_id(order_id).id }
+    Fulfillment.fulfill(@shop, params)
   end
 
   private
@@ -19,9 +34,12 @@ class ExternalController < ApplicationController
   def verify_shopify_request
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
-    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
     head :unauthorized unless calculated_hmac == hmac
     request.body.rewind
+  end
+
+  def calculated_hmac
+    Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
   end
 
   def hmac
@@ -34,7 +52,7 @@ class ExternalController < ApplicationController
 
   def credentials
     domain = request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']
-    Shop.find_by_domain(domain).credentials
+    @shop = Shop.find_by_domain(domain)
   end
 
 end

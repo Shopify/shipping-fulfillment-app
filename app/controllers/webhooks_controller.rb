@@ -64,7 +64,6 @@ class WebhooksController < ApplicationController
   def verify_shopify_webhook
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
-    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
     head :unauthorized unless calculated_hmac == hmac
     request.body.rewind
   end
@@ -83,6 +82,10 @@ class WebhooksController < ApplicationController
 
   def hmac
     request.headers['HTTP_X_SHOPIFY_HMAC_SHA256']
+  end
+
+  def calculated_hmac
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
   end
 
 end

@@ -18,6 +18,12 @@ ShipwireApp::Application.routes.draw do
 
   match "external/shipping_rates" => "external#shipping_rates", :via => :post
 
+  match "external/fetch_stock" => "external#fetch_stock", :via => :post
+
+  match "external/fetch_tracking_numbers" => "external#fetch_tracking_numbers", :via => :post
+
+  match "external/fulfill_order" => "external#fulfill_order", :via => :post
+
   #webhook routes
 
   match "orderpaid" => "webhooks#create", :via => :post

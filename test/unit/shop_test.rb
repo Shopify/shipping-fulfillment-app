@@ -5,10 +5,6 @@ class ShopTest < ActiveSupport::TestCase
   should have_many(:orders)
   should have_many(:variants)
   should have_many(:fulfillments)
-  should validate_presence_of(:login)
-  should validate_presence_of(:password)
-  should validate_presence_of(:token)
-  should validate_presence_of(:domain)
 
   def setup
   end
@@ -31,10 +27,14 @@ class ShopTest < ActiveSupport::TestCase
   end
 
   test "Webhooks created after save" do
-    Shop.any_instance.stubs(:create_carrier_service)
-    Shop.any_instance.stubs(:set_domain)
-    ['paid','cancelled','create','updated','fulfilled'].each{ |name| expect_webhook(name) }
+    stub_callbacks(Shop, %w{check_shipwire_credentials create_carrier_service set_domain create_fulfillment_service})
+
+    %w{paid cancelled create updated fulfilled}.each{ |name| expect_webhook(name) }
     shop = create(:shop)
+  end
+
+  test "check_shipwire_credentials validates credentials" do
+    assert true
   end
 
   test "automatic fulfillment setting for a shop" do
