@@ -32,35 +32,4 @@ class FulfillmentJobTest < ActiveSupport::TestCase
 
   end
 
-  ## WONT WORK WITH OVERIDDEN fulfill in shipwire_extensions.rb
-  # test "shipwire example api call" do
-
-  #   FakeWeb.allow_net_connect = true
-
-  #   shipwire = ActiveMerchant::Fulfillment::ShipwireService.new({:login => 'pixels@jadedpixel.com', :password => 'Ultimate', :test => true})
-
-  #   options = {
-  #     :warehouse => 'LAX',
-  #     :shipping_method => 'UPS Ground',
-  #     :email => 'cody@example.com'
-  #   }
-
-  #   us_address = {
-  #     :name     => 'Steve Jobs',
-  #     :company  => 'Apple Computer Inc.',
-  #     :address1 => '1 Infinite Loop',
-  #     :city     => 'Cupertino',
-  #     :state    => 'CA',
-  #     :country  => 'US',
-  #     :zip      => '95014',
-  #     :email    => 'steve@apple.com'
-  #   }
-
-  #   line_items = [ { :sku => 'AF0001', :quantity => 25 } ]
-
-  #   response = shipwire.fulfill('123456', us_address, line_items, options)
-
-  #   assert response.success?
-  # end
-
 end

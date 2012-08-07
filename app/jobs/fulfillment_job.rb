@@ -13,9 +13,8 @@ class FulfillmentJob
     response = shipwire.fulfill(fulfillment.shipwire_order_id, fulfillment.order.shipping_address, line_items, options)
     if response.success?
       fulfillment.success
-      # TODO: update fulfillment api request, overwrite current fulfillment for shipwire to look for routes
       %w(origin_lat origin_long destination_lat destination_long).each do |key|
-        fulfillment.update_attribute(key, BigDecimal.new(response.params[key])) if response.params.has_key?(key)
+        fulfillment.update_attribute(key, BigDecimal.new(response[key])) if response.has_key?(key)
       end
     else
       fulfillment.record_failure
