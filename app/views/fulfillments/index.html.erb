@@ -114,7 +114,7 @@ $(document).ready(function(){
 
   <% @fulfillments.select(&:geolocation?).each do |fulfillment| %>
     var origin = new google.maps.LatLng(<%= fulfillment.origin_lat %>, <%= fulfillment.origin_long %>);
-    var destination = new google.maps.LatLng(<%= fulfillment.destination_lat %>, <%= fulfillment.destination_long %>);
+    var destination = new google.maps.LatLng(<%= fulfillment.destination_lat.to_s %>, <%= fulfillment.destination_long.to_s %>);
     var address = '<%= fulfillment.order.shipping_address.address1 %>';
     var shipped = '<%= fulfillment.shipped.downcase %>';
     var shipper = '<%= fulfillment.shipper_name %>';

@@ -20,9 +20,20 @@ FactoryGirl.define do
     total "4.47"
     returned "NO"
     shipped "YES"
-    origin_lat 3.5694
-    origin_long 86.7
-    destination_lat 9.432
-    destination_long 51.342
+    origin_lat BigDecimal.new("3.5694")
+    origin_long BigDecimal.new("86.7")
+    destination_lat BigDecimal.new("9.432")
+    destination_long BigDecimal.new("51.3 4")
+
+    factory :other_fulfillment do
+        origin_lat BigDecimal.new("56.8")
+        origin_long BigDecimal.new("53.4")
+        destination_lat BigDecimal.new("34.2")
+        destination_long BigDecimal.new("102.4")
+    end
   end
 end
+
+
+origin_lat: #&lt;BigDecimal:7fb04b019098,'0.35694E1',18(45)&gt;, origin_long: #&lt;BigDecimal:7fb04b018e90,'0.867E2',18(45)&gt;, destination_lat: #&lt;BigDecimal:7fb04b018c38,'0.9432E1',18(45)&gt;, destination_long: #&lt;BigDecimal:7fb04b018a30,'0.51342E2',18(45)
+origin_lat: #&lt;BigDecimal:7fb04b00b3f8,'0.35694E1',18(45)&gt;, origin_long: #&lt;BigDecimal:7fb04b00b1f0,'0.867E2',18(45)&gt;, destination_lat: #&lt;BigDecimal:7fb04b00afe8,'0.9432E1',18(45)&gt;, destination_long: #&lt;BigDecimal:7fb04b00ade0,'0.51342E2',18(45)

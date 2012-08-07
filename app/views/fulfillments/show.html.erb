@@ -9,7 +9,13 @@
       <% end %>
     </ul>
 
-<hr />
+    <hr />
+
+    <h3>Address</h3>
+        <% address = @fulfillment.order.shipping_address %>
+        <%= address.address1 %><br />
+        <%= address.city %>, <%= address.province %>, <%= address.country %> <%= address.zip %>
+    <hr />
 
     <h3>Tracking</h3>
 
