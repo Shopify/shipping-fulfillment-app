@@ -23,6 +23,8 @@ module ActiveMerchant
       #   end
       # end
 
+      #######
+      ####### BEGIN TESTED
       def fetch_shop_tracking_info(shipwire_order_ids)
         request = build_tracking_request(shipwire_order_ids)
         data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
@@ -46,14 +48,12 @@ module ActiveMerchant
         end
       end
 
-      #######
-      ####### has to respond to new geo stuff
       def build_fulfillment_request(order_id, shipping_address, line_items, options)
         xml = Builder::XmlMarkup.new :indent => 2
         xml.instruct!
         xml.declare! :DOCTYPE, :OrderList, :SYSTEM, SCHEMA_URLS[:fulfillment]
         xml.tag! 'OrderList' do
-          xml.tag? 'AffiliateId', 1894
+          xml.tag! 'AffiliateId', 1894
           add_credentials(xml)
           xml.tag! 'Referer', 'Active Fulfillment'
           add_order(xml, order_id, shipping_address, line_items, options)
@@ -69,21 +69,24 @@ module ActiveMerchant
           response[node.name.underscore.to_sym] = node.text
         end
 
-        #Order information
-        #Routing
-        #Origin
-        #Latitude
-        #Longitude
-        #.. Destination
-        #Latitude
-        #Longitude
+        base_path = 'SubmitOrderResponse/OrderInformation/Order/Routing/'
+
+        if REXML::XPath.first(document, base_path)
+          extensions = {
+            origin_lat: 'Origin/Latitude',
+            origin_long: 'Origin/Longitude',
+            destination_lat: 'Destination/Latitude',
+            destination_long: 'Destination/Longitude'
+          }
+          extensions.each do |key, extension|
+            response[key] = REXML::XPath.first(document, base_path + extension).text
+          end
+        end
 
         response[:success] = response[:status] == '0'
         response[:message] = response[:success] ? "Successfully submitted the order" : message_from(response[:error_message])
         response
       end
-      #######
-      #######
 
       def parse_tracking_update_response(xml)
 
@@ -97,26 +100,31 @@ module ActiveMerchant
             get = node.attributes
             tracking = node.elements["TrackingNumber"]
 
-            response[id]["shipped"] = get["shipped"]
-            response[id]["shipper_name"] = get["shipperFullName"]
-            response[id]["return_condition"] = get["returnCondition"]
-            response[id]["total"] = get["total"]
-            response[id]["returned"] = get["returned"]
+            response[id][:shipped] = get["shipped"]
+            response[id][:shipper_name] = get["shipperFullName"]
+            response[id][:return_condition] = get["returnCondition"]
+            response[id][:total] = get["total"]
+            response[id][:returned] = get["returned"]
 
-            response[id]["ship_date"] = DateTime.parse(get["expectedDeliveryDate"]) if get["expectedDeliveryDate"]
-            response[id]["expected_delivery_date"] = DateTime.parse(get["expectedDeliveryDate"]) if get["expectedDeliveryDate"]
-            response[id]["return_date"] = DateTime.parse(get["returnDate"]) if get["returnDate"]
+            response[id][:ship_date] = DateTime.parse(get["expectedDeliveryDate"]) if get["expectedDeliveryDate"]
+            response[id][:expected_delivery_date] = DateTime.parse(get["expectedDeliveryDate"]) if get["expectedDeliveryDate"]
+            response[id][:return_date] = DateTime.parse(get["returnDate"]) if get["returnDate"]
 
             if tracking
-              response[id]["tracking_carrier"] = tracking.attributes["carrier"]
-              response[id]["tracking_link"] = tracking.attributes["href"]
-              response[id]["tracking_number"] = tracking.text
+              response[id][:tracking_carrier] = tracking.attributes["carrier"]
+              response[id][:tracking_link] = tracking.attributes["href"]
+              response[id][:tracking_number] = tracking.text.strip
             end
 
           end
         end
         response
       end
+
+      ####### END TESTED
+      #######
+
+
 
       def parse_total_inventory_response(xml)
         response = {}
@@ -127,13 +135,14 @@ module ActiveMerchant
           if node.name == 'Product'
             response[:stock_levels][node.attributes['code']] = {}
             base = response[:stock_levels][node.attributes['code']]
-            node.attributes.except('code','good','consuming','consumed','creating','created').each do |attribute|
-              base[attribute.to_sym] = node.attributes[attribute]
+            node.attributes.except('code','good','consuming','consumed','creating','created').each do |attribute, value|
+              base[attribute.to_sym] = value
             end
           end
         end
 
-        response[:success] = test? ? response[:status] == 'Test' : response[:status] == '0'
+        response[:status] = REXML::XPath.first(document,'InventoryUpdateResponse/Status').text
+        response[:success] = response[:status] == '0'
         response[:message] = response[:success] ? "Successfully received the stock levels" : message_from(response[:error_message])
 
         response
