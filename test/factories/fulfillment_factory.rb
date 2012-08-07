@@ -33,7 +33,3 @@ FactoryGirl.define do
     end
   end
 end
-
-
-origin_lat: #&lt;BigDecimal:7fb04b019098,'0.35694E1',18(45)&gt;, origin_long: #&lt;BigDecimal:7fb04b018e90,'0.867E2',18(45)&gt;, destination_lat: #&lt;BigDecimal:7fb04b018c38,'0.9432E1',18(45)&gt;, destination_long: #&lt;BigDecimal:7fb04b018a30,'0.51342E2',18(45)
-origin_lat: #&lt;BigDecimal:7fb04b00b3f8,'0.35694E1',18(45)&gt;, origin_long: #&lt;BigDecimal:7fb04b00b1f0,'0.867E2',18(45)&gt;, destination_lat: #&lt;BigDecimal:7fb04b00afe8,'0.9432E1',18(45)&gt;, destination_long: #&lt;BigDecimal:7fb04b00ade0,'0.51342E2',18(45)
