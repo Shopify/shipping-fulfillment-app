@@ -47,10 +47,26 @@ class Shop < ActiveRecord::Base
   end
 
   def create_carrier_service
-    carrier_service = ShopifyAPI::CarrierService.create
+    carrier_service = ShopifyAPI::CarrierService.create()
   end
 
   def create_fulfillment_service
-    true
+
+    params = {
+      fulfillment_service:{
+        fulfillment_service_type: 'app',
+        credential1: login,
+        credential2: password,
+        name: 'shipwire',
+        handle: 'shipwire',
+        email: nil,
+        endpoint: nil,
+        template: nil,
+        remote_address: nil,
+        include_pending_stock: 0
+      }
+    }
+
+    ShopifyAPI::FulfillmentService.create(params)
   end
 end

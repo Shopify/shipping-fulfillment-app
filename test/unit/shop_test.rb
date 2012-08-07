@@ -13,6 +13,23 @@ class ShopTest < ActiveSupport::TestCase
     ShopifyAPI::Webhook.expects(:create).with({topic: 'orders/'+name, address: 'http://shipwireapp:3001/order'+name, format: 'json'})
   end
 
+  def fulfillment_service_params
+    {
+      fulfillment_service:{
+        fulfillment_service_type: 'app',
+        credential1: 'David',
+        credential2: 'password',
+        name: 'shipwire',
+        handle: 'shipwire',
+        email: nil,
+        endpoint: nil,
+        template: nil,
+        remote_address: nil,
+        include_pending_stock: 0
+      }
+    }
+  end
+
   test "Valid shop saves" do
     stub_shop_callbacks
 
@@ -44,6 +61,12 @@ class ShopTest < ActiveSupport::TestCase
 
     shop.automatic_fulfillment = true
     assert shop.automatic_fulfillment?
+  end
+
+  test "create fulfillment service webhook makes shopify api call with correct params" do
+    ShopifyAPI::FulfillmentService.expects(:create).with(fulfillment_service_params)
+    stub_callbacks(Shop, %w{check_shipwire_credentials create_carrier_service set_domain setup_webhooks})
+    create(:shop)
   end
 
 end
