@@ -2,9 +2,6 @@ require 'test_helper'
 
 class FulfillmentTest < ActiveSupport::TestCase
 
-  should belong_to :shop
-  should have_many :line_items
-
   def setup
     super
     stub_fulfillment_callbacks
@@ -148,6 +145,14 @@ class FulfillmentTest < ActiveSupport::TestCase
 
      assert !Fulfillment.fulfill(@shop, params)
      assert Fulfillment.where('order_id = ?', order.id).empty?
+  end
+
+  test "Geolocation? returns true if all geolocation fields are present and false otherwise" do
+    fulfillment = create_fulfillment
+    assert fulfillment.geolocation?
+
+    fulfillment.update_attribute('destination_lat',nil)
+    assert !fulfillment.geolocation?
   end
 end
 

@@ -14,7 +14,7 @@ class FulfillmentJob
     if response.success?
       fulfillment.success
       %w(origin_lat origin_long destination_lat destination_long).each do |key|
-        fulfillment.update_attribute(key, BigDecimal.new(response[key])) if response.has_key?(key)
+        fulfillment.update_attribute(key, BigDecimal.new(response.params[key])) if response.params.has_key?(key)
       end
     else
       fulfillment.record_failure

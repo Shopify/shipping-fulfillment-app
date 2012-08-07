@@ -35,6 +35,11 @@ class Fulfillment < ActiveRecord::Base
     self.fulfill_orders(current_shop, params[:order_ids], params[:shipping_method], params[:warehouse] || '00', params[:line_item_ids] || [])
   end
 
+  def geolocation?
+    locations = [origin_lat, origin_long, destination_lat, destination_long]
+    locations.all? {|location| location}
+  end
+
 
   private
 

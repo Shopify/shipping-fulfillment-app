@@ -1,50 +1,3 @@
-<div class="span9 offset1">
-    <h2>Shipwire Fulfillments</h2>
-    <hr>
-
-    <div id="map_container">
-    </div>
-
-    <% if @fulfillments.blank? %>
-        <p>You have not made any fulfillments yet.</p>
-    <% else %>
-
-
-
-    <table class="table table-striped">
-        <thead>
-          <tr>
-            <th class="sortcol">Fulfillment</th>
-            <th class="sortcol">Shipping Service</th>
-            <th class="sortcol">Ship Date</th>
-            <th class="sortcol">Expected Delivery Date</th>
-            <th class="sortcol">Returned</th>
-            <th class="sortcol">Total</th>
-            <th class="sortcol">More Details</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @fulfillments.each do |fulfillment| %>
-            <tr>
-            <td><%= fulfillment.shipwire_order_id %></td>
-            <td><%= fulfillment.shipper_name %></td>
-            <td><%= fulfillment.ship_date %></td>
-            <td><%= fulfillment.expected_delivery_date%></td>
-            <td><%= fulfillment.returned %></td>
-            <td><%= fulfillment.total %></td>
-            <td><%= link_to 'view', fulfillment %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-
-    <% end %>
-</div>
-<script type="text/javascript"
-  src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false">
-</script>
-<%= javascript_include_tag "markercluster.js" %>
-<script type="text/javascript">
 $(document).ready(function(){
   var usLocation = new google.maps.LatLng(37.09024, -95.71289);
 
@@ -59,7 +12,8 @@ $(document).ready(function(){
   var markerClusterer = new MarkerClusterer(map, Array(), {'maxZoom':10});
 
   var geocoder = new google.maps.Geocoder();
-  var Delivery = function(origin, destination, address, shipped, shipperFullName, expectedDeliveryDate, link){
+
+  var Delivery = function(origin, destination, shipped, shipperFullName, expectedDeliveryDate, link){
     var self = this;
     var base = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&';
     var targetImage = base + 'chco=FFFFFF,DD8CFF,000000&ext=.png';
@@ -112,15 +66,29 @@ $(document).ready(function(){
     route.setMap(map);
   }
 
-  <% @fulfillments.select(&:geolocation?).each do |fulfillment| %>
-    var origin = new google.maps.LatLng(<%= fulfillment.origin_lat %>, <%= fulfillment.origin_long %>);
-    var destination = new google.maps.LatLng(<%= fulfillment.destination_lat %>, <%= fulfillment.destination_long %>);
+  <% @fulfillments.each do |fulfillment| %>
+    var origin = new google.maps.LatLng(<%= fulfillment.origin_lat %>, <%= fulfillment.origin_long%>);
+    var destination = new google.maps.LatLng(<%= fulfillment.destination_lat %>, <%= fulfillment.destination_long%>);
     var address = '<%= fulfillment.order.shipping_address.address1 %>';
     var shipped = '<%= fulfillment.shipped.downcase %>';
     var shipper = '<%= fulfillment.shipper_name %>';
     var expectedDate = '<%= fulfillment.expected_delivery_date %>';
-    var linkPath = '<%= fulfillment_path(fulfillment.id) %>';
-    new Delivery(origin, destination, address, shipped, shipper, expectedDate, linkPath)
+    var linkPath = '<%= fulfillment.tracking_link %>';
+    new Delivery(origin, destination,address, shipped, shipper, expectedDate, linkPath)
   <% end %>
+  // var v1 = new google.maps.LatLng(38.1,39.2);
+  // var v2 = new google.maps.LatLng(40.7,50.8);
+  // var v3 = new google.maps.LatLng(45.6,96.3);
+  // var v4 = new google.maps.LatLng(35.4,23.4);
+  // var v5 = new google.maps.LatLng(-19.3,-14.6);
+  // var v6 = new google.maps.LatLng(32.11,32.222);
+  // var v7 = new google.maps.LatLng(0.34,-60.56);
+  // var v8 = new google.maps.LatLng(1.5,1.6);
+
+
+  // d = new Delivery(v1,v2, 'Yes','someshipper', 'somedate','linkpath');
+  // e = new Delivery(v3,v4,'7318 Black Swan Place, Carlsbad, CA', 'Yes','someshipper', 'somedate','linkpath');
+  // f = new Delivery(v5,v6,'7319 Black Swan Place, Carlsbad, CA', 'Yes','someshipper', 'somedate','linkpath');
+  // g = new Delivery(v7,v8,'7320 Black Swan Place, Carlsbad, CA', 'Yes','someshipper', 'somedate','linkpath');
+
 });
-</script>
