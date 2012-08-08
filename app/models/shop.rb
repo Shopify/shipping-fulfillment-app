@@ -16,7 +16,8 @@ class Shop < ActiveRecord::Base
   after_create :setup_webhooks, :create_carrier_service, :create_fulfillment_service
 
   def credentials
-    return {login: login, password: password}
+    Rails.env == 'production' ? test = false : test = true
+    {login: login, password: password, test: test}
   end
 
   private

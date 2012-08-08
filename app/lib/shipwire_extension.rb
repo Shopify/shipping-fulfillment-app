@@ -23,8 +23,6 @@ module ActiveMerchant
       #   end
       # end
 
-      #######
-      ####### BEGIN TESTED
       def fetch_shop_tracking_info(shipwire_order_ids)
         request = build_tracking_request(shipwire_order_ids)
         data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
@@ -120,10 +118,6 @@ module ActiveMerchant
         end
         response
       end
-
-      ####### END TESTED
-      #######
-
 
 
       def parse_total_inventory_response(xml)

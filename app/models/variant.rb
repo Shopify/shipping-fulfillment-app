@@ -15,6 +15,7 @@ class Variant < ActiveRecord::Base
   def confirm_sku
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
     response = shipwire.fetch_stock_levels(:sku => sku)
+    puts "RESPONSE: #{response.inspect}"
     if response.success && response.stock_levels[sku].present?
       self.quantity = response.stock_levels[sku]
     else

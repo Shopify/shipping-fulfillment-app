@@ -9,6 +9,7 @@ class VariantsController < ApplicationController
   end
 
   def create
+    puts "CREATE CALLED"
     if current_shop.variants.create(shopify_variant_id: params[:shopify_variant_id], sku: params[:sku], title: params[:title])
       redirect_to variants_path, notice: "The variant is now managa by shipwire."
     else
