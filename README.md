@@ -1,7 +1,7 @@
 shipwire-app
 ============
 
-shipwire-app
+This app is the first step in factoring fulfillment services out of the shopify core.
 
 
 Getting Started
