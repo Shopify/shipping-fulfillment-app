@@ -20,7 +20,7 @@
         <td><%= f.text_field @variant.sku, {value: @variant.sku} %></td>
         <% if @variant.class == ShopifyAPI::Variant %>
           <td><%= @variant.inventory_quantity %></td>
-          <td><input type="submit" class="btn btn-success" value="Manage with Shipwire"/></td>
+          <td><%= f.submit "Manage with Shipwire",  :class => "btn btn-success" %></td>
         <% else %>
           <td><%= @variant.quantity %></td>
           <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :data => {:confirm => 'Are you sure?'}} %></td>
