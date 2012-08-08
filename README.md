@@ -15,3 +15,4 @@ Getting Started
 +Run your local version of shopify on port 3000
 and the shipwire app on port 3001 ie. rails server -p 3001
 
+### Warren D is a G
