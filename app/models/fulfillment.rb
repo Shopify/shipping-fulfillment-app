@@ -99,7 +99,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def make_shipwire_order_id
-    number = SecureRandom.hex(16)
+    number = SecureRandom.hex(4)
     self.shipwire_order_id ||= "#{self.order.id}.#{number}"
   end
 
