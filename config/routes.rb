@@ -50,6 +50,8 @@ ShipwireApp::Application.routes.draw do
 
   #other routes
 
+  match 'test' => 'external#test', :via => :post
+
   root :to                   => 'login#index'
 
   mount Resque::Server, :at =>  '/resque' if Rails.env == 'development'

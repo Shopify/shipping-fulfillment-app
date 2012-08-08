@@ -29,6 +29,10 @@ class ExternalController < ApplicationController
     Fulfillment.fulfill(@shop, params)
   end
 
+  def test
+    puts "PARAMS: #{@params.inspect}"
+  end
+
   private
 
   def verify_shopify_request
