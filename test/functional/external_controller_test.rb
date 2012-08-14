@@ -20,4 +20,12 @@ class ExternalControllerTest < ActionController::TestCase
   test "fulfill_order" do
 
   end
+
+  test "build_xml" do
+    assert_equal build_xml({"sku1" => 1, "sku2" => 2})
+  end
+
+  def example_xml
+    '<StockLevels><Product><Sku>sku1</Sku><Quantity>1</Quantity></Product><Product><Sku>sku2</Sku><Quantity>2</Quantity></Product></StockLevels>'
+  end
 end

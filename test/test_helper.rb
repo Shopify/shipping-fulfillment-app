@@ -43,15 +43,15 @@ class ActiveSupport::TestCase
   end
 
   def stub_shop_callbacks
-    stub_callbacks(Shop, %w{setup_webhooks set_domain create_carrier_service create_fulfillment_service check_shipwire_credentials})
+    stub_callbacks(Shop, %w(setup_webhooks set_domain create_carrier_service create_fulfillment_service check_shipwire_credentials))
   end
 
   def stub_variant_callbacks
-    stub_callbacks(Variant, %w{confirm_sku update_shopify})
+    stub_callbacks(Variant, %w(confirm_sku update_shopify))
   end
 
   def stub_fulfillment_callbacks
-    stub_callbacks(Fulfillment, %w{create_mirror_fulfillment_on_shopify update_fulfillment_status_on_shopify})
+    stub_callbacks(Fulfillment, %w(create_mirror_fulfillment_on_shopify update_fulfillment_status_on_shopify))
   end
 
   def stub_api_session
@@ -72,14 +72,3 @@ class ActiveSupport::TestCase
     create(:fulfillment, :line_items => [build(:line_item)])
   end
 end
-
-## No integration tests yet
-# class ActionDispatch::IntegrationTest
-#   include Capybara::DSL
-
-
-#   def teardown
-#     Capybara.reset_sessions!
-#     Capybara.use_default_driver
-#   end
-# end

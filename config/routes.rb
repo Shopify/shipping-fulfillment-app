@@ -1,14 +1,12 @@
 ShipwireApp::Application.routes.draw do
 
-  #TODO Routing
-
   #resource routes
 
   resource :shop, :except => [:new, :edit, :destroy]
 
   resources :fulfillments, :only => [:index, :show, :create]
 
-  resources :orders, :only => [:index, :show] 
+  resources :orders, :only => [:index, :show]
 
   resources :variants, :except => [:update, :new, :edit]
 
@@ -16,25 +14,26 @@ ShipwireApp::Application.routes.draw do
 
   #external routes
 
-  match "external/shipping_rates" => "external#shipping_rates", :via => :post
+  match "external/shipping_rates" => "external#shipping_rates", :via => :post #Consider removing the external
 
-  match "external/fetch_stock" => "external#fetch_stock", :via => :post
+  match "fetch_stock" => "external#fetch_stock", :via => [:get, :post]
 
-  match "external/fetch_tracking_numbers" => "external#fetch_tracking_numbers", :via => :post
+  match "fetch_tracking_numbers" => "external#fetch_tracking_numbers", :via => :post
 
-  match "external/fulfill_order" => "external#fulfill_order", :via => :post
 
   #webhook routes
 
-  match "orderpaid" => "webhooks#create", :via => :post
+  match "orderpaid" => "webhooks#order", :via => :post
 
-  match "ordercancelled" => "webhooks#create", :via => :post
+  match "ordercancelled" => "webhooks#order", :via => :post
 
-  match "orderfulfilled" => "webhooks#create", :via => :post
+  match "orderfulfilled" => "webhooks#order", :via => :post
 
-  match "ordercreated" => "webhooks#create", :via => :post
+  match "ordercreated" => "webhooks#order", :via => :post
 
-  match "orderupdated" => "webhooks#create", :via => :post
+  match "orderupdated" => "webhooks#order", :via => :post
+
+  match "fulfillmentcreated" => "webhooks#fulfillment", :via => :post
 
   #login routes
 
@@ -50,7 +49,7 @@ ShipwireApp::Application.routes.draw do
 
   #other routes
 
-  match 'test' => 'external#test', :via => :post
+  match 'test' => 'external#fulfill_order', :via => :post #TODO REMOVE
 
   root :to                   => 'login#index'
 

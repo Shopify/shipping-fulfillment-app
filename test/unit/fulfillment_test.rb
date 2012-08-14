@@ -69,6 +69,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert !fulfillment.save, "Fulfillment with invalid shipping_method saves."
   end
 
+
   test "State machine transitions call update_fulfillment_status_with_shopify" do
     Fulfillment.any_instance.expects(:update_fulfillment_status_on_shopify).times(3)
 
@@ -156,12 +157,26 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 end
 
-class AnotherOtherFulfillmentTest < ActiveSupport::TestCase
+class MoreFulfillmentTests < ActiveSupport::TestCase
   def setup
     Shop.any_instance.stubs(:setup_webhooks)
 
     @shop = build(:shop)
     @order = create(:order, :shop_id => @shop.id)
+  end
+
+  test "Updating the fulfillment status makes a ShopifyAPI::Fulfillment call" do
+    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+    stub_shop_callbacks
+    fulfillment = create_fulfillment
+    params = {
+      id: fulfillment.shopify_fulfillment_id,
+      status: 'success',
+      order_id: fulfillment.order.id
+    }
+    ShopifyAPI::Fulfillment.expects(:new).with(params)
+    NilClass.any_instance.expects(:save)
+    fulfillment.success
   end
 
   test "create_mirror_fulfillment_on_shopify" do
@@ -172,4 +187,6 @@ class AnotherOtherFulfillmentTest < ActiveSupport::TestCase
 
     assert Fulfillment.fulfill(@shop, params)
   end
+
+  private
 end

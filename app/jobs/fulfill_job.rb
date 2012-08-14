@@ -1,4 +1,4 @@
-class FulfillmentJob
+class FulfillJob
   @queue = :default
 
   def self.perform(fulfillment_id)

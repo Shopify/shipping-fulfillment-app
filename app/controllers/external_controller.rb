@@ -1,13 +1,14 @@
 class ExternalController < ApplicationController
-  respond_to :json, only: [:shipping_rates]
+  #respond_to :json#, only: [:shipping_rates, :fetch_stock]#TODO change after testing
 
   skip_before_filter :verify_authenticity_token
   skip_before_filter :shop_exists
   skip_around_filter :shopify_session
 
-  before_filter :verify_shopify_request, :symbolize_params
+  # before_filter :verify_shopify_request
+  before_filter :symbolize_params
 
-  rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
+  # rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
 
   def shipping_rates
     @rates = ShippingRates(@shop.credentials, @params[:items],@params[:destination]).rate_from_estimate
@@ -16,34 +17,57 @@ class ExternalController < ApplicationController
 
   def fetch_stock
     shipwire = ActiveMerchant::Shipping::Shipwire.new(@shop.credentials)
-    shipwire.fetch_stock_levels(@params[:options])
+    response = shipwire.fetch_stock_levels(@params[:sku])
+    stock_levels = response.stock_levels
+    respond_to do |format|
+      format.json { render :json => stock_levels }
+      format.xml { render :xml => build_stock_xml(stock_levels) }
+    end
   end
 
   def fetch_tracking_numbers
     shipwire = ActiveMerchant::Shipping::Shipwire.new(@shop.credentials)
-    shipwire.fetch_tracking_numbers(@params[:order_ids])
+    order_ids = convert_to_array(@params[:order_ids])
+    response = shipwire.fetch_tracking_numbers(order_ids)
+    tracking_numbers = response.tracking_numbers
+    respond_to do |format|
+      format.json { render :json => tracking_numbers }
+      format.xml { render :xml => build_tracking_xml(tracking_numbers) }
+    end
   end
 
   def fulfill_order
-    @params[:order_ids].map! { |order_id| Order.find_by_shopify_order_id(order_id).id }
-    Fulfillment.fulfill(@shop, params)
+    head :ok
   end
 
-  def test
-    puts "PARAMS: #{@params.inspect}"
+  def convert_to_array(string_array)
+    string_array[0...-1].split(',').map { |el| el.to_i }
   end
 
   private
 
+  def build_stock_xml(stock_levels)
+    output = "<StockLevels>"
+    stock_levels.keys.each do |key|
+      output.concat("<Product><Sku>" + key + "</Sku><Quantity>" + stock_levels[key].to_s + "</Quantity></Product>")
+    end
+    output.concat "</StockLevels>"
+  end
+
+  def build_tracking_xml(tracking_numbers)
+    output = "<TrackingNumbers>"
+    tracking_numbers.keys.each do |key|
+      output.concat("<Order><ID>" + key + "</ID><Tracking>" + tracking_numbers[key] + "</Tracking></Order>")
+    end
+    output.concat "</TrackingNumbers>"
+  end
+
   def verify_shopify_request
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
     head :unauthorized unless calculated_hmac == hmac
     request.body.rewind
-  end
-
-  def calculated_hmac
-    Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
   end
 
   def hmac
@@ -60,3 +84,4 @@ class ExternalController < ApplicationController
   end
 
 end
+

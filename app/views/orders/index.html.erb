@@ -22,9 +22,9 @@
         <tr id="<%= order.id %>">
           <% if !current_shop.automatic_fulfillment? %>
             <% if order.fulfillment_status == "fulfilled" || service_is_not_shipwire?(order) %>
-              <td><%= check_box_tag 'shopify_order_ids[]', order.id, false, :class => 'selector', :disabled => true %></td>
+              <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => true %></td>
             <% else %>
-              <td><%= check_box_tag 'shopify_order_ids[]', order.id, false, :class => 'selector', :disabled => false %></td>
+              <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => false %></td>
             <% end %>
           <% end %>
           <td><%= link_to order.name, "/orders/"+order.id.to_s %></td>

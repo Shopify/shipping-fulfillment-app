@@ -12,8 +12,8 @@
           <%= f.password_field :password %>
         </div>
         <div class="field">
-          <%= f.label :automatic_fulfillment %>
-          <%= select(:shop, :automatic_fulfillment, options_for_select([[true,true], [false,false]])) %>
+          <%= f.label :fulfillment %>
+          <%= select(:shop, :automatic_fulfillment, options_for_select([['Automatic',true], ['Manual',false]])) %>
         </div>
         <div class="field">
           <%= f.label :submit %>
@@ -27,9 +27,9 @@
         <ul>
           <li>Shipwire Login: <input name="login" value="<%= @shop.login %>" /></li>
           <li>Shipwire Password: <input name="password" value="<%= @shop.password %>" /></li>
-          <li>Automatic Fulfillment: <select name="automatic_fulfillment">
-            <option><%= @shop.automatic_fulfillment %></option>
-            <option><%= !@shop.automatic_fulfillment %></option>
+          <li>Fulfillment: <select name="automatic_fulfillment">
+            <option><%= @shop.shop_fulfillment_type %></option>
+            <option><%= @shop.not_shop_fulfillment_type %></option>
           </select></li>
         </ul>
 

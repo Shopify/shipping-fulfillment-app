@@ -1,6 +1,8 @@
 class Fulfillment < ActiveRecord::Base
 
-  SHIPPING_CODES = %w{1D 2D GD FT INTL}
+  include FlagForAfterCommit
+
+  SHIPPING_CODES = %w(1D 2D GD FT INTL)
 
   attr_accessible :email, :shipping_method, :warehouse, :tracking_carrier, :tracking_link, :tracking_number, :ship_date, :expected_delivery_date, :return_date, :return_condition, :shipper_name, :total, :returned, :shipped, :line_items, :order_id, :status
 
@@ -15,7 +17,7 @@ class Fulfillment < ActiveRecord::Base
   validate :order_fulfillment_status
 
   before_validation :make_shipwire_order_id
-  after_create :create_mirror_fulfillment_on_shopify, :update_fulfillment_statuses
+  after_create :create_mirror_fulfillment_on_shopify, :update_association_fulfillment_statuses
 
 
   state_machine :status, :initial => :pending do
@@ -43,6 +45,34 @@ class Fulfillment < ActiveRecord::Base
 
   private
 
+  def create_mirror_fulfillment_on_shopify
+    shopify_fulfillment = ShopifyAPI::Fulfillment.create(
+      order_id: order.shopify_order_id,
+      shipping_method: shipping_method,
+      line_items: line_items.map(&:line_item_id)
+    )
+    self.update_attribute(:shopify_fulfillment_id, shopify_fulfillment.id)
+  end
+
+  def update_association_fulfillment_statuses
+    line_items.each { |item| item.update_attribute(:fulfillment_status, 'fulfilled') }
+    if order.line_items.all? { |item| item.fulfillment_status == 'fulfilled' }
+      order.update_attribute(:fulfillment_status, 'fulfilled')
+    end
+  end
+
+  def update_fulfillment_status_on_shopify
+    if %w(success cancelled record_failure).include?(status)
+      params = {
+        id: shopify_fulfillment_id,
+        status: status,
+        order_id: order.id
+      }
+      shopify_fulfillment = ShopifyAPI::Fulfillment.new(params)
+      shopify_fulfillment.save
+    end
+  end
+
   def self.fulfill_orders(current_shop, order_ids, shipping_method, warehouse, line_item_ids)
     valid_order_ids = order_ids.select { |id| current_shop.orders.map(&:id).include? id }
     valid_order_ids.each do |id|
@@ -65,25 +95,13 @@ class Fulfillment < ActiveRecord::Base
       })
 
     if fulfillment.save
-      Resque.enqueue(FulfillmentJob, fulfillment.id)
+      Resque.enqueue(FulfillJob, fulfillment.id)
       return true
     end
     false
   end
 
-  def create_mirror_fulfillment_on_shopify
-    fulfillment = ShopifyAPI::Fulfillment.create(
-      order_id: self.order.shopify_order_id,
-      shipping_method: shipping_method,
-      line_items: line_items.map(&:line_item_id)
-    )
-    self.update_attribute(:shopify_fulfillment_id, fulfillment.id)
-  end
 
-  def update_fulfillment_status_on_shopify
-    fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id)
-    fulfillment.update_attribute(:status,"#{status}") if [:success, :cancelled, :record_failure].include?(status)
-  end
 
   def order_fulfillment_status
     if (order.fulfillment_status == 'fulfilled') || (order.fulfillment_status =='cancelled')
@@ -101,12 +119,5 @@ class Fulfillment < ActiveRecord::Base
   def make_shipwire_order_id
     number = SecureRandom.hex(4)
     self.shipwire_order_id ||= "#{self.order.id}.#{number}"
-  end
-
-  def update_fulfillment_statuses
-    line_items.each { |item| item.update_attribute(:fulfillment_status, 'fulfilled')}
-    if Order.find(order.id).line_items.all?{ |item| item.fulfillment_status == 'fulfilled'}
-      order.update_attribute(:fulfillment_status,'fulfilled')
-    end
   end
 end

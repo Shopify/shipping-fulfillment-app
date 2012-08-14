@@ -5,7 +5,7 @@ gem 'rails', '3.2.6'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
+gem "sqlite3", "~> 1.3.6"
 gem 'active_fulfillment',    '1.0.3',  :git => 'git://github.com/Shopify/active_fulfillment.git', :ref => '2200cb8'
 gem "active_shipping", "~> 0.9.14"
 gem 'less-rails-bootstrap'

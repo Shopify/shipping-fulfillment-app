@@ -20,6 +20,20 @@ class Shop < ActiveRecord::Base
     {login: login, password: password, test: test}
   end
 
+  def shop_fulfillment_type
+    if automatic_fulfillment
+      return 'Automatic'
+    end
+    'Manual'
+  end
+
+  def not_shop_fulfillment_type
+    if automatic_fulfillment
+      return 'Manual'
+    end
+    'Automatic'
+  end
+
   private
 
   def set_domain
@@ -58,8 +72,8 @@ class Shop < ActiveRecord::Base
         fulfillment_service_type: 'app',
         credential1: login,
         credential2: password,
-        name: 'shipwire',
-        handle: 'shipwire',
+        name: 'shipwire_app',
+        handle: 'shipwire_app',
         email: nil,
         endpoint: nil,
         template: nil,

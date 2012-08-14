@@ -40,15 +40,15 @@
         <tbody>
             <td><%= @fulfillment.shipwire_order_id %></td>
             <td><%= @fulfillment.shipper_name %></td>
-            <td><%= @fulfillment.ship_date %></td>
-            <td><%= @fulfillment.expected_delivery_date%></td>
+            <td><%= time_ago_in_words @fulfillment.ship_date %></td>
+            <td><%= time_ago_in_words @fulfillment.expected_delivery_date%></td>
             <td><%= @fulfillment.tracking_carrier %></td>
             <td><%= link_to "Tracking Link", @fulfillment.tracking_link %></td>
             <td><%= @fulfillment.tracking_number %></td>
             <td><%= @fulfillment.total %></td>
             <% if @fulfillment.returned == "YES" %>
             <td><%= @fulfillment.returned %></td>
-            <td><%= @fulfillment.return_date %></td>
+            <td><%= time_ago_in_words @fulfillment.return_date %></td>
             <td><%= @fulfillment.return_condition %></td>
             <% end %>
         </tbody>

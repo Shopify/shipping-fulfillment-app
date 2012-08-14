@@ -19,8 +19,8 @@ class ShopTest < ActiveSupport::TestCase
         fulfillment_service_type: 'app',
         credential1: 'David',
         credential2: 'password',
-        name: 'shipwire',
-        handle: 'shipwire',
+        name: 'shipwire_app',
+        handle: 'shipwire_app',
         email: nil,
         endpoint: nil,
         template: nil,
@@ -40,18 +40,22 @@ class ShopTest < ActiveSupport::TestCase
     stub_shop_callbacks
     shop = create(:shop)
 
-    assert_equal shop.credentials, {login: shop.login, password: shop.password}
+    assert_equal shop.credentials, {login: shop.login, password: shop.password, test: true}
   end
 
   test "Webhooks created after save" do
-    stub_callbacks(Shop, %w{check_shipwire_credentials create_carrier_service set_domain create_fulfillment_service})
+    stub_callbacks(Shop, %w(check_shipwire_credentials create_carrier_service set_domain create_fulfillment_service))
 
-    %w{paid cancelled create updated fulfilled}.each{ |name| expect_webhook(name) }
+    %w(paid cancelled create updated fulfilled).each{ |name| expect_webhook(name) }
     shop = create(:shop)
   end
 
   test "check_shipwire_credentials validates credentials" do
-    assert true
+    stub_callbacks(Shop, %w(create_carrier_service set_domain create_fulfillment_service setup_webhooks))
+    response = stub(:success? => true)
+
+    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_stock_levels).returns(response)
+    shop = create(:shop)
   end
 
   test "automatic fulfillment setting for a shop" do
@@ -65,8 +69,16 @@ class ShopTest < ActiveSupport::TestCase
 
   test "create fulfillment service webhook makes shopify api call with correct params" do
     ShopifyAPI::FulfillmentService.expects(:create).with(fulfillment_service_params)
-    stub_callbacks(Shop, %w{check_shipwire_credentials create_carrier_service set_domain setup_webhooks})
+    stub_callbacks(Shop, %w(check_shipwire_credentials create_carrier_service set_domain setup_webhooks))
     create(:shop)
+  end
+
+  test "#shop_fulfillment_type returns fulfillment type" do
+    stub_shop_callbacks
+    shop = create(:shop)
+
+    assert_equal 'Manual', shop.shop_fulfillment_type
+    assert_equal 'Automatic', shop.not_shop_fulfillment_type
   end
 
 end

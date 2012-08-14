@@ -1,0 +1,2 @@
+class FulfillmentError < StandardError
+end

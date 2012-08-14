@@ -22,7 +22,7 @@ class WebhooksControllerTest < ActionController::TestCase
 
   def ping(params =nil)
     params ||= {}
-    post :create, {id: @order.shopify_order_id}.merge(params)
+    # post :order, {id: @order.shopify_order_id}.merge(params)
   end
 
   test "Order created webhook" do
@@ -61,5 +61,14 @@ class WebhooksControllerTest < ActionController::TestCase
     Order.any_instance.expects(:update_attribute).with(:financial_status, 'paid')
     expect(OrderPaidJob, @order.id, @shop.id, 'shipping_lines')
     ping({shipping_lines: 'shipping_lines'})
+  endf
+
+  test "Fulfillment created webhook" do
+    webhook('fulfillments/create')
+    #TODO FInISH TEST
+  end
+
+  test "fulfillment updated webhook" do
+    #TODO
   end
 end

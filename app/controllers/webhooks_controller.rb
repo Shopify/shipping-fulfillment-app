@@ -6,12 +6,13 @@ class WebhooksController < ApplicationController
 
   before_filter :sanitized_params
   before_filter :verify_shopify_webhook
-  before_filter :find_or_create_order
+  before_filter :find_or_create_order, :only => [:order]
+  before_filter :verify_shipwire_service, :only => [:fulfillment]
   before_filter :hook
 
   rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
 
-  def create
+  def order
     case @hook
       when 'orders/create'
         order_created
@@ -25,6 +26,15 @@ class WebhooksController < ApplicationController
         order_fulfilled
     end
     head :ok
+  end
+
+  def fulfillment
+    case @hook
+      when 'fulfillments/create'
+        fulfillment_created
+      when 'fulfillments/update'
+        fulfillment_updated
+    end
   end
 
   private
@@ -52,6 +62,15 @@ class WebhooksController < ApplicationController
     @order.update_attribute(:financial_status, 'paid')
   end
 
+  def fulfillment_created
+    raise FulfillmentError unless Fulfillment.where('shopify_fulfillment_id = ?', @params[:id]).blank?
+    Resque.enquue(CreateFulfillmentJob, @params[:line_items], @params[:shipping_method])
+  end
+
+  def fulfillment_updated
+    # TODO
+  end
+
   def find_or_create_order
     @shop = Shop.find_by_domain(shop_domain)
     if @shop.orders.where('shopify_order_id = ?', @params['id']).blank?
@@ -64,12 +83,17 @@ class WebhooksController < ApplicationController
   def verify_shopify_webhook
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
     head :unauthorized unless calculated_hmac == hmac
     request.body.rewind
   end
 
+  def verify_shipwire_service
+    raise FulfillmentError unless @params[:service] == 'shipwire'
+  end
+
   def sanitized_params
-    @params = params.except(:action, :controller).with_indifferent_access # json webhook data does not have root node
+    @params = params.except(:action, :controller).with_indifferent_access
   end
 
   def hook
@@ -82,10 +106,6 @@ class WebhooksController < ApplicationController
 
   def hmac
     request.headers['HTTP_X_SHOPIFY_HMAC_SHA256']
-  end
-
-  def calculated_hmac
-    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
   end
 
 end

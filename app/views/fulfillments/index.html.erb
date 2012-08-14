@@ -28,8 +28,8 @@
             <tr>
             <td><%= fulfillment.shipwire_order_id %></td>
             <td><%= fulfillment.shipper_name %></td>
-            <td><%= fulfillment.ship_date %></td>
-            <td><%= fulfillment.expected_delivery_date%></td>
+            <td><%= time_ago_in_words fulfillment.ship_date %></td>
+            <td><%= time_ago_in_words fulfillment.expected_delivery_date%></td>
             <td><%= fulfillment.returned %></td>
             <td><%= fulfillment.total %></td>
             <td><%= link_to 'view', fulfillment %></td>
