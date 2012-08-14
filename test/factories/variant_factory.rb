@@ -4,7 +4,7 @@ FactoryGirl.define do
     sequence(:shopify_variant_id){ |i| i }
     sku { SecureRandom.hex(16) }
     title "Rawling Baseball"
-    quantity "100"
+    quantity 100
     backordered "10"
     reserved "5"
     shipping "3"

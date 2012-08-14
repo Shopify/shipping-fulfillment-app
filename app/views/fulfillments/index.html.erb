@@ -40,13 +40,11 @@
 
     <% end %>
 </div>
-<script type="text/javascript"
-  src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false">
-</script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false"></script>
 <%= javascript_include_tag "markercluster.js" %>
 <script type="text/javascript">
 $(document).ready(function(){
-  var usLocation = new google.maps.LatLng(37.09024, -95.71289);
+  var usLocation = new google.maps.LatLng(34.32178452107211, -352.7379409249999);
 
   var mapOptions = {
     zoom: 2,
@@ -59,37 +57,34 @@ $(document).ready(function(){
   var markerClusterer = new MarkerClusterer(map, Array(), {'maxZoom':10});
 
   var geocoder = new google.maps.Geocoder();
-  var Delivery = function(origin, destination, address, shipped, shipperFullName, expectedDeliveryDate, link){
+
+  var Delivery = function(destination, shipped, shipperFullName, expectedDeliveryDate, link){
     var self = this;
     var base = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&';
     var targetImage = base + 'chco=FFFFFF,DD8CFF,000000&ext=.png';
-    var sourceImage = base + 'chco=AAFDAA,11BEEE,000333&ext=.png';
 
     var makeContent = function(){
       return "<ul><li>Address: " + address + "</li><li>Shipped: " + shipped + "</li><li>Shipping Service: " + shipperFullName + "</li><li>Expected Delivery Date: " + expectedDeliveryDate + "</li></ul><a href=" + link + ">view</a>";
     }
 
     var pinTarget = function(position){
+
+      var infoWindow = new google.maps.InfoWindow({
+        content: content,
+        disableAutoPan: true,
+      });
+
       var marker = new google.maps.Marker({
         position: position,
         map: map,
         icon: targetImage
       });
-      markerClusterer.addMarker(marker);
-      var infoWindow = new google.maps.InfoWindow({
-        content: content,
-        disableAutoPan: true,
-      });
-      infoWindow.open(map, marker);
-    }
 
-    var pinSource = function(position){
-      var marker = new google.maps.Marker({
-        position: position,
-        map: map,
-        icon: sourceImage
-      });
       markerClusterer.addMarker(marker);
+
+      google.maps.event.addListener(marker, 'click', function(){
+        infoWindow.open(map, marker);
+      });
     }
 
     var address = address;
@@ -97,30 +92,18 @@ $(document).ready(function(){
     var shipperFullName = shipperFullName;
     var expectedDeliveryDate = expectedDeliveryDate;
     var content = makeContent();
-    pinSource(origin);
+
     pinTarget(destination);
-
-    var path = [origin, destination];
-
-    var route = new google.maps.Polyline({
-      path: path,
-      strokeColor: '#008000',
-      strokeOpacity: 1.0,
-      strokeWeight: 2
-    });
-
-    route.setMap(map);
   }
 
-  <% @fulfillments.select(&:geolocation?).each do |fulfillment| %>
-    var origin = new google.maps.LatLng(<%= fulfillment.origin_lat %>, <%= fulfillment.origin_long %>);
-    var destination = new google.maps.LatLng(<%= fulfillment.destination_lat.to_s %>, <%= fulfillment.destination_long.to_s %>);
+  <% @fulfillments.each do |fulfillment| %>
+    var destination = new google.maps.LatLng(<%= fulfillment.destination_lat %>, <%= fulfillment.destination_long%>);
     var address = '<%= fulfillment.order.shipping_address.address1 %>';
     var shipped = '<%= fulfillment.shipped.downcase %>';
     var shipper = '<%= fulfillment.shipper_name %>';
     var expectedDate = '<%= fulfillment.expected_delivery_date %>';
-    var linkPath = '<%= fulfillment_path(fulfillment.id) %>';
-    new Delivery(origin, destination, address, shipped, shipper, expectedDate, linkPath)
+    var linkPath = '<%= fulfillment.tracking_link %>';
+    new Delivery(destination,address, shipped, shipper, expectedDate, linkPath)
   <% end %>
 });
 </script>

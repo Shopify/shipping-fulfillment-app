@@ -36,7 +36,6 @@
         <% unless current_shop.blank? || current_shop.new_record? %>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class='<%= active_nav_class('home', 'index') %>'><%= link_to 'Credentials',  :controller => "shops", :action => "show" %></li>
               <li class='<%= active_nav_class('home', 'design') %>'><%= link_to 'Orders', '/orders' %></li>
               <li class='<%= active_nav_class('home', 'design') %>'><%= link_to 'Tracking', '/fulfillments' %></li>
               <li class='<%= active_nav_class('home', 'design') %>'><%= link_to 'Inventory', '/variants' %></li>
@@ -49,6 +48,8 @@
               <ul class="dropdown-menu">
                 <li><%= link_to raw('<i class="icon-home"></i> Storefront'), "http://"+current_shop.domain, :target => 'blank' %></li>
                 <li><%= link_to raw('<i class="icon-cog"></i> Shopify Admin'), "http://"+current_shop.domain+"/admin", :target => 'blank' %></li>
+                <li class="divider"></li>
+                <li><%= link_to 'Credentials',  :controller => "shops", :action => "show" %></li>
                 <li class="divider"></li>
                 <li><%= link_to raw('<i class="icon-off"></i> logout'), logout_path %></li>
               </ul>

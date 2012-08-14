@@ -1,4 +1,7 @@
 class VariantsController < ApplicationController
+
+  before_filter :valid_shipwire_credentials
+
   def index
     @products = ShopifyAPI::Product.all
   end

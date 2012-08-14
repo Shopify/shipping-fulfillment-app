@@ -1,6 +1,7 @@
 class OrdersController < ApplicationController
   respond_to :html, except: [:shipping_rates]
   respond_to :js, only: [:shipping_rates]
+  before_filter :valid_shipwire_credentials
 
   PER_PAGE = 10
 

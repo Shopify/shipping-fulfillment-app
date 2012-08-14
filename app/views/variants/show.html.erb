@@ -19,10 +19,10 @@
         <td><%= @variant.title %></td>
         <td><%= f.text_field @variant.sku, {value: @variant.sku} %></td>
         <% if @variant.class == ShopifyAPI::Variant %>
-          <td><%= @variant.inventory_quantity %></td>
+          <td><span class="<%= inventory_label(@variant.inventory_quantity) %>"><%= @variant.inventory_quantity %></span></td>
           <td><%= f.submit "Manage with Shipwire",  :class => "btn btn-success" %></td>
         <% else %>
-          <td><%= @variant.quantity %></td>
+          <td><span class="<%= inventory_label(@variant.quantity) %>"><%= @variant.quantity %></span></td>
           <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :data => {:confirm => 'Are you sure?'}} %></td>
         <% end %>
       </tr>

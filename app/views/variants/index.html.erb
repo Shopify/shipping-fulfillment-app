@@ -23,7 +23,7 @@
         <td><%= product.title %></td>
         <td><%= variant.title %></td>
         <td><%= variant.sku %></td>
-        <td><%= variant.inventory_quantity %></td>
+        <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
         <td><%= variant.inventory_management %></td>
         <td><%= link_to 'view', {:controller => 'variants', :action => 'show', :id => variant.id, :product_title => product.title} %></td>
       </tr>

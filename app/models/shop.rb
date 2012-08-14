@@ -54,7 +54,11 @@ class Shop < ActiveRecord::Base
   def check_shipwire_credentials
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
     response = shipwire.fetch_stock_levels()
-    response.success?
+    if response.success?
+      self.update_attribute(:valid_credentials, true)
+    else
+      errors.add(:shop, "Must have valid shipwire credentials to use the services provided by this app.")
+    end
   end
 
   def make_webhook(topic, action)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120803131839) do
+ActiveRecord::Schema.define(:version => 20120814193507) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -104,9 +104,10 @@ ActiveRecord::Schema.define(:version => 20120803131839) do
     t.string   "password"
     t.boolean  "automatic_fulfillment"
     t.string   "token"
-    t.datetime "created_at",            :null => false
-    t.datetime "updated_at",            :null => false
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
     t.string   "domain"
+    t.boolean  "valid_credentials",     :default => false
   end
 
   create_table "variants", :force => true do |t|
@@ -115,7 +116,6 @@ ActiveRecord::Schema.define(:version => 20120803131839) do
     t.string   "sku"
     t.integer  "shop_id"
     t.integer  "shopify_variant_id"
-    t.string   "quantity"
     t.string   "backordered"
     t.string   "reserved"
     t.string   "shipping"
@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(:version => 20120803131839) do
     t.string   "orderedLastWeek"
     t.string   "orderedLast4Weeks"
     t.string   "title"
+    t.integer  "quantity"
   end
 
 end

@@ -6,6 +6,7 @@ FactoryGirl.define do
     automatic_fulfillment false
     sequence(:domain){|i| "domain"+i.to_s }
     token '1391230123912301230132'
+    valid_credentials true
 
     factory :shop_true do
       automatic_fulfillment true

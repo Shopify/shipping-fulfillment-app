@@ -36,4 +36,12 @@
         <%= submit_tag('Update' , :class => 'btn btn-primary') %>
     <% end %>
   <% end %>
+
+<h2>
+<% if @shop.valid_credentials %>
+Valid Shipwire Credentials
+<% else %>
+Invalid Shipwire Credentials
+<% end %>
+</h2>
 </div>
