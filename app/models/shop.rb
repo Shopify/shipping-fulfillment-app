@@ -71,6 +71,7 @@ class Shop < ActiveRecord::Base
 
   def create_carrier_service
     return if Rails.env == 'development'
+
     carrier_service = ShopifyAPI::CarrierService.create()
   end
 

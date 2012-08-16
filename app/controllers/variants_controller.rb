@@ -14,7 +14,6 @@ class VariantsController < ApplicationController
     filtered_variants = all_variants.flatten.select { |variant| managed?(variant.inventory_management) }
     @pages = (filtered_variants.length.to_f/PER_PAGE).ceil
     @variants = paginate(filtered_variants)
-    puts @variants.inspect
   end
 
   def show
@@ -51,8 +50,7 @@ class VariantsController < ApplicationController
   def paginate(variants)
     return [] if variants.empty?
     first = [0, @page*PER_PAGE].max
-    last = [variants.length-1, (@page+1)*PER_PAGE].min
-    variants[first,last]
+    variants[first,PER_PAGE]
   end
 
   def managed?(service)
