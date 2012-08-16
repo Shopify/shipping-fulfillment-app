@@ -7,6 +7,7 @@ class Shop < ActiveRecord::Base
   has_many :variants
   has_many :fulfillments
   has_many :orders
+  has_many :line_items
 
   validates_presence_of :login, :password, :token
   validates :domain, :presence => true, :uniqueness => true
@@ -46,7 +47,8 @@ class Shop < ActiveRecord::Base
       'orders/cancelled' => 'ordercancelled',
       'orders/create' => 'ordercreate',
       'orders/updated' => 'orderupdated',
-      'orders/fulfilled' => 'orderfulfilled'
+      'orders/fulfilled' => 'orderfulfilled',
+      'fulfillments/create' => 'fulfillmentcreated'
     }
     hooks.each { |topic, action| make_webhook(topic, action) }
   end

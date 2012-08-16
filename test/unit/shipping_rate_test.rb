@@ -4,16 +4,16 @@ require 'test_helper'
 class ShippingRateTest < ActiveSupport::TestCase
   def setup
     super
-    @order = create(:order, shop: @shop)
+    @order = create_order
   end
 
-  def destination(address)
+  def destination(order)
 
     location = {
-      country: address.country,
-      province: address.province,
-      city: address.city,
-      address1: address.address1
+      country: order.country,
+      province: order.province,
+      city: order.city,
+      address1: order.address1
     }
 
     ActiveMerchant::Shipping::Location.new(location)
@@ -81,7 +81,7 @@ class ShippingRateTest < ActiveSupport::TestCase
   end
 
   test "find_rates for an order" do
-    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order.shipping_address), 'UPS', 'UPS Second Day Air', rate_return)
+    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order), 'UPS', 'UPS Second Day Air', rate_return)
     ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
 
     rates = ShippingRates.new(@shop.credentials, {id: @order.id}).fetch_rates
@@ -89,7 +89,7 @@ class ShippingRateTest < ActiveSupport::TestCase
   end
 
   test "find_rates for a shopify request" do
-    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order.shipping_address), 'UPS', 'UPS Second Day Air', rate_return)
+    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order), 'UPS', 'UPS Second Day Air', rate_return)
     ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
 
     rates = ShippingRates.new(@shop.credentials, request_params).fetch_rates

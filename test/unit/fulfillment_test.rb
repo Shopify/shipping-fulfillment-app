@@ -5,11 +5,12 @@ class FulfillmentTest < ActiveSupport::TestCase
   def setup
     super
     stub_fulfillment_callbacks
-    @order = create(:order, :shop_id => @shop.id)
+    @order = create_order
+    @line_item = create(:line_item, shop: @shop)
   end
 
   test "Valid fulfillment saves" do
-    fulfillment = build(:fulfillment, :line_items => [build(:line_item)])
+    fulfillment = build(:fulfillment, :line_items => [build(:line_item, shop: @shop)])
 
     assert fulfillment.save
     assert fulfillment.shipwire_order_id.present?
@@ -30,7 +31,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     params = {order_ids: [@order.id], line_item_ids: [@order.line_items.first.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
-    assert_equal "fulfilled", @order.line_items.first.fulfillment_status
+    assert_equal "fulfilled", @order.line_items.first.reload.fulfillment_status
   end
 
   test "Fulfill order" do
@@ -43,9 +44,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfill multiple orders" do
     Resque.expects(:enqueue).times(3)
-    ids = [1,2,3].map{create(:order, :shop_id => @shop.id).id}
+    ids = [1,2,3].map{create_order.id}
     params = {order_ids: ids, shipping_method: '1D', warehouse: '00'}
-
     assert_difference "Fulfillment.count", 3 do
       assert Fulfillment.fulfill(@shop, params)
     end
@@ -69,24 +69,9 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert !fulfillment.save, "Fulfillment with invalid shipping_method saves."
   end
 
-
-  test "State machine transitions call update_fulfillment_status_with_shopify" do
-    Fulfillment.any_instance.expects(:update_fulfillment_status_on_shopify).times(3)
-
-    fulfillment = create_fulfillment
-    fulfillment.success
-
-    fulfillment.status = 'pending'
-    fulfillment.cancel
-
-    fulfillment.status = 'pending'
-    fulfillment.record_failure
-  end
-
   test "Fulfillment has appropriate fulfillment line items" do
     Resque.expects(:enqueue)
     params = {order_ids: [@order.id], shipping_method: '1D', warehouse: '00'}
-
     assert_difference "FulfillmentLineItem.count", 5 do
       Fulfillment.fulfill(@shop, params)
     end
@@ -94,9 +79,9 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfill does not fulfill line_item if line_item status is fulfilled" do
     Resque.expects(:enqueue)
-    fulfilled_item = create(:fulfilled_item)
-    another_item = create(:line_item)
-    order = create(:order, :line_items => [fulfilled_item, another_item], :shop => @shop)
+    fulfilled_item = create(:fulfilled_item, shop: @shop)
+    another_item = create(:line_item, shop: @shop)
+    order = create(:order, line_items: [fulfilled_item, another_item], shop: @shop)
     params = {order_ids: [order.id], line_item_ids: [fulfilled_item.id, another_item.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
@@ -105,7 +90,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Order is not fulfilled if not from current shop" do
     Resque.expects(:enqueue).times(1)
-    order = create(:order)
+    shop = create(:shop)
+    order = create(:order, line_items: [@line_item], shop: shop)
     params = {order_ids: [@order.id, order.id], shipping_method: '1D', warehouse: '00'}
 
     Fulfillment.fulfill(@shop, params)
@@ -116,7 +102,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Line item is not fulfilled if id does not correspond to order" do
     Resque.expects(:enqueue)
-    other_item = create(:line_item)
+    other_item = create(:line_item, shop: @shop)
     params = {order_ids: [@order.id], line_item_ids: [@order.line_items.first.id, other_item.id], shipping_method: '1D', warehouse: '00'}
 
     assert Fulfillment.fulfill(@shop, params)
@@ -132,7 +118,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfill returns false and does not save if the orders fulfillment status is cancelled" do
      Resque.expects(:enqueue).never
-     order = create(:order, :fulfillment_status => 'cancelled', :shop_id => @shop.id)
+     order = create(:order, fulfillment_status: 'cancelled', shop: @shop, line_items: [@line_item])
      params = {order_ids: [order.id], shipping_method: '1D', warehouse: '00'}
 
      assert !Fulfillment.fulfill(@shop, params)
@@ -141,7 +127,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
    test "Fulfill returns false and does not save if the orders fulfillment status is fulfilled" do
      Resque.expects(:enqueue).never
-     order = create(:order, :fulfillment_status => 'fulfilled', :shop_id => @shop.id)
+     order = create(:order, fulfillment_status: 'fulfilled', shop: @shop, line_items: [@line_item])
      params = {order_ids: [order.id], shipping_method: '1D', warehouse: '00'}
 
      assert !Fulfillment.fulfill(@shop, params)
@@ -159,21 +145,21 @@ end
 
 class MoreFulfillmentTests < ActiveSupport::TestCase
   def setup
-    Shop.any_instance.stubs(:setup_webhooks)
+    stub_shop_callbacks
 
     @shop = build(:shop)
-    @order = create(:order, :shop_id => @shop.id)
+    @order = create_order
   end
 
   test "Updating the fulfillment status makes a ShopifyAPI::Fulfillment call" do
     Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
-    stub_shop_callbacks
     fulfillment = create_fulfillment
     params = {
       id: fulfillment.shopify_fulfillment_id,
       status: 'success',
       order_id: fulfillment.order.id
     }
+
     ShopifyAPI::Fulfillment.expects(:new).with(params)
     NilClass.any_instance.expects(:save)
     fulfillment.success
@@ -188,5 +174,19 @@ class MoreFulfillmentTests < ActiveSupport::TestCase
     assert Fulfillment.fulfill(@shop, params)
   end
 
-  private
+  test "State machine transitions call update_fulfillment_status_with_shopify" do
+    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+    Fulfillment.any_instance.expects(:update_fulfillment_status_on_shopify).times(3)
+
+    fulfillment = create_fulfillment
+    fulfillment.success
+
+    fulfillment.update_attribute(:status, 'pending')
+    fulfillment.cancel
+
+    fulfillment.update_attribute(:status, 'pending')
+    fulfillment.record_failure
+  end
+
+
 end

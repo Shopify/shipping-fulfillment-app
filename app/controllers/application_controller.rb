@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   private
 
   def valid_shipwire_credentials
-    redirect_to(shop_path, :alert => "You must create an account") unless current_shop.valid_credentials || Rails.env == 'development'
+    redirect_to(shop_path, :alert => "You must create an account") unless Rails.env == 'development' || current_shop.valid_credentials
   end
 
   def shop_exists

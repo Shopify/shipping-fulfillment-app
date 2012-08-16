@@ -10,7 +10,9 @@ class WebhooksController < ApplicationController
   before_filter :verify_shipwire_service, :only => [:fulfillment]
   before_filter :hook
 
-  rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
+  rescue_from ActionController::RoutingError do |exception|
+    head :ok
+  end
 
   def order
     case @hook
@@ -64,11 +66,7 @@ class WebhooksController < ApplicationController
 
   def fulfillment_created
     raise FulfillmentError unless Fulfillment.where('shopify_fulfillment_id = ?', @params[:id]).blank?
-    Resque.enquue(CreateFulfillmentJob, @params[:line_items], @params[:shipping_method])
-  end
-
-  def fulfillment_updated
-    # TODO
+    Resque.enqueue(CreateFulfillmentJob, @params[:line_items], @params[:shipping_method])
   end
 
   def find_or_create_order

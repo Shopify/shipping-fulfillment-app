@@ -13,7 +13,6 @@ class ActiveSupport::TestCase
 
   fixtures :all
 
-
   def setup
     stub_shop_callbacks
     @shop = create(:shop)
@@ -61,6 +60,7 @@ class ActiveSupport::TestCase
 
   def stub_controller_filters(controller)
     controller.any_instance.stubs(:shop_exists)
+    controller.any_instance.stubs(:valid_shipwire_credentials)
     controller.any_instance.stubs(:current_shop).returns(@shop)
   end
 
@@ -69,6 +69,12 @@ class ActiveSupport::TestCase
   end
 
   def create_fulfillment
-    create(:fulfillment, :line_items => [build(:line_item)])
+    order = create_order
+    create(:fulfillment, :line_items => order.line_items, order: order, shop: @shop)
+  end
+
+  def create_order
+    line_items = (0...5).map { create(:line_item, shop: @shop) }
+    create(:order, line_items: line_items, shop: @shop)
   end
 end

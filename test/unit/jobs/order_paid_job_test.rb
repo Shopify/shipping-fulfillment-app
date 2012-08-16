@@ -3,7 +3,7 @@ require 'test_helper'
 class OrderPaidJobTest < ActiveSupport::TestCase
   def setup
     super
-    @order = create(:order)
+    @order = create_order
   end
 
   test "Perform calls Fulfillment.fulfill with appropriate parameters" do

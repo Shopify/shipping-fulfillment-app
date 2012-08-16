@@ -39,13 +39,12 @@ class ShippingRates
 
   def prepare_destination(params)
     if @order
-      address = @order.shipping_address
 
       location = {
-        country: address.country,
-        province: address.province,
-        city: address.city,
-        address1: address.address1,
+        country: @order.country,
+        province: @order.province,
+        city: @order.city,
+        address1: @order.address1,
       }
     else
       location = params[:destination].slice(:country, :province, :city, :address1)

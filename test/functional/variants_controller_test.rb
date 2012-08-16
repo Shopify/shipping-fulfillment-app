@@ -22,8 +22,8 @@ class VariantsControllerTest < ActionController::TestCase
   end
 
   test "show: renders page correctly" do
-    stub_products_and_variants
-    get :show, {id: 1, product_title: 'Bicycle'}
+    variant = create(:variant, shop: @shop)
+    get :show, {id: variant.id, product_title: 'Bicycle'}
     assert_template :show
   end
 

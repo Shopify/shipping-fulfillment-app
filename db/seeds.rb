@@ -1,7 +1,3 @@
-
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
-
 require 'factory_girl_rails'
 require 'mocha'
 
@@ -19,10 +15,13 @@ ShopifyAPI::Session.new("http://localhost:3000/admin","123")
 
 
 shop = FactoryGirl.create(:shop, domain: 'shop1.localhost')
-order = FactoryGirl.create(:order, shop:shop)
-FactoryGirl.create(:order, shop:shop)
-FactoryGirl.create(:order, shop:shop)
-another_order = FactoryGirl.create(:order, shop:shop, financial_status: 'pending')
+3.times do
+  line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
+  FactoryGirl.create(:order, line_items: line_items, shop: shop)
+end
+line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
+order = FactoryGirl.create(:order, shop:shop, financial_status: 'pending', line_items: line_items)
 fulfillment = FactoryGirl.create(:fulfillment, shop: shop, line_items: [order.line_items.first])
-FactoryGirl.create(:other_fulfillment, shop: shop, line_items: another_order.line_items[0..3])
-FactoryGirl.create(:variant, shop: shop)
+FactoryGirl.create(:other_fulfillment, shop: shop, line_items: order.line_items[0..3])
+variant = FactoryGirl.create(:variant, shop: shop)
+order.line_items.first.update_attribute(:variant_id, variant.shopify_variant_id)

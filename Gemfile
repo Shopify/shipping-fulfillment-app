@@ -10,7 +10,7 @@ gem 'active_fulfillment',    '1.0.3',  :git => 'git://github.com/Shopify/active_
 gem "active_shipping", "~> 0.9.14"
 gem 'less-rails-bootstrap'
 gem 'jquery-rails'
-gem 'state_machine',         '0.9.4'                             # State machine, used everywhere
+gem "state_machine", "~> 1.1.2"
 gem 'shopify_app'
 gem 'resque', :require => 'resque/server'
 gem 'redis', '~> 2.2.0', :require => ['redis/connection/hiredis', 'redis'], :git => 'git://github.com/ssoroka/redis-rb.git', :branch => 'srem_patch', :ref => '949568e'

@@ -15,6 +15,6 @@ Getting Started
 +Run your local version of shopify on port 3000
 and the shipwire app on port 3001 ie. rails server -p 3001
 
-+To see an example of a variant with inventory managed by shipwire go to http://localhost:3001/variants/1?product_title=hello
++To see an example of a variant with inventory managed by shipwire go to http://localhost:3001/variants/1?product_title=Baseball
 
 ### Warren D is a G

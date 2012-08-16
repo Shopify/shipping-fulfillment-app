@@ -14,7 +14,7 @@ class Fulfillment < ActiveRecord::Base
 
   validates_presence_of :order_id, :line_items, :shipwire_order_id
   validate :legal_shipping_method
-  validate :order_fulfillment_status
+  validate :order_fulfillment_status, :if => "self.new_record?"
 
   before_validation :make_shipwire_order_id
   after_create :create_mirror_fulfillment_on_shopify, :update_association_fulfillment_statuses
@@ -30,7 +30,8 @@ class Fulfillment < ActiveRecord::Base
     event :record_failure do
       transition :pending => :failure
     end
-    after_transition :pending => any, :do => [:update_fulfillment_status_on_shopify]
+
+    after_transition any => any, :do => :update_fulfillment_status_on_shopify
   end
 
   def self.fulfill(current_shop, params)
@@ -41,7 +42,6 @@ class Fulfillment < ActiveRecord::Base
     locations = [origin_lat, origin_long, destination_lat, destination_long]
     locations.all? {|location| location}
   end
-
 
   private
 
@@ -62,6 +62,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def update_fulfillment_status_on_shopify
+    puts "update on shopify"
     if %w(success cancelled record_failure).include?(status)
       params = {
         id: shopify_fulfillment_id,
@@ -100,8 +101,6 @@ class Fulfillment < ActiveRecord::Base
     end
     false
   end
-
-
 
   def order_fulfillment_status
     if (order.fulfillment_status == 'fulfilled') || (order.fulfillment_status =='cancelled')

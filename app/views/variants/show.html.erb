@@ -1,49 +1,134 @@
 <div class="span9 offset1">
-<h2><%= @product_title + ' - ' + @variant.title %></h2>
+<h2><span class="gray"><%= @product_title %></span>/<%= @variant.title %></h2>
+<p>SKU <%= @variant.sku %> [Edit]</p>
+<hr />
 
-<%= form_for @variant, :url => {action: 'create'}, :html => {method: 'post', class: 'variant_form'} do |f|%>
-<%= hidden_field_tag 'shopify_variant_id', @variant.id %>
-<%= hidden_field_tag 'title', @variant.title %>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Product</th>
-      <th>Variant</th>
-      <th>Sku</th>
-      <th>Inventory Quantity</th>
-      <th>Inventory Management</th>
-    </tr>
-  </thead>
-      <tr>
-        <td><%= @product_title %></td>
-        <td><%= @variant.title %></td>
-        <td><%= f.text_field @variant.sku, {value: @variant.sku} %></td>
-        <% if @variant.class == ShopifyAPI::Variant %>
-          <td><span class="<%= inventory_label(@variant.inventory_quantity) %>"><%= @variant.inventory_quantity %></span></td>
-          <td><%= f.submit "Manage with Shipwire",  :class => "btn btn-success" %></td>
-        <% else %>
-          <td><span class="<%= inventory_label(@variant.quantity) %>"><%= @variant.quantity %></span></td>
-          <td><%= link_to "Manage with Shopify", {:path => variant_path(@variant.id)}, {:class => 'btn btn-success', :method => 'delete', :data => {:confirm => 'Are you sure?'}} %></td>
-        <% end %>
-      </tr>
-</table>
-  <br />
-<% end %>
+<p><%= @variant.quantity %> currently in stock</p>
+<p class="gray"><%= @variant.reserved %> reserved - <%= @variant.shipping %> shipping - <%= @variant.shipped %> shipped to date</p>
+<hr />
 
-<% if @variant.class == Variant %>
-  <ul class="shipwire_variant_statistics">
-    <li>Quantity: <%= @variant.quantity %></li>
-    <li>Backordered: <%= @variant.backordered %></li>
-    <li>Reserved: <%= @variant.reserved %></li>
-    <li>Shipping: <%= @variant.shipping %></li>
-    <li>Shipped: <%= @variant.shipped %></li>
-    <li>Available Date: <%= @variant.availableDate %></li>
-    <li>Shipped Last Day: <%= @variant.shippedLastDay %></li>
-    <li>Shipped Last Week: <%= @variant.shippedLastWeek %></li>
-    <li>Shipped Last 4 Weeks: <%= @variant.shippedLast4Weeks %></li>
-    <li>Ordered Last Day: <%= @variant.orderedLastDay %></li>
-    <li>Ordered Last Week: <%= @variant.orderedLastWeek %></li>
-    <li>Ordered Last 4 Weeks: <%= @variant.orderedLast4Weeks %></li>
-  </ul>
-<% end %>
+<div id="map_container">
 </div>
+
+<hr />
+<table>
+<thead>
+  <tr>
+    <th></th>
+    <th class="gray">Shipped</th>
+    <th class="gray">Ordered</th>
+</thead>
+<tbody>
+  <tr>
+    <td class="gray">
+      Yesterday
+    </td>
+    <td>
+      <%= @variant.shippedLastDay %>
+    </td>
+    <td>
+      <%= @variant.orderedLastDay %>
+    </td>
+  </tr>
+  <tr>
+    <td class="gray">
+      Last Week
+    </td>
+    <td>
+      <%= @variant.shippedLastWeek %>
+    </td>
+    <td>
+      <%= @variant.orderedLastWeek %>
+    </td>
+  </tr>
+  <tr>
+    <td class="gray">
+      Last 4 Weeks
+    </td>
+    <td>
+      <%= @variant.shippedLast4Weeks %>
+    </td>
+    <td>
+      <%= @variant.orderedLast4Weeks %>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<%= link_to 'Manage with Shopify', {:controller => 'variants', :action => 'destroy', :id => @variant.id}, :method => :delete, :class => 'btn btn-success' %>
+
+</div>
+<% if geolocation?(@address) %>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false"></script>
+  <%= javascript_include_tag "markercluster.js" %>
+  <script type="text/javascript">
+  $(document).ready(function(){
+    var usLocation = new google.maps.LatLng(<%= @address[:latitude] %>, <%= @address[:longitude] %>);
+
+    var mapOptions = {
+      zoom: 6,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      center: usLocation
+    }
+
+    var map = new google.maps.Map(document.getElementById("map_container"), mapOptions);
+
+    var markerClusterer = new MarkerClusterer(map, Array(), {'maxZoom':10});
+
+    var geocoder = new google.maps.Geocoder();
+
+    var Delivery = function(destination, address, city, province, country, zip){
+      var self = this;
+      var base = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&';
+      var targetImage = base + 'chco=FFFFFF,DD8CFF,000000&ext=.png';
+
+      var makeContent = function(){
+        var piece1 = address + "<br />" + city + ", ";
+        var piece2 = country + ", " + zip;
+
+        if (province === ''){
+          return piece1 + piece2;
+        }
+        else{
+          return piece1 + province + ", " + piece2;
+        }
+      }
+
+      var pinTarget = function(position){
+
+        var infoWindow = new google.maps.InfoWindow({
+          content: content,
+          disableAutoPan: true,
+        });
+
+        var marker = new google.maps.Marker({
+          position: position,
+          map: map,
+          icon: targetImage
+        });
+
+        markerClusterer.addMarker(marker);
+
+        google.maps.event.addListener(marker, 'click', function(){
+          infoWindow.open(map, marker);
+        });
+      }
+
+      var address = address;
+      var shipped = shipped;
+      var shipperFullName = shipperFullName;
+      var expectedDeliveryDate = expectedDeliveryDate;
+      var content = makeContent();
+
+      pinTarget(destination);
+    }
+      var destination = new google.maps.LatLng(<%= @address[:latitude] %>, <%= @address[:longitude] %>);
+      var address = '<%= @address[:address1] %>';
+      var city = '<%= @address[:city] %>';
+      var province = '<%= @address[:province] %>';
+      var country = '<%= @address[:country] %>';
+      var zip = '<%= @address[:zip] %>';
+      new Delivery(destination,address,city,province,country,zip);
+  });
+  </script>
+<% end %>

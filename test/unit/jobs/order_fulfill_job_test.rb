@@ -3,7 +3,7 @@ require 'test_helper'
 class OrderFulfillTest < ActiveSupport::TestCase
   def setup
     super
-    @order = create(:order)
+    @order = create_order
   end
 
   test "Perform updates the order and corresponding line item fulfillment statuses" do

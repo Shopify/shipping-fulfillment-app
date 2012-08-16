@@ -47,7 +47,7 @@ $(document).ready(function(){
 
   <% @fulfillments.each do |fulfillment| %>
     var destination = new google.maps.LatLng(<%= fulfillment.destination_lat %>, <%= fulfillment.destination_long%>);
-    var address = '<%= fulfillment.order.shipping_address.address1 %>';
+    var address = '<%= fulfillment.order.address1 %>';
     var shipped = '<%= fulfillment.shipped.downcase %>';
     var shipper = '<%= fulfillment.shipper_name %>';
     var expectedDate = '<%= fulfillment.expected_delivery_date %>';

@@ -9,14 +9,13 @@ FactoryGirl.define do
     financial_status 'paid'
     name '1345'
     total_price '45.69'
-    association(:shipping_address)
-
-    ignore do
-        line_item_count 5
-    end
-
-    after(:create) do |order, evaluator|
-        FactoryGirl.create_list(:line_item, evaluator.line_item_count, order: order)
-    end
+    address1 '532 Beacon Street'
+    address2 '7318 Black Swan Place'
+    city 'Carlsbad'
+    zip '92011'
+    province 'CA'
+    country 'United States'
+    latitude  43.999
+    longitude 43.999
   end
 end

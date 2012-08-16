@@ -7,8 +7,24 @@ class Variant < ActiveRecord::Base
   validates :shopify_variant_id, :presence => true, :uniqueness => true
   validate :confirm_sku
 
-
   after_create :update_shopify
+
+  def last_fulfilled_order_address
+    item = shop.line_items.order("created_at DESC")
+      .where('variant_id = ? AND fulfillment_status = ?', shopify_variant_id, 'fulfilled')
+      .first
+
+    item.order.address if item.present?
+  end
+
+  def self.batch_create_variants(shop, shopify_variant_ids)
+   failures = shopify_variant_ids.select do |shopify_variant_id|
+      shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
+      variant = Variant.new(shopify_variant_id: shopify_variant_id, sku: shopify_variant.sku, title: shopify_variant.title)
+      !variant.save
+    end
+    failures.length
+  end
 
   private
 
@@ -24,6 +40,6 @@ class Variant < ActiveRecord::Base
 
   def update_shopify
     shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
-    shopify_variant.update_attributes({quantity: quantity, inventory_management: 'shipwire'})
+    shopify_variant.update_attributes({quantity: quantity, inventory_management: 'shipwire'}) #TODO find out how to do this
   end
 end

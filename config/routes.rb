@@ -8,7 +8,14 @@ ShipwireApp::Application.routes.draw do
 
   resources :orders, :only => [:index, :show]
 
-  resources :variants, :except => [:update, :new, :edit]
+  resources :variants, :except => [:update, :new, :edit] do
+    collection do
+      match "/filter/:management/:page" => "variants#index", :via => :get
+      match "/filter/:management" => "variants#index", :via => :get
+    end
+  end
+
+  match "variants/update" =>  "variants#update", :as => :variant_update, :via => :post
 
   match "shippingrates" => "orders#shipping_rates",   :as => :rates
 

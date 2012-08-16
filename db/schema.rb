@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120814193507) do
+ActiveRecord::Schema.define(:version => 20120815024610) do
 
   create_table "fulfillment_line_items", :force => true do |t|
     t.integer  "line_item_id"
@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(:version => 20120814193507) do
     t.datetime "updated_at",          :null => false
     t.integer  "order_id"
     t.boolean  "requires_shipping"
+    t.integer  "shop_id"
   end
 
   create_table "orders", :force => true do |t|
@@ -76,27 +77,23 @@ ActiveRecord::Schema.define(:version => 20120814193507) do
     t.integer  "total_weight"
     t.string   "currency"
     t.string   "financial_status"
-    t.boolean  "confirmed",          :default => false
+    t.boolean  "confirmed",                                        :default => false
     t.string   "fulfillment_status"
     t.string   "name"
     t.datetime "cancelled_at"
     t.string   "cancel_reason"
     t.decimal  "total_price"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
+    t.datetime "created_at",                                                          :null => false
+    t.datetime "updated_at",                                                          :null => false
     t.integer  "shop_id"
-  end
-
-  create_table "shipping_addresses", :force => true do |t|
     t.string   "address1"
     t.string   "address2"
     t.string   "city"
     t.string   "zip"
     t.string   "province"
     t.string   "country"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.integer  "order_id"
+    t.decimal  "latitude",           :precision => 9, :scale => 6
+    t.decimal  "longitude",          :precision => 9, :scale => 6
   end
 
   create_table "shops", :force => true do |t|

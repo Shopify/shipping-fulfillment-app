@@ -1,12 +1,18 @@
 class Order < ActiveRecord::Base
-  attr_protected #?
+  attr_protected
 
   has_many :line_items, :dependent => :destroy
-  has_one :shipping_address, :dependent => :destroy
   belongs_to :shop
 
-  accepts_nested_attributes_for :shipping_address
   accepts_nested_attributes_for :line_items
+
+  def address
+    address_hash = {}
+    %w(address1 address2 city zip province country latitude longitude).each do |key|
+      address_hash[key.to_sym] = self.send(key)
+    end
+    address_hash
+  end
 
 
   def filter_fulfillable_items(line_item_ids)
@@ -18,10 +24,9 @@ class Order < ActiveRecord::Base
 
   def self.create_order(params,shop)
     options = order_options(params)
-    options[:shipping_address_attributes] = shipping_attributes(params)
-    options[:line_items_attributes] = line_items_attributes(params)
-    options[:shop_id] = shop.id
-    order = create(options)
+    options.merge(shipping_attributes(params))
+    options[:line_items_attributes] = line_items_attributes(params, shop)
+    order = shop.orders.create(options)
   end
 
   def self.order_options(params)
@@ -31,14 +36,15 @@ class Order < ActiveRecord::Base
   end
 
   def self.shipping_attributes(params)
-    options = params[:shipping_address].slice(*ShippingAddress.column_names)
+    options = params[:shipping_address].slice(*Order.column_names)
     options.delete(:id)
     options
   end
 
-  def self.line_items_attributes(params)
+  def self.line_items_attributes(params, shop)
     params[:line_items].map do |item|
       options = item.slice(*LineItem.column_names)
+      options[:shop_id] = shop.id
       options[:line_item_id] = options.delete(:id)
       options
     end

@@ -6,7 +6,7 @@ class OrderCancelJobTest < ActiveSupport::TestCase
   end
 
   test "Order updates line_item attributes on the order" do
-    order = create(:order)
+    order = create_order
 
     item1 = {id: order.line_items.first.line_item_id, fulfillment_status: 'fulfilled'}
     item2 = {id: order.line_items.last.line_item_id, fulfillment_status: 'fulfilled'}

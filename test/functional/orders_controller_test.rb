@@ -6,8 +6,8 @@ class OrdersControllerTest < ActionController::TestCase
     session[:shopify] = stub_api_session
     stub_controller_filters(OrdersController)
 
-    @order1 = create(:order, shop: @shop)
-    @order2 = create(:order, shop: @shop)
+    @order1 = create_order
+    @order2 = create_order
   end
 
   test "index: fulfill checkbox appears if automatic fulfillment set to false" do

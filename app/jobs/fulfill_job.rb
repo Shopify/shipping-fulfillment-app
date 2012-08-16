@@ -10,7 +10,7 @@ class FulfillJob
       shipping_method: fulfillment.shipping_method
     }
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(fulfillment.shop.credentials)
-    response = shipwire.fulfill(fulfillment.shipwire_order_id, fulfillment.order.shipping_address, line_items, options)
+    response = shipwire.fulfill(fulfillment.shipwire_order_id, fulfillment.order.address, line_items, options)
     if response.success?
       fulfillment.success
       %w(origin_lat origin_long destination_lat destination_long).each do |key|

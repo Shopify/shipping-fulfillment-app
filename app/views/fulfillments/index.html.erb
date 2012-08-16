@@ -40,6 +40,7 @@
 
     <% end %>
 </div>
+
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false"></script>
 <%= javascript_include_tag "markercluster.js" %>
 <script type="text/javascript">
@@ -98,7 +99,7 @@ $(document).ready(function(){
 
   <% @fulfillments.each do |fulfillment| %>
     var destination = new google.maps.LatLng(<%= fulfillment.destination_lat %>, <%= fulfillment.destination_long%>);
-    var address = '<%= fulfillment.order.shipping_address.address1 %>';
+    var address = '<%= fulfillment.order.address1 %>';
     var shipped = '<%= fulfillment.shipped.downcase %>';
     var shipper = '<%= fulfillment.shipper_name %>';
     var expectedDate = '<%= fulfillment.expected_delivery_date %>';
