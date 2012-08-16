@@ -1,6 +1,5 @@
 class Shop < ActiveRecord::Base
   Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:3001/' : HOOK_ADDRESS = 'production root url'
-  #TODO: set production url
 
   attr_accessible :login, :password, :automatic_fulfillment
 
@@ -10,7 +9,7 @@ class Shop < ActiveRecord::Base
   has_many :line_items
 
   validates_presence_of :login, :password, :token
-  validates :domain, :presence => true, :uniqueness => true
+  #validates :domain, :presence => true, :uniqueness => true
   validate :check_shipwire_credentials
 
   before_create :set_domain
@@ -42,6 +41,8 @@ class Shop < ActiveRecord::Base
   end
 
   def setup_webhooks
+    return if Rails.env == 'development'
+
     hooks = {
       'orders/paid' => 'orderpaid',
       'orders/cancelled' => 'ordercancelled',
@@ -54,6 +55,7 @@ class Shop < ActiveRecord::Base
   end
 
   def check_shipwire_credentials
+    return if Rails.env == 'development'
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
     response = shipwire.fetch_stock_levels()
     if response.success?
@@ -68,10 +70,12 @@ class Shop < ActiveRecord::Base
   end
 
   def create_carrier_service
+    return if Rails.env == 'development'
     carrier_service = ShopifyAPI::CarrierService.create()
   end
 
   def create_fulfillment_service
+    return if Rails.env == 'development'
 
     params = {
       fulfillment_service:{

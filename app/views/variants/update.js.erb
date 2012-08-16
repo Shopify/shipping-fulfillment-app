@@ -7,7 +7,7 @@
 <% else %>
   <% @failures.each do |id| %>
     alert("div.<%= id %>");
-    $("div.<%= id %>").addClass('error');
-    $("div.<%= id %>").append('<p>Please submit a valid SKU</p>');
+    $("div.<%= id %>").addClass('warning');
+    $("div.<%= id %>").append('<p class="help-inline">Please submit a valid SKU</p>');
   <% end %>
 <% end %>

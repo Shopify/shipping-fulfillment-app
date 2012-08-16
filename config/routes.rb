@@ -2,7 +2,7 @@ ShipwireApp::Application.routes.draw do
 
   #resource routes
 
-  resource :shop, :except => [:new, :edit, :destroy]
+  resource :shop, :except => [:index, :new, :edit, :destroy]
 
   resources :fulfillments, :only => [:index, :show, :create]
 

@@ -12,7 +12,11 @@ class LoginController < ApplicationController
     if response = request.env['omniauth.auth']
       session[:shopify] = ShopifyAPI::Session.new(params['shop'], response['credentials']['token'])
       session[:shop] = params['shop']
-      redirect_to controller: 'orders', action: 'index', notice: 'Logged in'
+      if current_shop
+        redirect_to controller: 'orders', action: 'index', notice: 'Logged in'
+      else
+        redirect_to controller: 'shops', action: 'show', notice: 'Add your Shipwire credentials.'
+      end
     else
       redirect_to action: 'index', alert: 'Could not log in to Shopify store.'
     end

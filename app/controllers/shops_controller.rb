@@ -10,7 +10,7 @@ class ShopsController < ApplicationController
     @shop.token = session[:shopify].token
     @shop.domain = session[:shop]
     if @shop.save
-      Resque.enqueue(OrderCollectorJob, @shop)
+      Resque.enqueue(OrderCollectorJob, @shop) unless Rails.env == 'development'
       redirect_to shop_path, notice: 'Your settings have been saved.'
     else
       redirect_to shop_path, alert: 'Invalid settings, was not able to save.'
@@ -21,6 +21,7 @@ class ShopsController < ApplicationController
     if current_shop.update_attributes(params.slice(:login, :password, :automatic_fulfillment))
       redirect_to shop_path, notice: 'Your settings have been updated.'
     else
+      puts "ERRORS: #{@shop.errors.inspect}"
       redirect_to shop_path, alert: 'Could not successfully update!'
     end
   end

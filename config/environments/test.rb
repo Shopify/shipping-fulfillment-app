@@ -34,4 +34,7 @@ ShipwireApp::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
+
+  config.shopify.api_key = "7183b6e049353dcbae5401ecaa4e1dab"
+  config.shopify.secret = "5eb520fd4b2e434bd710696de8c1a7ec"
 end

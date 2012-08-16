@@ -13,8 +13,6 @@ module ShipwireApp
   class Application < Rails::Application
     
     # Shopify API connection credentials:
-    config.shopify.api_key = "3a4c8c2bd8b0edabfcf0a45fcf3c08b7"
-    config.shopify.secret = "ff3db41c70db8e61d0626de410b6dc5a"
     
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

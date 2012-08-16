@@ -20,8 +20,6 @@ class VariantsController < ApplicationController
   def show
     @product_title = params[:product_title]
     @variant = current_shop.variants.find_by_shopify_variant_id(params[:id])
-    puts @variant.inspect
-    puts "adsadsasdasdas"
     @address = @variant.last_fulfilled_order_address
   end
 

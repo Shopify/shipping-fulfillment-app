@@ -19,6 +19,7 @@ class Variant < ActiveRecord::Base
     item.order.address if item.present?
   end
 
+  #test
   def self.batch_create_variants(shop, shopify_variant_ids)
    failures = shopify_variant_ids.select do |shopify_variant_id|
       shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
@@ -28,6 +29,7 @@ class Variant < ActiveRecord::Base
     failures.length
   end
 
+  #test
   def self.update_skus(management, params)
     ids,skus,failures = [],[],[]
     case management
@@ -57,7 +59,30 @@ class Variant < ActiveRecord::Base
     [ids, skus, failures]
   end
 
+  #test
+  def self.filter_and_paginate_variants(management, page)
+    all_variants = ShopifyAPI::Product.all.map do |product|
+      product.variants.each { |variant| variant.product_title = product.title }
+      product.variants
+    end
+    filtered_variants = all_variants.flatten.select { |variant| managed?(variant.inventory_management) }
+
+  end
+
   private
+
+  def managed?(service)
+    case @management
+    when 'shipwire'
+      true if service == 'shipwire'
+    when 'shopify'
+      true if service == 'shopify'
+    when 'other'
+      true unless service.blank? || ['shipwire','shopify'].include?(service)
+    when 'none'
+      true if service == nil || service == ''
+    end
+  end
 
   def confirm_sku
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)

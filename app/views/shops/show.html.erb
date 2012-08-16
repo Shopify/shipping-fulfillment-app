@@ -16,8 +16,7 @@
           <%= select(:shop, :automatic_fulfillment, options_for_select([['Automatic',true], ['Manual',false]])) %>
         </div>
         <div class="field">
-          <%= f.label :submit %>
-          <%= f.submit %>
+          <%= f.submit :Submit, :class => 'btn btn-success' %>
         </div>
       <% end %>
 
@@ -40,8 +39,6 @@
 <h2>
 <% if @shop.valid_credentials %>
 Valid Shipwire Credentials
-<% else %>
-Invalid Shipwire Credentials
 <% end %>
 </h2>
 </div>
