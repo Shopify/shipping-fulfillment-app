@@ -14,6 +14,7 @@ class VariantsController < ApplicationController
     filtered_variants = all_variants.flatten.select { |variant| managed?(variant.inventory_management) }
     @pages = (filtered_variants.length.to_f/PER_PAGE).ceil
     @variants = paginate(filtered_variants)
+    puts @variants.inspect
   end
 
   def show
@@ -26,22 +27,10 @@ class VariantsController < ApplicationController
 
   def update
     management = params.delete('management')
-    case management
-      when 'shipwire'
-        params.each do |key,value|
-          variant = Variant.find(key.to_i)
-          variant.update_attribute(:sku, value)
-        end
-      when 'shopify' || 'none'
-        params.each do |key,value|
-          variant = ShopifyAPI::Variant.find(key.to_i)
-          variant.update_attribute(:sku, value) #TODO find out how to do this
-        end
-      else
-    end
-    head :ok
+    @ids, @skus, @failures = Variant.update_skus(management, params.except(:action,:controller,:format))
   end
 
+  # need to toggle create and destroy between different filters
   def create
     failures = Variant.batch_create_variants(current_shop, params[:shopify_variant_ids])
     if failures == 0

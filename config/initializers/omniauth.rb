@@ -1,11 +1,11 @@
 ## need to add api permissions to so others can install in their store
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :shopify, 
-           ShopifyApp.configuration.api_key, 
+  provider :shopify,
+           ShopifyApp.configuration.api_key,
            ShopifyApp.configuration.secret,
-           :scope => "read_orders,read_products",
-           :setup => lambda {|env| 
+           :scope => "read_orders,write_products",
+           :setup => lambda {|env|
                        params = Rack::Utils.parse_query(env['QUERY_STRING'])
                        site_url = "#{Rails.env.development? ? "http" : "https"}://#{params['shop']}:3000"
                        env['omniauth.strategy'].options[:client_options][:site] = site_url

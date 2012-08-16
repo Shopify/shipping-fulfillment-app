@@ -21,40 +21,40 @@
   <p>There are no products managed by <%= @management %> in your store.</p>
 <% else %>
 <form>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <% if @management != 'other' %>
-        <th><input id="super_checkbox" type="checkbox"></th>
-      <% end %>
-      <th>Variant</th>
-      <th>Product</th>
-      <th>Sku</th>
-      <th>Quantity</th>
-    </tr>
-  </thead>
-    <% @variants.each do |variant| %>
-      <tr class="inventory_item">
+  <table class="table table-striped">
+    <thead>
+      <tr>
         <% if @management != 'other' %>
-          <td><%= check_box_tag 'shopify_variant_ids[]', variant.id, false, :class => 'selector' %></td>
+          <th><input id="super_checkbox" type="checkbox"></th>
         <% end %>
-        <% if @management == 'shipwire' %>
-          <td><%= link_to variant.title, variant_path(variant) %></td>
-        <% else %>
-          <td><%= variant.title %></td>
-        <% end %>
-        <td><%= variant.product_title %></td>
-        <td><%= variant.sku %></td>
-        <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
+        <th>Variant</th>
+        <th>Product</th>
+        <th>Sku</th>
+        <th>Quantity</th>
       </tr>
-    <% end %>
-</table>
-<br />
-<% if @management == 'shipwire' %>
-  <%= submit_tag("Manage with Shopify",:class => "btn btn-success") %>
-<% elsif @management == 'shopify' || 'none' %>
-  <%= submit_tag("Manage with Shipwire",:class => "btn btn-success") %>
-<% end %>
+    </thead>
+      <% @variants.each do |variant| %>
+        <tr class="inventory_item">
+          <% if @management != 'other' %>
+            <td><%= check_box_tag 'shopify_variant_ids[]', variant.id, false, :class => 'selector' %></td>
+          <% end %>
+          <% if @management == 'shipwire' %>
+            <td><%= link_to variant.title, variant_path(variant) %></td>
+          <% else %>
+            <td><%= variant.title %></td>
+          <% end %>
+          <td><%= variant.product_title %></td>
+          <td id="<%= variant.id %>"><%= variant.sku %></td>
+          <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
+        </tr>
+      <% end %>
+  </table>
+  <br />
+  <% if @management == 'shipwire' %>
+    <%= submit_tag("Manage with Shopify",:class => "btn btn-success") %>
+  <% elsif @management == 'shopify' || 'none' %>
+    <%= submit_tag("Manage with Shipwire",:class => "btn btn-success") %>
+  <% end %>
 </form>
 
 <% if @management != 'other' %>
@@ -108,7 +108,7 @@
     </div>
     <div class="modal-body">
   <form action="/variants/update" >
-  <table class="table table-striped">
+  <table class="table">
     <thead>
       <tr>
         <th>Variant</th>
@@ -124,7 +124,11 @@
             <td><%= variant.title %></td>
           <% end %>
           <td><%= variant.product_title %></td>
-          <td><input name="<%= variant.id %>" value="<%= variant.sku %>" type="text" class="variant_sku span3"></td>
+          <td>
+            <div class="<%= variant.id %> control-group">
+              <input data-id="<%= variant.id %>" value="<%= variant.sku %>" type="text" class="variant_sku span3">
+            </div>
+          </td>
         </tr>
       <% end %>
   </table>
@@ -158,29 +162,20 @@ $(document).ready(function(){
   });
 
   $("#update_skus").click(function(){
-    //make json mapping variant id to sku
     var data = {}
     data['management'] = '<%= @management %>';
     $.each(
       $(".edited"),
       function(){
-        data[$(this).attr('name')] = $(this).val();
-        console.log(data);
+        data[$(this).data('id')] = $(this).val();
       }
     );
 
     $.post(
       '<%= variant_update_path %>',
-      data,
-      function(response){
-        alert(response);
-      }
+      data
     );
 
-    $('#myModal').modal('hide')
-    //make get request
-    //delete from
-    $
   })
 });
 </script>
