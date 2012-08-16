@@ -1,4 +1,7 @@
 class Variant < ActiveRecord::Base
+
+  Rails.env == 'development' ? PER_PAGE = 2 : PER_PAGE = 50
+
   attr_accessible :shopify_variant_id, :sku, :quantity, :backordered, :reserved, :shipping, :shipped, :availableDate, :shippedLastDay, :shippedLastWeek, :shippedLast4Weeks, :orderedLastDay, :orderedLastWeek, :orderedLast4Weeks, :title
 
   belongs_to :shop
@@ -65,14 +68,22 @@ class Variant < ActiveRecord::Base
       product.variants.each { |variant| variant.product_title = product.title }
       product.variants
     end
-    filtered_variants = all_variants.flatten.select { |variant| managed?(variant.inventory_management) }
 
+    filtered_variants = all_variants.flatten.select { |variant| Variant.managed?(management, variant.inventory_management) }
+    pages = (filtered_variants.length.to_f/PER_PAGE).ceil
+
+    variants = Variant.paginate(filtered_variants,page)
+    [variants, pages]
   end
 
-  private
+  def self.paginate(variants, page)
+    return [] if variants.empty?
+    first = [0, page*PER_PAGE].max
+    variants[first,PER_PAGE]
+  end
 
-  def managed?(service)
-    case @management
+  def self.managed?(management, service)
+    case management
     when 'shipwire'
       true if service == 'shipwire'
     when 'shopify'
@@ -83,6 +94,8 @@ class Variant < ActiveRecord::Base
       true if service == nil || service == ''
     end
   end
+
+  private
 
   def confirm_sku
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)

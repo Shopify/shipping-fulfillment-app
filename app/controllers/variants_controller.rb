@@ -2,18 +2,10 @@ class VariantsController < ApplicationController
 
   before_filter :valid_shipwire_credentials
 
-  Rails.env == 'development' ? PER_PAGE = 2 : PER_PAGE = 50
-
   def index
     @management = params[:management] || 'shipwire'
     @page = params[:page].to_i || 1
-    all_variants = ShopifyAPI::Product.all.map do |product|
-      product.variants.each { |variant| variant.product_title = product.title }
-      product.variants
-    end
-    filtered_variants = all_variants.flatten.select { |variant| managed?(variant.inventory_management) }
-    @pages = (filtered_variants.length.to_f/PER_PAGE).ceil
-    @variants = paginate(filtered_variants)
+    @variants, @pages = Variant.filter_and_paginate_variants(@management, @page)
   end
 
   def show
@@ -43,27 +35,6 @@ class VariantsController < ApplicationController
     shopify_variant.update_attribute('inventory_management','shopify')
     variant.destroy
     redirect_to variants_path, notice: "The variant will no longer be managed by shipwire."
-  end
-
-  private
-
-  def paginate(variants)
-    return [] if variants.empty?
-    first = [0, @page*PER_PAGE].max
-    variants[first,PER_PAGE]
-  end
-
-  def managed?(service)
-    case @management
-    when 'shipwire'
-      true if service == 'shipwire'
-    when 'shopify'
-      true if service == 'shopify'
-    when 'other'
-      true unless service.blank? || ['shipwire','shopify'].include?(service)
-    when 'none'
-      true if service == nil || service == ''
-    end
   end
 
 end
