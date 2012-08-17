@@ -18,27 +18,22 @@ class VariantsController < ApplicationController
     management = params.delete('management')
     puts "UPDATE"
     @ids, @skus, @failures = Variant.update_skus(management, params.except(:action,:controller,:format))
-    puts @ids
-    puts @skus
-    puts @failures
   end
 
-  # need to toggle create and destroy between different filters
   def create
-    failures = Variant.batch_create_variants(current_shop, params[:shopify_variant_ids])
+    shopify_variant_ids = params[:shopify_variant_ids]
+    failures = Variant.batch_create_variants(current_shop, shopify_variant_ids)
     if failures == 0
-      redirect_to variants_path, notice: "The variant is now managa by shipwire."
+      redirect_to variants_path, notice: pluralize(shopify_variant_ids.length, 'Variant') + "now managed by shipwire."
     else
       redirect_to variants_path, alert: pluralize(failures, 'Variant') + "did not manage to save, please check the sku."
     end
   end
 
   def destroy
-    variant = current_shop.variants.find_by_shopify_variant_id(params[:id])
-    shopify_variant = ShopifyAPI::Variant.find(variant.shopify_variant_id)
-    shopify_variant.update_attribute('inventory_management','shopify')
-    variant.destroy
-    redirect_to variants_path, notice: "The variant will no longer be managed by shipwire."
+    shopify_variant_ids = params[:shopify_variant_ids]
+    Variant.batch_destroy_variants(current_shop, shopify_variant_ids)
+    redirect_to variants_path, notice: pluralize(shopify_variant_ids.length, 'Variant') + "now managed by shopify."
   end
 
 end

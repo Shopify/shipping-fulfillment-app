@@ -14,7 +14,7 @@ ShopifyAPI::Base.stubs(:activate_session => true)
 ShopifyAPI::Session.new("http://localhost:3000/admin","123")
 
 
-shop = FactoryGirl.create(:shop, domain: 'socialtheme.myshopify.com')
+shop = FactoryGirl.create(:shop, domain: 'davidstore.myshopify.com')
 3.times do
   line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
   FactoryGirl.create(:order, line_items: line_items, shop: shop)

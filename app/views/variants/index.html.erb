@@ -20,162 +20,168 @@
 <% if @variants.blank? %>
   <p>There are no products managed by <%= @management %> in your store.</p>
 <% else %>
-<form>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <% if @management != 'other' %>
-          <th><input id="super_checkbox" type="checkbox"></th>
-        <% end %>
-        <th>Variant</th>
-        <th>Product</th>
-        <th>Sku</th>
-        <th>Quantity</th>
-      </tr>
-    </thead>
-      <% @variants.each do |variant| %>
-        <tr class="inventory_item">
-          <% if @management != 'other' %>
-            <td><%= check_box_tag 'shopify_variant_ids[]', variant.id, false, :class => 'selector' %></td>
-          <% end %>
-          <% if @management == 'shipwire' %>
-            <td><%= link_to variant.title, variant_path(variant) %></td>
-          <% else %>
-            <td><%= variant.title %></td>
-          <% end %>
-          <td><%= variant.product_title %></td>
-          <td id="<%= variant.id %>"><%= variant.sku %></td>
-          <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
-        </tr>
-      <% end %>
-  </table>
-  <br />
-  <% if @management == 'shipwire' %>
-    <%= submit_tag("Manage with Shopify",:class => "btn btn-success") %>
-  <% elsif @management == 'shopify' || 'none' %>
-    <%= submit_tag("Manage with Shipwire",:class => "btn btn-success") %>
+  <% if @management == 'shopify' || @management == 'none' %>
+    <%= form_tag(variant_path, :method => 'get') %>
+  <% elsif @management == 'shipwire' %>
+    <%= form_tag(variant_path, :method => 'destroy') %>
   <% end %>
-</form>
-
-<% if @management != 'other' %>
-  <a class="btn btn-primary" data-toggle="modal" href="#myModal">Edit SKUs</a>
-<% end %>
-</div>
-
-
-
-
-
-<!-- PAGINATION BEGIN -->
-
-
-
-<div class="span10">
-<% if @pages > 1 %>
-<div class="pagination">
-  <ul>
-    <% if @page > 0 %>
-      <li><%= link_to 'Prev', '/variants/filter/'+@management+'/'+(@page-1).to_s %></li>
-    <% end %>
-    <% @pages.times do |page| %>
-      <li class="<%= 'active' if page == @page %>"><%= link_to page.to_s, '/variants/filter/'+@management+'/'+page.to_s %></li>
-    <% end %>
-    <% if @page < @pages-1 %>
-      <li><%= link_to 'Next', '/variants/filter/'+@management+'/'+(@page+1).to_s %></li>
-    <% end %>
-  </ul>
-</div>
-<% end %>
-<% end %>
-</div>
-</div>
-
-
-
-<!-- PAGINATION END -->
-
-
-
-
-
-<!-- MODAL BEGIN -->
-<% if @management != 'other' %>
-
-  <div class="modal hide" id="myModal">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3>Update SKUs</h3>
-    </div>
-    <div class="modal-body">
-  <form action="/variants/update" >
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Variant</th>
-        <th>Product</th>
-        <th>Sku</th>
-      </tr>
-    </thead>
-      <% @variants.each do |variant| %>
-        <tr class="inventory_item">
-          <% if @management == 'shipwire' %>
-            <td><%= link_to variant.title, variant_path(variant) %></td>
-          <% else %>
-            <td><%= variant.title %></td>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <% if @management != 'other' %>
+            <th><input id="super_checkbox" type="checkbox"></th>
           <% end %>
-          <td><%= variant.product_title %></td>
-          <td>
-            <div class="<%= variant.id %> control-group">
-              <input data-id="<%= variant.id %>" value="<%= variant.sku %>" type="text" class="variant_sku span3">
-            </div>
-          </td>
+          <th>Variant</th>
+          <th>Product</th>
+          <th>Sku</th>
+          <th>Quantity</th>
         </tr>
-      <% end %>
-  </table>
-  <br />
+      </thead>
+        <% @variants.each do |variant| %>
+          <tr class="inventory_item">
+            <% if @management != 'other' %>
+              <td><%= check_box_tag 'shopify_variant_ids[]', variant.id, false, :class => 'selector' %></td>
+            <% end %>
+            <% if @management == 'shipwire' %>
+              <td><%= link_to variant.title, variant_path(variant) %></td>
+            <% else %>
+              <td><%= variant.title %></td>
+            <% end %>
+            <td><%= variant.product_title %></td>
+            <td id="<%= variant.id %>"><%= variant.sku %></td>
+            <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
+          </tr>
+        <% end %>
+    </table>
+    <br />
+    <% if @management == 'shipwire' %>
+      <%= submit_tag("Manage with Shopify",:class => "btn btn-success") %>
+    <% elsif @management == 'shopify' || 'none' %>
+      <%= submit_tag("Manage with Shipwire",:class => "btn btn-success") %>
+    <% end %>
+  <% if %w( shipwire shopify none).include? @management %>
+    </formm>
+  <% end %>
 
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">Close</a>
-      <a id="update_skus" href="#" class="btn btn-primary">Save Changes</a>
-    </div>
-  </form>
+  <% if @management != 'other' %>
+    <a class="btn btn-primary" data-toggle="modal" href="#myModal">Edit SKUs</a>
+  <% end %>
+
+
+
+
+
+  <!-- PAGINATION BEGIN -->
+
+
+
+  <div class="span10">
+    <% if @pages > 1 %>
+      <div class="pagination">
+        <ul>
+          <% if @page > 0 %>
+            <li><%= link_to 'Prev', '/variants/filter/'+@management+'/'+(@page-1).to_s %></li>
+          <% end %>
+          <% @pages.times do |page| %>
+            <li class="<%= 'active' if page == @page %>"><%= link_to page.to_s, '/variants/filter/'+@management+'/'+page.to_s %></li>
+          <% end %>
+          <% if @page < @pages-1 %>
+            <li><%= link_to 'Next', '/variants/filter/'+@management+'/'+(@page+1).to_s %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
   </div>
 
-<% end %>
 
-<!-- MODAL END -->
 
-<script>
-$(document).ready(function(){
-  $('#super_checkbox').click(function(){
-    if ($('#super_checkbox').is(':checked')){
-      $('.selector').attr('checked',true);
-    }
-    else{
-      $('.selector').attr('checked',false);
-    }
-  });
+  <!-- PAGINATION END -->
 
-  $('.variant_sku').click(function(){
-    $(this).addClass('edited');
-  });
 
-  $("#update_skus").click(function(){
-    var data = {}
-    data['management'] = '<%= @management %>';
-    $.each(
-      $(".edited"),
-      function(){
-        data[$(this).data('id')] = $(this).val();
+
+
+
+  <!-- MODAL BEGIN -->
+  <% if @management != 'other' %>
+
+    <div class="modal hide" id="myModal">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h3>Update SKUs</h3>
+      </div>
+      <div class="modal-body">
+    <form action="/variants/update" >
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Variant</th>
+          <th>Product</th>
+          <th>Sku</th>
+        </tr>
+      </thead>
+        <% @variants.each do |variant| %>
+          <tr class="inventory_item">
+            <% if @management == 'shipwire' %>
+              <td><%= link_to variant.title, variant_path(variant) %></td>
+            <% else %>
+              <td><%= variant.title %></td>
+            <% end %>
+            <td><%= variant.product_title %></td>
+            <td>
+              <div class="<%= variant.id %> control-group">
+                <input data-id="<%= variant.id %>" value="<%= variant.sku %>" type="text" class="variant_sku span3">
+              </div>
+            </td>
+          </tr>
+        <% end %>
+    </table>
+    <br />
+
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <a id="update_skus" href="#" class="btn btn-primary">Save Changes</a>
+      </div>
+    </form>
+    </div>
+
+  <% end %>
+
+  <!-- MODAL END -->
+
+  <script>
+  $(document).ready(function(){
+    $('#super_checkbox').click(function(){
+      if ($('#super_checkbox').is(':checked')){
+        $('.selector').attr('checked',true);
       }
-    );
+      else{
+        $('.selector').attr('checked',false);
+      }
+    });
 
-    $.post(
-      '<%= variant_update_path %>',
-      data
-    );
+    $('.variant_sku').click(function(){
+      $(this).addClass('edited');
+    });
 
-  })
-});
-</script>
+    $("#update_skus").click(function(){
+      var data = {}
+      data['management'] = '<%= @management %>';
+      $.each(
+        $(".edited"),
+        function(){
+          data[$(this).data('id')] = $(this).val();
+        }
+      );
+
+      $.post(
+        '<%= variant_update_path %>',
+        data
+      );
+
+    })
+  });
+  </script>
+
+<% end %>

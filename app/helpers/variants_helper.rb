@@ -14,7 +14,7 @@ module VariantsHelper
       'Shipwire' => '/variants/filter/shipwire',
       'Shopify' => '/variants/filter/shopify',
       'Other' => '/variants/filter/other',
-      'None' => '/variants/filter/none'
+      'Manually' => '/variants/filter/manually'
     }
     filters.delete(management)
     filters

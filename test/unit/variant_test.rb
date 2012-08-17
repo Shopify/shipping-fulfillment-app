@@ -174,8 +174,49 @@ class VariantTest < ActiveSupport::TestCase
     assert_equal 'YTK-974', variant.sku
   end
 
-  test "update skus" do
-    #last variant test
+  test "#self.update_skus provides the ids and skus of all the updated variants" do
+    variant1 = MockShopifyVariant.new('shipwire',1,'JIF-043')
+    variant2 = MockShopifyVariant.new('shipwire',2,'YWZ-922')
+    params = {variant1.id => variant1.sku, variant2.id => variant2.sku}
+
+    Variant.stubs(:find_and_set_sku).returns(true)
+
+    ids = [1,2]
+    skus = ['JIF-043','YWZ-922']
+    failures = []
+    assert_equal [ids, skus, failures], Variant.update_skus('shipwire', params)
+  end
+
+  test "#self.update_skus provides the variant ids for all the updates that failed" do
+    variant1 = MockShopifyVariant.new('shipwire',1,'JIF-043')
+    variant2 = MockShopifyVariant.new('shipwire',2,'YWZ-922')
+    variant3 = MockShopifyVariant.new('shipwire',3,'FCT-388')
+    params = {
+      variant1.id => variant1.sku,
+      variant2.id => variant2.sku,
+      variant3.id => variant3.sku
+    }
+
+    Variant.expects(:find_and_set_sku).with('shipwire',1,'JIF-043').returns(true)
+    Variant.expects(:find_and_set_sku).with('shipwire',2,'YWZ-922').returns(false)
+    Variant.expects(:find_and_set_sku).with('shipwire',3,'FCT-388').returns(false)
+
+    ids = [1]
+    skus = ['JIF-043']
+    failures = [2,3]
+    assert_equal [ids, skus, failures], Variant.update_skus('shipwire', params)
+  end
+
+  test "#self.batch_destroy_variants destroys all the variants corresponding to the shopify order ids" do
+    stub_variant_callbacks
+    create(:variant, shop: @shop, shopify_variant_id: 1)
+    create(:variant, shop: @shop, shopify_variant_id: 2)
+
+    mock_shopify_variants
+
+    assert_difference "Variant.count", -2 do
+      Variant.batch_destroy_variants(@shop, [1,2])
+    end
   end
 
   def mock_shopify_variants
@@ -184,14 +225,19 @@ class VariantTest < ActiveSupport::TestCase
   end
 
   class MockShopifyVariant
-    attr_accessor :inventory_management, :inventory_quantity, :sku, :title, :product_title
+    attr_accessor :inventory_management, :inventory_quantity, :sku, :title, :product_title, :id
 
-    def initialize(inventory_management='shopify')
+    def initialize(inventory_management='shopify', id=1, sku='GK5-90L')
+      @id = id
+      @sku = sku
       @inventory_management = inventory_management
       @inventory_quantity = 10
-      @sku = "GK5-90L"
       @title = "Chive T-shirt"
       @product_title = nil
+    end
+
+    def save
+      true
     end
   end
 

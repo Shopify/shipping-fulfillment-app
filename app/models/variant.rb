@@ -29,7 +29,17 @@ class Variant < ActiveRecord::Base
     failures.length
   end
 
-  #test
+  def self.batch_destroy_variants(shop, shopify_variant_ids)
+    shopify_variant_ids.each do |id|
+      variant = shop.variants.find_by_shopify_variant_id(id)
+      if variant.destroy
+        shopify_variant = ShopifyAPI::Variant.find(id)
+        shopify_variant.inventory_management = 'shopify'
+        shopify_variant.save
+      end
+    end
+  end
+
   def self.update_skus(management, params)
     ids,skus,failures = [],[],[]
     params.each do |id, sku|
@@ -47,7 +57,7 @@ class Variant < ActiveRecord::Base
     if management == 'shipwire'
       variant = Variant.find(id.to_i)
       variant.update_attribute(:sku, sku)
-    elsif management == 'shopify' || management == 'none'
+    elsif management == 'shopify' || management == 'manually'
       variant = ShopifyAPI::Variant.find(id.to_i)
       variant.sku = sku
       variant.save
@@ -83,7 +93,7 @@ class Variant < ActiveRecord::Base
       true if service == 'shopify'
     when 'other'
       true unless service.blank? || ['shipwire','shopify'].include?(service)
-    when 'none'
+    when 'manually'
       true if service == nil || service == ''
     end
   end
