@@ -16,7 +16,11 @@ class VariantsController < ApplicationController
 
   def update
     management = params.delete('management')
+    puts "UPDATE"
     @ids, @skus, @failures = Variant.update_skus(management, params.except(:action,:controller,:format))
+    puts @ids
+    puts @skus
+    puts @failures
   end
 
   # need to toggle create and destroy between different filters

@@ -1,6 +1,6 @@
 class Variant < ActiveRecord::Base
 
-  Rails.env == 'development' ? PER_PAGE = 2 : PER_PAGE = 50
+  Rails.env == 'development' ? PER_PAGE = 2 : PER_PAGE = 30
 
   attr_accessible :shopify_variant_id, :sku, :quantity, :backordered, :reserved, :shipping, :shipped, :availableDate, :shippedLastDay, :shippedLastWeek, :shippedLast4Weeks, :orderedLastDay, :orderedLastWeek, :orderedLast4Weeks, :title
 
@@ -12,8 +12,6 @@ class Variant < ActiveRecord::Base
 
   after_create :update_shopify
 
-
-
   def last_fulfilled_order_address
     item = shop.line_items.order("created_at DESC")
       .where('variant_id = ? AND fulfillment_status = ?', shopify_variant_id, 'fulfilled')
@@ -22,7 +20,6 @@ class Variant < ActiveRecord::Base
     item.order.address if item.present?
   end
 
-  #test
   def self.batch_create_variants(shop, shopify_variant_ids)
    failures = shopify_variant_ids.select do |shopify_variant_id|
       shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
@@ -35,34 +32,30 @@ class Variant < ActiveRecord::Base
   #test
   def self.update_skus(management, params)
     ids,skus,failures = [],[],[]
-    case management
-      when 'shipwire'
-        params.each do |id, sku|
-          variant = Variant.find(id.to_i)
-          if variant.update_attribute(:sku, sku)
-            ids << id
-            skus << sku
-          else
-            failures << id
-          end
-        end
-      when 'shopify' || 'none'
-        params.each do |id, sku|
-          variant = ShopifyAPI::Variant.find(id.to_i)
-          variant.sku = sku
-          if variant.save!
-            ids << id
-            skus << sku
-          else
-            failures << id
-          end
-        end
+    params.each do |id, sku|
+      if Variant.find_and_set_sku(management, id, sku)
+        ids << id
+        skus << sku
       else
+        failures << id
+      end
     end
     [ids, skus, failures]
   end
 
-  #test
+  def self.find_and_set_sku(management, id, sku)
+    if management == 'shipwire'
+      variant = Variant.find(id.to_i)
+      variant.update_attribute(:sku, sku)
+    elsif management == 'shopify' || management == 'none'
+      variant = ShopifyAPI::Variant.find(id.to_i)
+      variant.sku = sku
+      variant.save
+    else
+      nil
+    end
+  end
+
   def self.filter_and_paginate_variants(management, page)
     all_variants = ShopifyAPI::Product.all.map do |product|
       product.variants.each { |variant| variant.product_title = product.title }
@@ -109,6 +102,8 @@ class Variant < ActiveRecord::Base
 
   def update_shopify
     shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
-    shopify_variant.save({quantity: quantity, inventory_management: 'shipwire'}) #TODO find out how to do this
+    shopify_variant.inventory_quantity = quantity
+    shopify_variant.inventory_management = 'shipwire'
+    shopify_variant.save!
   end
 end
