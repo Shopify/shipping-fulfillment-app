@@ -7,27 +7,4 @@
  *= require imports
  *= require shopify_app_buttons
  *= require shopify_app
- *= require_tree
 */
-
-.pagination ul {
-  margin:0 auto;
-  padding-top:14px;
-}
-
-.pagination{
-  text-align:center;
-}
-
-.fulfill_submit td{
-  width: 270px;
-
-}
-
-.alert-success, .alert-error{
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  margin-bottom: 0!important;
-  text-align: center;
-}

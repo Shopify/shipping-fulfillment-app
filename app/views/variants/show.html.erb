@@ -1,10 +1,10 @@
 <div class="span9 offset1">
-<h2><span class="gray"><%= @product_title %></span>/<%= @variant.title %></h2>
+<h2><span class="muted"><%= @product_title %></span>/<%= @variant.title %></h2>
 <p>SKU <%= @variant.sku %> [Edit]</p>
 <hr />
 
 <p><%= @variant.quantity %> currently in stock</p>
-<p class="gray"><%= @variant.reserved %> reserved - <%= @variant.shipping %> shipping - <%= @variant.shipped %> shipped to date</p>
+<p class="muted"><%= @variant.reserved %> reserved - <%= @variant.shipping %> shipping - <%= @variant.shipped %> shipped to date</p>
 <hr />
 
 <div id="map_container">
@@ -15,12 +15,12 @@
 <thead>
   <tr>
     <th></th>
-    <th class="gray">Shipped</th>
-    <th class="gray">Ordered</th>
+    <th class="muted">Shipped</th>
+    <th class="muted">Ordered</th>
 </thead>
 <tbody>
   <tr>
-    <td class="gray">
+    <td class="muted">
       Yesterday
     </td>
     <td>
@@ -31,7 +31,7 @@
     </td>
   </tr>
   <tr>
-    <td class="gray">
+    <td class="muted">
       Last Week
     </td>
     <td>
@@ -42,7 +42,7 @@
     </td>
   </tr>
   <tr>
-    <td class="gray">
+    <td class="muted">
       Last 4 Weeks
     </td>
     <td>
