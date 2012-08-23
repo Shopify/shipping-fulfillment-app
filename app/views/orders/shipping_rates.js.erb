@@ -12,7 +12,7 @@ var responseRow = function(service, serviceCode, price, estimatedDeliveryDate, e
   var tableHead = "<table class='table table-striped'><thead><tr><th>Service</th><th>Service Code</th><th>Price</th><th>Estimated Delivery Date</th><th>Estimated Delivery Range</th></tr></thead><tbody>";
   var rows = '';
   <% @rates.each do |rate| %>
-    rows += responseRow(<%= rate.service %>, <%= rate.service_code %>, <%= rate.price %>, <%= rate.estimated_delivery_date %>, <%= rate.estimated_delivery_range %>));
+    rows += responseRow(<%= rate.service %>, <%= rate.service_code %>, <%= rate.price %>, <%= time_ago_in_words rate.estimated_delivery_date %>, <%= time_ago_in_words rate.estimated_delivery_range %>));
   <% end %>
   var tableFoot = "</tbody></table>";
   var table = tableHead + rows + tableFoot;
