@@ -9,11 +9,11 @@ class FulfillmentTrackingUpdateJobTest < ActiveSupport::TestCase
   test "Perform makes tracking requests and updates fulfillment" do
     fulfillment = create(:fulfillment, expected_delivery_date: DateTime.now + 1.week, shop: @shop, line_items: [create(:line_item)])
     active_order_ids = [fulfillment.shipwire_order_id]
-    response = {fulfillment.shipwire_order_id => {returned: "YES"}}
+    response = {fulfillment.shipwire_order_id => {returned: "Yes"}}
     ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_shop_tracking_info).with(active_order_ids).returns(response)
 
     FulfillmentTrackingUpdateJob.perform
-    assert_equal "YES", fulfillment.reload.returned
+    assert_equal "Yes", fulfillment.reload.returned
   end
 
   test "Perform only updates recent fulfillments" do

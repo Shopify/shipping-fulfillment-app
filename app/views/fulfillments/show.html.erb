@@ -36,7 +36,7 @@
             <th class="sortcol">Tracking Link</th>
             <th class="sortcol">Tracking Number</th>
             <th class="sortcol">Total</th>
-            <% if @fulfillment.returned == "YES" %>
+            <% if @fulfillment.returned == "Yes" %>
             <th class="sortcol">Returned</th>
             <th class="sortcol">Return Date</th>
             <th class="sortcol">Return Condition</th>
@@ -52,7 +52,7 @@
             <td><%= link_to "Tracking Link", @fulfillment.tracking_link %></td>
             <td><%= @fulfillment.tracking_number %></td>
             <td><%= @fulfillment.total %></td>
-            <% if @fulfillment.returned == "YES" %>
+            <% if @fulfillment.returned == "Yes" %>
             <td><%= @fulfillment.returned %></td>
             <td><%= time_ago_in_words @fulfillment.return_date %></td>
             <td><%= @fulfillment.return_condition %></td>

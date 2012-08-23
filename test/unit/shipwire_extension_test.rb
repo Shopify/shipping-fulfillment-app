@@ -48,11 +48,11 @@ class ShippingExtensionTest < ActiveSupport::TestCase
 
     expected = {
       "40299" => {
-        shipped: "YES",
+        shipped: "Yes",
         shipper_name: "USPS First-Class Mail Parcel + Delivery Confirmation",
         return_condition: "GOOD",
         total: "4.47",
-        returned: "YES",
+        returned: "Yes",
         ship_date: DateTime.parse("22 Mar 2011 00:00:00 +0000"),
         expected_delivery_date: DateTime.parse("22 Mar 2011 00:00:00 +0000"),
         return_date: DateTime.parse("04 May 2011 17:33:25 +0000"),
@@ -209,7 +209,7 @@ class ShippingExtensionTest < ActiveSupport::TestCase
 <TrackingUpdateResponse>
     <Status>0</Status>
     <Order id="40299"
-           shipped="YES"
+           shipped="Yes"
            shipper="USPS FC"
            shipperFullName="USPS First-Class Mail Parcel + Delivery Confirmation"
            shipDate="2011-03-15 10:40:06"
@@ -218,12 +218,12 @@ class ShippingExtensionTest < ActiveSupport::TestCase
            shipping="4.47"
            packaging="0.00"
            total="4.47"
-           returned="YES"
+           returned="Yes"
            returnDate="2011-05-04 17:33:25"
            returnCondition="GOOD"
            href="https://app.shipwire.com/c/t/xxx1:yyy2"
            affiliateStatus="shipwireFulfilled"
-           manuallyEdited="NO">
+           manuallyEdited="No">
         <TrackingNumber carrier="USPS"
                         href="http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum=9400110200793472606087">
         9400110200793472606087</TrackingNumber>

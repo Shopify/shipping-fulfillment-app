@@ -16,7 +16,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   end
 
   test "show: page renders and has columns corresponding to being returned" do
-    fulfillment = create(:fulfillment, :line_items => [build(:line_item)], returned: "YES", shop: @shop)
+    fulfillment = create(:fulfillment, :line_items => [build(:line_item)], returned: "Yes", shop: @shop)
 
     get :show, {:id => fulfillment.id.to_s}
     assert_template :show

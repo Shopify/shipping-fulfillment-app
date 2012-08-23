@@ -18,8 +18,8 @@ FactoryGirl.define do
     return_condition "GOOD"
     shipper_name "USPS First-Class Mail Parcel + Delivery Confirmation"
     total "4.47"
-    returned "NO"
-    shipped "YES"
+    returned "No"
+    shipped "Yes"
     origin_lat BigDecimal.new("3.5694")
     origin_long BigDecimal.new("86.7")
     destination_lat BigDecimal.new("9.432")
