@@ -2,23 +2,25 @@
   <h1>Inventory Management</h1>
   <hr>
 
-  Showing all variants managed by
-  <ul class="unstyled" style="display:inline-block;">
-    <li class="dropdown" id="menu1">
+  <div class="p10">
+    Showing all variants managed by
+    <ul class="unstyled" style="display:inline-block;">
+      <li class="dropdown" id="menu1">
       
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-        <%= @management.capitalize %>
-        <b class="caret"></b>
-      </a>
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+          <%= @management.capitalize %>
+          <b class="caret"></b>
+        </a>
       
-      <ul class="dropdown-menu">
-        <% other_filters(@management.capitalize).each do |filter, path| %>
-          <li><a href="<%= path %>"><%= filter %></a></li>
-        <% end %>
-      </ul>
+        <ul class="dropdown-menu">
+          <% other_filters(@management.capitalize).each do |filter, path| %>
+            <li><a href="<%= path %>"><%= filter %></a></li>
+          <% end %>
+        </ul>
       
-    </li>
-  </ul>
+      </li>
+    </ul>
+  </div>
 
 <% if @variants.blank? %>
 
@@ -31,47 +33,52 @@
   <% elsif @management == 'shipwire' %>
     <%= form_tag(variant_path, :method => 'destroy') %>
   <% end %>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <% if @management != 'other' %>
-            <th><input id="super_checkbox" type="checkbox"></th>
-          <% end %>
-          <th>Variant</th>
-          <th>Product</th>
-          <th>Sku</th>
-          <th>Quantity</th>
-        </tr>
-      </thead>
-        <% @variants.each do |variant| %>
-          <tr class="inventory_item">
-            <% if @management != 'other' %>
-              <td><%= check_box_tag 'shopify_variant_ids[]', variant.id, false, :class => 'selector' %></td>
-            <% end %>
-            <% if @management == 'shipwire' %>
-              <td><%= link_to variant.title, variant_path(variant) %></td>
-            <% else %>
-              <td><%= variant.title %></td>
-            <% end %>
-            <td><%= variant.product_title %></td>
-            <td id="<%= variant.id %>"><%= variant.sku %></td>
-            <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
-          </tr>
+  
+  <div class="form-actions-holder">
+    <div class="well">
+      <% if @management == 'shipwire' %>
+        <%= submit_tag("Manage with Shopify",:class => "btn btn-primary disabled", :disabled => 'disabled') %>
+      <% elsif @management == 'shopify' || 'none' %>
+        <%= submit_tag("Manage with Shipwire",:class => "btn btn-primary disabled", :disabled => 'disabled') %>
+      <% end %>
+  
+      <% if @management != 'other' %>
+        <a class="btn disabled" data-toggle="modal" href="#myModal">Edit SKUs</a>
+      <% end %>
+    </div>
+  </div>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <% if @management != 'other' %>
+          <th><input id="super_checkbox" type="checkbox"></th>
         <% end %>
-    </table>
-    <br />
-    <% if @management == 'shipwire' %>
-      <%= submit_tag("Manage with Shopify",:class => "btn btn-primary") %>
-    <% elsif @management == 'shopify' || 'none' %>
-      <%= submit_tag("Manage with Shipwire",:class => "btn btn-primary") %>
-    <% end %>
+        <th>Variant</th>
+        <th>Product</th>
+        <th>Sku</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+      <% @variants.each do |variant| %>
+        <tr class="inventory_item">
+          <% if @management != 'other' %>
+            <td><%= check_box_tag 'shopify_variant_ids[]', variant.id, false, :class => 'selector' %></td>
+          <% end %>
+          <% if @management == 'shipwire' %>
+            <td><%= link_to variant.title, variant_path(variant) %></td>
+          <% else %>
+            <td><%= variant.title %></td>
+          <% end %>
+          <td><%= variant.product_title %></td>
+          <td id="<%= variant.id %>"><%= variant.sku %></td>
+          <td><span class="<%= inventory_label(variant.inventory_quantity) %>"><%= variant.inventory_quantity %></span></td>
+        </tr>
+      <% end %>
+  </table>
     
   <% if %w( shipwire shopify none).include? @management %>
     </formm>
-  <% end %>
-
-  <% if @management != 'other' %>
-    <a class="btn" data-toggle="modal" href="#myModal">Edit SKUs</a>
   <% end %>
 </div>
 
@@ -164,6 +171,14 @@
     });
     
     // nasty checkbox js
+    var checkboxHeadCount = function(){
+      if( $('.selector:checked').length > 0){
+        $('.form-actions-holder a, .form-actions-holder input').removeClass('disabled').removeAttr('disabled');
+      } else {
+        $('.form-actions-holder a, .form-actions-holder input').addClass('disabled').attr('disabled','disabled');
+      }
+    }
+
     $('.selector').click(function(){    
       if( $('.selector').length > $('.selector:checked').length && $('.selector:checked').length != 0){
         $('#super_checkbox').prop("indeterminate", true);
@@ -176,6 +191,8 @@
       } else {
         $('#super_checkbox').attr('checked',false);
       };
+
+      checkboxHeadCount();
     });
 
     $('#super_checkbox').click(function(){
@@ -184,6 +201,8 @@
       } else {
         $('.selector').attr('checked',false);
       }
+
+      checkboxHeadCount();
     });
   });
   </script>

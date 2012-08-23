@@ -35,9 +35,9 @@
         <% unless current_shop.blank? || current_shop.new_record? %>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class='<%= active_nav_class('home', 'design') %>'><%= link_to 'Orders', '/orders' %></li>
-              <li class='<%= active_nav_class('home', 'design') %>'><%= link_to 'Tracking', '/fulfillments' %></li>
-              <li class='<%= active_nav_class('home', 'design') %>'><%= link_to 'Inventory', '/variants' %></li>
+              <li class='<%= active_nav_class('orders') %>'><%= link_to 'Orders', '/orders' %></li>
+              <li class='<%= active_nav_class('fulfillments') %>'><%= link_to 'Fulfillments', '/fulfillments' %></li>
+              <li class='<%= active_nav_class('variants') %>'><%= link_to 'Inventory', '/variants' %></li>
             </ul>
           </div>
 

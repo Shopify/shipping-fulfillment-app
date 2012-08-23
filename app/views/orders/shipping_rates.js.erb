@@ -1,9 +1,9 @@
 var responseTable = function(service, serviceCode, price, estimatedDeliveryDate, estimatedDeliveryRange){
-  return "<table class='table table-striped'><thead><tr><th>Service</th><th>Service Code</th><th>Price</th><th>Estimated Delivery Date</th><th>Estimated Delivery Range</th></tr></thead><tbody><tr><td>" + service + "</td><td>" + serviceCode + "</td><td>" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr></tbody></table>";
+  return "<table class='table table-striped'><thead><tr><th>Service</th><th>Service Code</th><th>Price</th><th>Estimated Delivery Date</th><th>Estimated Delivery Range</th></tr></thead><tbody><tr><td>" + service + "</td><td>" + serviceCode + "</td><td>$" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr></tbody></table>";
 }
 
 var responseRow = function(service, serviceCode, price, estimatedDeliveryDate, estimatedDeliveryRange){
-  return "<tr><td>" + service + "</td><td>" + serviceCode + "</td><td>$" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr>";
+  return "<tr><td>" + service + "</td><td>" + serviceCode + "</td><td>" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr>";
 }
 
 <% if Rails.env == 'development' %>

@@ -7,14 +7,14 @@
       <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
       
       <div class="form-actions-holder">
-        <div class="fulfill_submit well form-inline muted hide">
+        <div class="fulfill_submit well form-inline muted">
           <%= label_tag :shipping_method, 'Shipping Method', :class => 'control-label' %>
-          <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
+          <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method", :class => 'disabled', :disabled => 'disabled' %>
 
           <%= label_tag :warehouse, 'Warehouse', :class => 'control-label' %>
-          <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
+          <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse', :class => 'disabled', :disabled => 'disabled' %>
 
-          <%= submit_tag("Fullfill",:class => "btn btn-primary") %>
+          <%= submit_tag("Fullfill",:class => "btn btn-primary disabled", :disabled => 'disabled') %>
         </div>
       </div>
       
@@ -76,9 +76,9 @@ $(document).ready(function(){
   // nasty checkbox js
   var checkboxHeadCount = function(){
     if( $('.selector:checked').length > 0){
-      $('.fulfill_submit').fadeIn('fast');
+      $('.form-actions-holder select, .form-actions-holder input').removeClass('disabled').removeAttr('disabled');
     } else {
-      $('.fulfill_submit').fadeOut('fast');
+      $('.form-actions-holder select, .form-actions-holder input').addClass('disabled').attr('disabled','disabled');
     }
   }
   

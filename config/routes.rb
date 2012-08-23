@@ -58,7 +58,7 @@ ShipwireApp::Application.routes.draw do
 
   match 'test' => 'external#fulfill_order', :via => :post #TODO REMOVE
 
-  root :to                   => 'login#index'
+  root :to                   => 'orders#index'
 
   mount Resque::Server, :at =>  '/resque' if Rails.env == 'development'
 
