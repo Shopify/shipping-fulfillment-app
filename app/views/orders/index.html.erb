@@ -1,15 +1,28 @@
-<div class="span9 offset1">
-    <h2>Orders</h2>
+<div class="span12">
+    <h1>Orders</h1>
     <hr>
     <% if @orders.blank? %>
         <p>There are no orders in your store.</p>
     <% else %>
       <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
+      
+      <div class="form-actions-holder">
+        <div class="fulfill_submit well form-inline muted hide">
+          <%= label_tag :shipping_method, 'Shipping Method', :class => 'control-label' %>
+          <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
+
+          <%= label_tag :warehouse, 'Warehouse', :class => 'control-label' %>
+          <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
+
+          <%= submit_tag("Fullfill",:class => "btn btn-primary") %>
+        </div>
+      </div>
+      
       <table class="table table-striped">
         <thead>
           <tr>
             <% if !current_shop.automatic_fulfillment? %>
-            <th class="sortcol">Fulfill!</th>
+            <th class="sortcol"><input id="super_checkbox" type="checkbox"></th>
             <% end %>
             <th class="sortcol">Order</th>
             <th class="sortcol">Date</th>
@@ -27,7 +40,7 @@
               <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => false %></td>
             <% end %>
           <% end %>
-          <td><%= link_to order.name, "/orders/"+order.id.to_s %></td>
+          <td><%= link_to "#"+order.name, "/orders/"+order.id.to_s %></td>
           <td><%= time_ago_in_words order.created_at.to_s %> ago</td>
           <td>
             <span class="label  <% if order.financial_status  == 'paid' %>label-success<% end %> <% if order.financial_status  == 'refunded' %>label-important<% end %>"><%= order.financial_status %>
@@ -35,41 +48,64 @@
           </td>
           <td>
             <% if !order.fulfillment_status %>
-            <span class="label label-warning">Not Fulfilled</span>
+            <span class="label">pending</span>
             <% elsif order.fulfillment_status == "partial" %>
             <span class="label">Partially Fulfilled</span>
             <% else %>
             <span class="label label-success">Fulfilled</span>
             <% end %>
           </td>
-          <td><%= order.total_price %> <%= order.currency %></td>
+          <td>$<%= order.total_price %> <%= order.currency %></td>
         </tr>
       <% end %>
       </table>
-      <br />
-      <hr>
-
-      <table class="fulfill_submit">
-        <tr>
-          <td>
-            <%= label_tag :shipping_method, 'Shipping Method: ' %>
-            <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
-          </td>
-          <td>
-            <%= label_tag :warehouse, 'Warehouse :' %>
-            <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
-          </td>
-          <td>
-            <%= submit_tag("Fullfill",:class => "btn btn-success") %>
-          </td>
-        </tr>
-      </table>
+      
     <% end %>
-    <br/>
-  <div class="span9 offset1">
-    <div class="pagination">
-      <!-- Stylize with twitter pagination at some point !-->
+    
+    <div class="span12">
+      <div class="pagination">
+        <!-- Stylize with twitter pagination at some point !-->
+      </div>
     </div>
-  </div>
+    
 <% end %>
 </div>
+
+<script>
+$(document).ready(function(){
+  // nasty checkbox js
+  var checkboxHeadCount = function(){
+    if( $('.selector:checked').length > 0){
+      $('.fulfill_submit').fadeIn('fast');
+    } else {
+      $('.fulfill_submit').fadeOut('fast');
+    }
+  }
+  
+  $('.selector').click(function(){    
+    if( $('.selector').length > $('.selector:checked').length && $('.selector:checked').length != 0){
+      $('#super_checkbox').prop("indeterminate", true);
+    } else {
+      $('#super_checkbox').prop("indeterminate", false);
+    };
+    
+    if( $('.selector').length == $('.selector:checked').length && $('.selector:checked').length > 1){
+      $('#super_checkbox').attr('checked',true);
+    } else {
+      $('#super_checkbox').attr('checked',false);
+    };
+    
+    checkboxHeadCount();
+  });
+  
+  $('#super_checkbox').click(function(){
+    if ($('#super_checkbox').is(':checked')){
+      $('.selector').attr('checked',true);
+    } else {
+      $('.selector').attr('checked',false);
+    }
+    
+    checkboxHeadCount();
+  });
+});
+</script>

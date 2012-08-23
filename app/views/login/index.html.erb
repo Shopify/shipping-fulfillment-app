@@ -1,15 +1,11 @@
-<div class="page-header" id="login-header">
-  <h1>Install This App</h1>
-  <h1><small>This app requires you to login to start using it.</small></h1>
+<div class="span12">
+  <div class="page-header" id="login-header">
+    <h1>Install The Shipwire App for Shopify</h1>
+    
+    <%= form_tag login_path, :class => 'form-search' do %>
+      <%= text_field_tag 'shop', nil, :placeholder => 'Shop URL' %>
+      <%= submit_tag 'Install', :class => 'btn btn-primary btn-large' %>
+    <% end %>
+    <p class="muted">Don't have a Shopify store? <a href="http://shopify.com">Start a free trial</a></p>
+  </div>
 </div>
-
-<div style="width:340px; margin:0 auto;">
-  <%= form_tag login_path, :class => 'form-search' do %>
-    <%= text_field_tag 'shop', nil, :placeholder => 'Shop URL', :class => 'btn-large' %>
-    <%= submit_tag 'Install', :class => 'btn btn-primary btn-large' %>
-  <% end %>
-</div>
-
-<p align="center" style="margin-top:30px">
-  <%= image_tag '../assets/shopify.png' %>
-</p>

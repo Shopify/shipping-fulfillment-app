@@ -3,7 +3,7 @@ var responseTable = function(service, serviceCode, price, estimatedDeliveryDate,
 }
 
 var responseRow = function(service, serviceCode, price, estimatedDeliveryDate, estimatedDeliveryRange){
-  return "<tr><td>" + service + "</td><td>" + serviceCode + "</td><td>" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr>";
+  return "<tr><td>" + service + "</td><td>" + serviceCode + "</td><td>$" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr>";
 }
 
 <% if Rails.env == 'development' %>

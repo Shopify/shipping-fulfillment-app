@@ -1,5 +1,5 @@
-<div class="span9 offset1">
-    <h2>Shipwire Fulfillments</h2>
+<div class="span12">
+    <h1>Shipwire Fulfillments</h1>
     <hr>
 
     <div id="map_container">
@@ -14,25 +14,23 @@
     <table class="table table-striped">
         <thead>
           <tr>
-            <th class="sortcol">Fulfillment</th>
-            <th class="sortcol">Shipping Service</th>
+            <th class="sortcol"></th>
+            <th class="sortcol">Shipping Method</th>
             <th class="sortcol">Ship Date</th>
             <th class="sortcol">Expected Delivery Date</th>
             <th class="sortcol">Returned</th>
             <th class="sortcol">Total</th>
-            <th class="sortcol">More Details</th>
           </tr>
         </thead>
         <tbody>
           <% @fulfillments.each do |fulfillment| %>
             <tr>
-            <td><%= fulfillment.shipwire_order_id %></td>
-            <td><%= fulfillment.shipper_name %></td>
-            <td><%= time_ago_in_words fulfillment.ship_date %></td>
-            <td><%= time_ago_in_words fulfillment.expected_delivery_date%></td>
-            <td><%= fulfillment.returned %></td>
-            <td><%= fulfillment.total %></td>
-            <td><%= link_to 'view', fulfillment %></td>
+              <td><%= link_to fulfillment.shipwire_order_id, fulfillment %></td>
+              <td><%= fulfillment.shipper_name %></td>
+              <td><%= time_ago_in_words fulfillment.ship_date %></td>
+              <td><%= time_ago_in_words fulfillment.expected_delivery_date%></td>
+              <td><span class="label <% if fulfillment.returned == "YES" %>label-warning<% end %>"><%= fulfillment.returned %></span></td>
+              <td>$<%= fulfillment.total %></td>
             </tr>
           <% end %>
         </tbody>

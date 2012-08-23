@@ -1,69 +1,65 @@
- <div class="span9 offset1">
-   <h2>Order <%= @order.name %></h2>
+ <div class="span12">
+   <h1>Order <%= @order.name %></h1>
+   <hr/>
 
-      <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <% if !current_shop.automatic_fulfillment? %>
-            <th>Fulfill</th>
-            <% end %>
-            <th>Variant</th>
-            <th>SKU</th>
-            <th>Fulfillment Service</th>
-            <th>Requires Shipping</th>
-            <th>Fulfillment</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <% @line_items.each do |item| %>
-          <tr>
-            <% if !current_shop.automatic_fulfillment? %>
-              <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => disabled?(item) %></td>
-            <% end %>
-            <td><%= item.name %></td>
-            <td><%= item.sku %></td>
-            <td><%= item.fulfillment_service %></td>
-            <td><%= item.requires_shipping %></td>
-            <td>
-              <% if !item.fulfillment_status %>
-              <span class="label">Not Fulfilled</span>
-              <% else %>
-              <span class="label label-success">Fulfilled</span>
-              <% end %>
-            </td>
-            <td><%= item.price %></td>
-          </tr>
-        <% end %>
-        </table>
-        <br />
+  <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
+  
+    <% if shipwire_fulfillable?(@order) %>
+      <div class="form-actions-holder">
+        <div class="fulfill_submit well form-inline muted hide">
+          <%= label_tag :shipping_method, 'Shipping Method', :class => 'control-label' %>
+          <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
 
-          <% if shipwire_fulfillable?(@order) %>
+          <%= label_tag :warehouse, 'Warehouse', :class => 'control-label' %>
+          <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
 
-          <hr>
-          <table class="fulfill_submit">
-            <tr>
-              <td>
-                <%= label_tag :shipping_method, 'Shipping Method: ' %>
-                <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method" %>
-              </td>
-              <td>
-                <%= label_tag :warehouse, 'Warehouse: ' %>
-                <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse' %>
-              </td>
-                <%= hidden_field_tag 'shopify_order_id', :value => @order.id %>
-              <td>
-                <%= submit_tag("Fullfill",:class => "btn btn-success") %>
-              </td>
-            </tr>
-          </table>
+          <%= submit_tag("Fullfill",:class => "btn btn-primary") %>
+        </div>
+      </div>
+    <% end %>
+    
+    <table class="table table-striped p40">
+      <thead>
+        <tr>
+          <% if !current_shop.automatic_fulfillment? %>
+          <th><input id="super_checkbox" type="checkbox"></th>
           <% end %>
-        <% end %>
-          <hr>
-          <div id='rates_table'>
-            <button id="rates_button" class='btn btn-primary' data-order='<%= @order.id %>'>Calculate Shipping Rate</button>
-          </div>
-        </div> <!-- span8 / right-column -->
+          <th>Variant</th>
+          <th>SKU</th>
+          <th>Fulfillment Service</th>
+          <th>Requires Shipping</th>
+          <th>Fulfillment</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+    
+      <% @line_items.each do |item| %>
+        <tr>
+          <% if !current_shop.automatic_fulfillment? %>
+            <td><%= check_box_tag 'line_item_ids[]', item.id, false, :class => 'selector', :disabled => disabled?(item) %></td>
+          <% end %>
+          <td><%= item.name %></td>
+          <td><%= item.sku %></td>
+          <td><%= item.fulfillment_service %></td>
+          <td><%= item.requires_shipping %></td>
+          <td>
+            <% if !item.fulfillment_status %>
+            <span class="label">pending</span>
+            <% else %>
+            <span class="label label-success">fulfilled</span>
+            <% end %>
+          </td>
+          <td>$<%= item.price %></td>
+        </tr>
+      <% end %>
+    </table>
+    
+  <% end %>
+  
+  <div id='rates_table'>
+    <button id="rates_button" class='btn btn-primary' data-order='<%= @order.id %>'>Calculate Shipping Rate</button>
+  </div>
+</div>
 
 <script>
 $(document).ready(function(){
@@ -74,6 +70,41 @@ $(document).ready(function(){
       type: "GET",
       data: {id: id}
     });
+  });
+  
+  // nasty checkbox js
+  var checkboxHeadCount = function(){
+    if( $('.selector:checked').length > 0){
+      $('.fulfill_submit').fadeIn('fast');
+    } else {
+      $('.fulfill_submit').fadeOut('fast');
+    }
+  }
+  
+  $('.selector').click(function(){    
+    if( $('.selector').length > $('.selector:checked').length && $('.selector:checked').length != 0){
+      $('#super_checkbox').prop("indeterminate", true);
+    } else {
+      $('#super_checkbox').prop("indeterminate", false);
+    };
+    
+    if( $('.selector').length == $('.selector:checked').length && $('.selector:checked').length > 1){
+      $('#super_checkbox').attr('checked',true);
+    } else {
+      $('#super_checkbox').attr('checked',false);
+    };
+    
+    checkboxHeadCount();
+  });
+  
+  $('#super_checkbox').click(function(){
+    if ($('#super_checkbox').is(':checked')){
+      $('.selector').attr('checked',true);
+    } else {
+      $('.selector').attr('checked',false);
+    }
+    
+    checkboxHeadCount();
   });
 });
 </script>
