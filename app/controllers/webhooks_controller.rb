@@ -6,7 +6,6 @@ class WebhooksController < ApplicationController
 
   before_filter :sanitized_params
   before_filter :verify_shopify_webhook
-  before_filter :find_or_create_order, :only => [:order]
   before_filter :verify_shipwire_service, :only => [:fulfillment]
   before_filter :hook
 
@@ -15,6 +14,8 @@ class WebhooksController < ApplicationController
   end
 
   def order
+    find_or_create_order
+    puts @params
     case @hook
       when 'orders/create'
         order_created

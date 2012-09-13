@@ -1,74 +1,72 @@
 <div class="span12">
-    <h1>Orders</h1>
-    <hr>
-    <% if @orders.blank? %>
-        <p>There are no orders in your store.</p>
-    <% else %>
-      <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
-      
-      <div class="form-actions-holder">
-        <div class="fulfill_submit well form-inline muted">
-          <%= label_tag :shipping_method, 'Shipping Method', :class => 'control-label' %>
-          <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method", :class => 'disabled', :disabled => 'disabled' %>
+  <h1>Orders</h1>
+  <hr>
+  <% if @orders.blank? %>
+  <p>There are no orders in your store.</p>
+  <% else %>
+  <%= form_tag :controller => 'fulfillments', :action => 'create' do %>
 
-          <%= label_tag :warehouse, 'Warehouse', :class => 'control-label' %>
-          <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse', :class => 'disabled', :disabled => 'disabled' %>
+  <div class="form-actions-holder">
+    <div class="fulfill_submit well form-inline muted">
+      <%= label_tag :shipping_method, 'Shipping Method', :class => 'control-label' %>
+      <%= select_tag :shipping_method, options_for_select(shipping_options), :id => "shipping_method", :class => 'disabled', :disabled => 'disabled' %>
 
-          <%= submit_tag("Fullfill",:class => "btn btn-primary disabled", :disabled => 'disabled') %>
-        </div>
-      </div>
-      
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <% if !current_shop.automatic_fulfillment? %>
-            <th class="sortcol"><input id="super_checkbox" type="checkbox"></th>
-            <% end %>
-            <th class="sortcol">Order</th>
-            <th class="sortcol">Date</th>
-            <th class="sortcol">Paid</th>
-            <th class="sortcol">Fulfillment</th>
-            <th class="sortcol">Total</th>
-          </tr>
-        </thead>
-      <% @orders.each do |order| %>
-        <tr id="<%= order.id %>">
-          <% if !current_shop.automatic_fulfillment? %>
-            <% if order.fulfillment_status == "fulfilled" || service_is_not_shipwire?(order) %>
-              <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => true %></td>
-            <% else %>
-              <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => false %></td>
-            <% end %>
-          <% end %>
-          <td><%= link_to "#"+order.name, "/orders/"+order.id.to_s %></td>
-          <td><%= time_ago_in_words order.created_at.to_s %> ago</td>
-          <td>
-            <span class="label  <% if order.financial_status  == 'paid' %>label-success<% end %> <% if order.financial_status  == 'refunded' %>label-important<% end %>"><%= order.financial_status %>
-            </span>
-          </td>
-          <td>
-            <% if !order.fulfillment_status %>
-            <span class="label">pending</span>
-            <% elsif order.fulfillment_status == "partial" %>
-            <span class="label">Partially Fulfilled</span>
-            <% else %>
-            <span class="label label-success">Fulfilled</span>
-            <% end %>
-          </td>
-          <td>$<%= order.total_price %> <%= order.currency %></td>
-        </tr>
-      <% end %>
-      </table>
-      
-    <% end %>
-    
-    <div class="span12">
-      <div class="pagination">
-        <!-- Stylize with twitter pagination at some point !-->
-      </div>
+      <%= label_tag :warehouse, 'Warehouse', :class => 'control-label' %>
+      <%= select_tag :warehouse, options_for_select(warehouse_options), :id => 'warehouse', :class => 'disabled', :disabled => 'disabled' %>
+
+      <%= submit_tag("Fulfill",:class => "btn btn-primary disabled", :disabled => 'disabled') %>
     </div>
-    
-<% end %>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <% if !current_shop.automatic_fulfillment? %>
+        <th class="sortcol"><input id="super_checkbox" type="checkbox"></th>
+        <% end %>
+        <th class="sortcol">Order</th>
+        <th class="sortcol">Date</th>
+        <th class="sortcol">Paid</th>
+        <th class="sortcol">Fulfillment</th>
+        <th class="sortcol">Total</th>
+      </tr>
+    </thead>
+    <% @orders.each do |order| %>
+    <tr id="<%= order.id %>">
+      <% if !current_shop.automatic_fulfillment? %>
+      <% if order.fulfillment_status == "fulfilled" || service_is_not_shipwire?(order) %>
+      <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => true %></td>
+      <% else %>
+      <td><%= check_box_tag 'order_ids[]', order.id, false, :class => 'selector', :disabled => false %></td>
+      <% end %>
+      <% end %>
+      <td><%= link_to "#"+order.name, "/orders/"+order.id.to_s %></td>
+      <td><%= time_ago_in_words order.created_at.to_s %> ago</td>
+      <td>
+        <span class="label  <% if order.financial_status  == 'paid' %>label-success<% end %> <% if order.financial_status  == 'refunded' %>label-important<% end %>"><%= order.financial_status %>
+        </span>
+      </td>
+      <td>
+        <% if !order.fulfillment_status %>
+        <span class="label">pending</span>
+        <% elsif order.fulfillment_status == "partial" %>
+        <span class="label">Partially Fulfilled</span>
+        <% else %>
+        <span class="label label-success">Fulfilled</span>
+        <% end %>
+      </td>
+      <td>$<%= order.total_price %> <%= order.currency %></td>
+    </tr>
+    <% end %>
+  </table>
+
+  <% end %>
+
+  <div class="span12">
+    <%= will_paginate @orders %>
+  </div>
+
+  <% end %>
 </div>
 
 <script>

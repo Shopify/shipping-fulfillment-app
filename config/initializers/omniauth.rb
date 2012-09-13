@@ -4,18 +4,10 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :shopify,
            ShopifyApp.configuration.api_key,
            ShopifyApp.configuration.secret,
-           :scope => "read_orders,write_products",
+           :scope => "write_orders,write_products,write_shipping",
            :setup => lambda {|env|
                        params = Rack::Utils.parse_query(env['QUERY_STRING'])
-                       site_url = "http://#{params['shop']}"
+                       site_url = "http://#{params['shop']}:3000"
                        env['omniauth.strategy'].options[:client_options][:site] = site_url
                      }
 end
-
-# if Rails.env.development?
-#   class ShopifyAPI::Session
-#     def site
-#       "http://localhost:3000/admin"
-#     end
-#   end
-# end

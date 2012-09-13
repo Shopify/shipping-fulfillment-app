@@ -45,13 +45,15 @@ class Fulfillment < ActiveRecord::Base
 
   private
 
-  def create_mirror_fulfillment_on_shopify
-    shopify_fulfillment = ShopifyAPI::Fulfillment.create(
-      order_id: order.shopify_order_id,
-      shipping_method: shipping_method,
-      line_items: line_items.map(&:line_item_id)
-    )
-    self.update_attribute(:shopify_fulfillment_id, shopify_fulfillment.id)
+  def create_mirror_fulfillment_on_shopify(shop)
+    ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+      shopify_fulfillment = ShopifyAPI::Fulfillment.create(
+          order_id: order.shopify_order_id,
+          shipping_method: shipping_method,
+          line_items: line_items.map(&:line_item_id)
+        )
+      self.update_attribute(:shopify_fulfillment_id, shopify_fulfillment.id)
+    }
   end
 
   def update_association_fulfillment_statuses
@@ -61,7 +63,7 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def update_fulfillment_status_on_shopify
+  def update_fulfillment_status_on_shopify(shop)
     puts "update on shopify"
     if %w(success cancelled record_failure).include?(status)
       params = {
@@ -69,8 +71,9 @@ class Fulfillment < ActiveRecord::Base
         status: status,
         order_id: order.id
       }
-      shopify_fulfillment = ShopifyAPI::Fulfillment.new(params)
-      shopify_fulfillment.save
+      ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+        shopify_fulfillment = ShopifyAPI::Fulfillment.create(params)
+      }
     end
   end
 

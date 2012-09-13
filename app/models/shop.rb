@@ -9,15 +9,17 @@ class Shop < ActiveRecord::Base
   has_many :line_items
 
   validates_presence_of :login, :password, :token
-  #validates :domain, :presence => true, :uniqueness => true
+  validates :domain, :presence => true, :uniqueness => true
   validate :check_shipwire_credentials
-
-  before_create :set_domain
   after_create :setup_webhooks, :create_carrier_service, :create_fulfillment_service
 
   def credentials
-    Rails.env == 'production' ? test = false : test = true
+    test = Rails.env != 'production'
     {login: login, password: password, test: test}
+  end
+
+  def base_url
+    "#{domain}:3000"
   end
 
   def shop_fulfillment_type
@@ -36,12 +38,7 @@ class Shop < ActiveRecord::Base
 
   private
 
-  def set_domain
-    domain = ShopifyAPI::Shop.current.myshopify_domain
-  end
-
   def setup_webhooks
-    return if Rails.env == 'development'
 
     hooks = {
       'orders/paid' => 'orderpaid',
@@ -55,7 +52,6 @@ class Shop < ActiveRecord::Base
   end
 
   def check_shipwire_credentials
-    return if Rails.env == 'development'
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
     response = shipwire.fetch_stock_levels()
     if response.success?
@@ -66,23 +62,24 @@ class Shop < ActiveRecord::Base
   end
 
   def make_webhook(topic, action)
-    ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
+    ShopifyAPI::Session.temp(base_url, token) {
+      ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
+    }
   end
 
   def create_carrier_service
-    return if Rails.env == 'development'
-
-    carrier_service = ShopifyAPI::CarrierService.create()
+    ShopifyAPI::Session.temp(base_url, token) {
+      carrier_service = ShopifyAPI::CarrierService.create()
+    }
   end
 
   def create_fulfillment_service
-    return if Rails.env == 'development'
 
     params = {
       fulfillment_service:{
-        fulfillment_service_type: 'app',
-        credential1: login,
-        credential2: password,
+        fulfillment_service_type: 'api',
+        credential1: nil,
+        credential2: nil,
         name: 'shipwire_app',
         handle: 'shipwire_app',
         email: nil,
@@ -93,6 +90,8 @@ class Shop < ActiveRecord::Base
       }
     }
 
-    ShopifyAPI::FulfillmentService.create(params)
+    ShopifyAPI::Session.temp(base_url, token) {
+      ShopifyAPI::FulfillmentService.create(params)
+    }
   end
 end

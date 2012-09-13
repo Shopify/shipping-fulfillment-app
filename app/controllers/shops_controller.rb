@@ -10,8 +10,8 @@ class ShopsController < ApplicationController
     @shop.token = session[:shopify].token
     @shop.domain = session[:shop]
     if @shop.save
-      Resque.enqueue(OrderCollectorJob, @shop) unless Rails.env == 'development'
-      redirect_to shop_path, notice: 'Your settings have been saved.'
+      Resque.enqueue(OrderCollectorJob, @shop)
+      redirect_to orders_path, notice: 'Your settings have been saved.'
     else
       redirect_to shop_path, alert: 'Invalid settings, was not able to save.'
     end

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FulfillmentCreateJobTest < ActiveSupport::TestCase
+class CreateFulfillmentJobTest < ActiveSupport::TestCase
 
   def setup
     super
@@ -10,7 +10,7 @@ class FulfillmentCreateJobTest < ActiveSupport::TestCase
     items = []
     5.times { items << create(:line_items) }
     shopify_line_item_ids = items.map(&:line_item_id)
-    FulfillmentCreateJob.perform(shopify_line_item_ids, '1D')
+    CreateFulfillmentJob.perform(shopify_line_item_ids, '1D')
     expected{
       
     }

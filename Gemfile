@@ -17,6 +17,7 @@ gem 'resque', :require => 'resque/server'
 gem 'redis', '~> 2.2.0', :require => ['redis/connection/hiredis', 'redis'], :git => 'git://github.com/ssoroka/redis-rb.git', :branch => 'srem_patch', :ref => '949568e'
 gem 'hiredis','~> 0.4.5' # Faster redis
 gem "will_paginate", "~> 3.0.3"
+gem 'bootstrap-will_paginate'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

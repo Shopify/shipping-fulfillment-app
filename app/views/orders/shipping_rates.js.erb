@@ -6,17 +6,13 @@ var responseRow = function(service, serviceCode, price, estimatedDeliveryDate, e
   return "<tr><td>" + service + "</td><td>" + serviceCode + "</td><td>" + price + "</td><td>" + estimatedDeliveryDate + "</td><td>" + estimatedDeliveryRange[0] + "-" + estimatedDeliveryRange[1] + "</td></tr>";
 }
 
-<% if Rails.env == 'development' %>
-  var table = responseTable('UPS Ground','UPS G','19.00','2011-04-08 09:33:10',['2011-04-08 09:33:10','2011-04-08 09:33:10']);
-<% else %>
-  var tableHead = "<table class='table table-striped'><thead><tr><th>Service</th><th>Service Code</th><th>Price</th><th>Estimated Delivery Date</th><th>Estimated Delivery Range</th></tr></thead><tbody>";
-  var rows = '';
-  <% @rates.each do |rate| %>
-    rows += responseRow(<%= rate.service %>, <%= rate.service_code %>, <%= rate.price %>, <%= time_ago_in_words rate.estimated_delivery_date %>, <%= time_ago_in_words rate.estimated_delivery_range %>));
-  <% end %>
-  var tableFoot = "</tbody></table>";
-  var table = tableHead + rows + tableFoot;
+var tableHead = "<table class='table table-striped'><thead><tr><th>Service</th><th>Service Code</th><th>Price</th><th>Estimated Delivery Date</th><th>Estimated Delivery Range</th></tr></thead><tbody>";
+var rows = '';
+<% @rates.each do |rate| %>
+rows += responseRow(<%= rate.service %>, <%= rate.service_code %>, <%= rate.price %>, <%= time_ago_in_words rate.estimated_delivery_date %>, <%= time_ago_in_words rate.estimated_delivery_range %>));
 <% end %>
+var tableFoot = "</tbody></table>";
+var table = tableHead + rows + tableFoot;
 
 $('#rates_table').append(table)
 $('#rates_button').remove();

@@ -36,13 +36,13 @@ class Order < ActiveRecord::Base
   end
 
   def self.shipping_attributes(params)
-    options = params[:shipping_address].slice(*Order.column_names)
+    options = params["shipping_address"].slice(*Order.column_names)
     options.delete(:id)
     options
   end
 
   def self.line_items_attributes(params, shop)
-    params[:line_items].map do |item|
+    params["line_items"].map do |item|
       options = item.slice(*LineItem.column_names)
       options[:shop_id] = shop.id
       options[:line_item_id] = options.delete(:id)

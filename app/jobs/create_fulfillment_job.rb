@@ -1,4 +1,4 @@
-class FulfillmentCreateJob
+class CreateFulfillmentJob
   @queue = :default
 
   def self.perform(shopify_line_items, shipping_method)
