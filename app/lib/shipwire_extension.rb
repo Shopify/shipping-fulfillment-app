@@ -69,17 +69,17 @@ module ActiveMerchant
 
         base_path = 'SubmitOrderResponse/OrderInformation/Order/Routing/'
 
-        if REXML::XPath.first(document, base_path)
-          extensions = {
-            origin_lat: 'Origin/Latitude',
-            origin_long: 'Origin/Longitude',
-            destination_lat: 'Destination/Latitude',
-            destination_long: 'Destination/Longitude'
-          }
-          extensions.each do |key, extension|
-            response[key] = REXML::XPath.first(document, base_path + extension).text
-          end
-        end
+        # if REXML::XPath.first(document, base_path)
+        #   extensions = {
+        #     origin_lat: 'Origin/Latitude',
+        #     origin_long: 'Origin/Longitude',
+        #     destination_lat: 'Destination/Latitude',
+        #     destination_long: 'Destination/Longitude'
+        #   }
+        #   extensions.each do |key, extension|
+        #     response[key] = REXML::XPath.first(document, base_path + extension).text
+        #   end
+        # end
 
         response[:success] = response[:status] == '0'
         response[:message] = response[:success] ? "Successfully submitted the order" : message_from(response[:error_message])

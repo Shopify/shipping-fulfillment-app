@@ -10,7 +10,7 @@ class ShopTest < ActiveSupport::TestCase
   end
 
   def expect_webhook(name)
-    ShopifyAPI::Webhook.expects(:create).with({topic: 'orders/'+name, address: 'http://shipwireapp:3001/order'+name, format: 'json'})
+    ShopifyAPI::Webhook.expects(:create).with({topic: 'orders/'+name, address: 'http://shipwireapp:5000/order'+name, format: 'json'})
   end
 
   def fulfillment_service_params

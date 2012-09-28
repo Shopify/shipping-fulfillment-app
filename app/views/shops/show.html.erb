@@ -1,70 +1,9 @@
-<div class="span12">
-  <h1>Shipwire Credentials</h1>
-  <hr/>
+<div class="row">
+  <div class="span12">
+    <h1>You're all set up!</h1>
 
-  <% if @shop.new_record? %>
-      <%= form_for @shop, :url => {:action => "create"}, id: 'shop_form' do |f| %>
-        <div class="field">
-          <%= f.label :login %>
-          <%= f.text_field :login %>
-        </div>
-        <div class="field">
-          <%= f.label :password %>
-          <%= f.password_field :password %>
-        </div>
-        <div class="field">
-          <%= f.label :fulfillment %>
-          <%= select(:shop, :automatic_fulfillment, options_for_select([['Automatic',true], ['Manual',false]])) %>
-        </div>
-        <div class="field">
-          <%= f.submit :Submit, :class => 'btn btn-primary' %>
-        </div>
-      <% end %>
-
-  <% else %>
-
-    <%= form_tag({controller: 'shops', action: 'update'}, {method: 'put', class: 'shop_update_form form-horizontal'}) do %>
-      <fieldset>
-        <div class="control-group">
-          <label class="control-label">Login</label>
-          <div class="controls">
-            <input name="login" value="<%= @shop.login %>" type="text"/>
-          </div>
-        </div>
-        
-        <div class="control-group">
-          <label class="control-label">Password</label>
-          <div class="controls">
-            <input name="password" value="<%= @shop.password %>" type="text"/>
-          </div>
-        </div>
-        
-        <div class="control-group">
-          <label class="control-label">Fulfillment</label>
-          <div class="controls">
-            <select name="automatic_fulfillment">
-              <option><%= @shop.shop_fulfillment_type %></option>
-              <option><%= @shop.not_shop_fulfillment_type %></option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="control-group">
-          <label class="control-label">Credential Status</label>
-          <div class="controls">
-            <% if @shop.valid_credentials %>
-              <span class="label label-success" style="line-height:26px">valid</span>
-            <% else %>
-              <span class="label label-warning" style="line-height:26px">require a valid login & password</span>
-            <% end %>
-          </div>
-        </div>
-      
-        <div class="form-actions">
-          <%= submit_tag('Update' , :class => 'btn btn-primary') %>
-        </div>
-      </fieldset>
-    <% end %>
-    
-  <% end %>
+    <hr />
+  
+    <%= link_to "Edit my credentials", edit_shop_path(@shop) %>
+  </div>
 </div>

@@ -1,8 +1,16 @@
 class ShopsController < ApplicationController
-  skip_before_filter :shop_exists, :only =>['show','create']
+  skip_before_filter :shop_exists, :only =>['create', 'new']
 
   def show
-    current_shop.present? ? @shop = current_shop : @shop = Shop.new
+    @shop = current_shop
+  end
+
+  def new
+    @shop = Shop.new()
+  end
+
+  def edit
+    @shop = current_shop
   end
 
   def create
@@ -10,19 +18,18 @@ class ShopsController < ApplicationController
     @shop.token = session[:shopify].token
     @shop.domain = session[:shop]
     if @shop.save
-      Resque.enqueue(OrderCollectorJob, @shop)
-      redirect_to orders_path, notice: 'Your settings have been saved.'
+      # Resque.enqueue(OrderCollectorJob, @shop)
+      render action: "show", notice: 'Your settings have been saved.'
     else
-      redirect_to shop_path, alert: 'Invalid settings, was not able to save.'
+      render action: "new", alert: 'Invalid settings, was not able to save.'
     end
   end
 
   def update
-    if current_shop.update_attributes(params.slice(:login, :password, :automatic_fulfillment))
+    if current_shop.update_attributes(params[:shop])
       redirect_to shop_path, notice: 'Your settings have been updated.'
     else
-      puts "ERRORS: #{@shop.errors.inspect}"
-      redirect_to shop_path, alert: 'Could not successfully update!'
+      render action: "edit", alert: 'Could not successfully update!'
     end
   end
 

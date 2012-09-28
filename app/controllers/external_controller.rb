@@ -16,8 +16,9 @@ class ExternalController < ApplicationController
   end
 
   def fetch_stock
-    shipwire = ActiveMerchant::Shipping::Shipwire.new(@shop.credentials)
-    response = shipwire.fetch_stock_levels(@params[:sku])
+    @shop = Shop.find_by_domain @params[:shop]
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(@shop.credentials)
+    response = shipwire.fetch_stock_levels(:sku => @params[:sku])
     stock_levels = response.stock_levels
     respond_to do |format|
       format.json { render :json => stock_levels }

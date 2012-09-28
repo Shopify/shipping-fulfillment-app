@@ -17,27 +17,36 @@ class WebhooksController < ApplicationController
     find_or_create_order
     puts @params
     case @hook
-      when 'orders/create'
-        order_created
-      when 'orders/updated'
-        order_updated
-      when 'orders/paid'
-        order_paid
-      when 'orders/cancelled'
-        order_cancelled
-      when 'orders/fulfilled'
-        order_fulfilled
+    when 'orders/create'
+      order_created
+    when 'orders/updated'
+      order_updated
+    when 'orders/paid'
+      order_paid
+    when 'orders/cancelled'
+      order_cancelled
+    when 'orders/fulfilled'
+      order_fulfilled
     end
     head :ok
   end
 
   def fulfillment
     case @hook
-      when 'fulfillments/create'
-        fulfillment_created
-      when 'fulfillments/update'
-        fulfillment_updated
+    when 'fulfillments/create'
+      fulfillment_created
+    when 'fulfillments/update'
+      fulfillment_updated
     end
+    head :ok
+  end
+
+  def uninstalled
+    case @hook
+    when 'app/uninstalled'
+      app_uninstalled
+    end
+    head :ok
   end
 
   private
@@ -67,7 +76,7 @@ class WebhooksController < ApplicationController
 
   def fulfillment_created
     raise FulfillmentError unless Fulfillment.where('shopify_fulfillment_id = ?', @params[:id]).blank?
-    Resque.enqueue(CreateFulfillmentJob, @params[:line_items], @params[:shipping_method])
+    Resque.enqueue(CreateFulfillmentJob, @params, shop_domain)
   end
 
   def find_or_create_order
@@ -79,7 +88,12 @@ class WebhooksController < ApplicationController
     end
   end
 
+  def app_uninstalled
+    Resque.enqueue(AppUninstalledJob, shop_domain)
+  end
+
   def verify_shopify_webhook
+    puts "HMAC: #{hmac}"
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
     calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
@@ -88,7 +102,7 @@ class WebhooksController < ApplicationController
   end
 
   def verify_shipwire_service
-    raise FulfillmentError unless @params[:service] == 'shipwire'
+    head :ok unless @params["service"] == 'shipwire-app'
   end
 
   def sanitized_params

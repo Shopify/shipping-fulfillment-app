@@ -1,12 +1,12 @@
 class Shop < ActiveRecord::Base
-  Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:3001/' : HOOK_ADDRESS = 'production root url'
+  Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:5000/' : HOOK_ADDRESS = 'production root url'
 
   attr_accessible :login, :password, :automatic_fulfillment
 
-  has_many :variants
-  has_many :fulfillments
-  has_many :orders
-  has_many :line_items
+  has_many :variants, :dependent => :destroy
+  has_many :fulfillments, :dependent => :destroy
+  has_many :orders, :dependent => :destroy
+  has_many :line_items, :dependent => :destroy
 
   validates_presence_of :login, :password, :token
   validates :domain, :presence => true, :uniqueness => true
@@ -19,21 +19,7 @@ class Shop < ActiveRecord::Base
   end
 
   def base_url
-    "#{domain}:3000"
-  end
-
-  def shop_fulfillment_type
-    if automatic_fulfillment
-      return 'Automatic'
-    end
-    'Manual'
-  end
-
-  def not_shop_fulfillment_type
-    if automatic_fulfillment
-      return 'Manual'
-    end
-    'Automatic'
+    Rails.env.production? ? domain : "#{domain}:3000"
   end
 
   private
@@ -41,23 +27,18 @@ class Shop < ActiveRecord::Base
   def setup_webhooks
 
     hooks = {
-      'orders/paid' => 'orderpaid',
-      'orders/cancelled' => 'ordercancelled',
-      'orders/create' => 'ordercreate',
-      'orders/updated' => 'orderupdated',
-      'orders/fulfilled' => 'orderfulfilled',
-      'fulfillments/create' => 'fulfillmentcreated'
+      'fulfillments/create' => 'fulfillmentcreated',
+      'app/uninstalled' => 'appuninstalled'
     }
     hooks.each { |topic, action| make_webhook(topic, action) }
   end
 
   def check_shipwire_credentials
+    return if password.empty?
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
     response = shipwire.fetch_stock_levels()
-    if response.success?
-      self.update_attribute(:valid_credentials, true)
-    else
-      errors.add(:shop, "Must have valid shipwire credentials to use the services provided by this app.")
+    unless response.success?
+      errors.add(:password, "Must have valid shipwire credentials to use the services provided by this app.")
     end
   end
 
@@ -80,12 +61,12 @@ class Shop < ActiveRecord::Base
         fulfillment_service_type: 'api',
         credential1: nil,
         credential2: nil,
-        name: 'shipwire_app',
+        name: 'Shipwire App',
         handle: 'shipwire_app',
         email: nil,
         endpoint: nil,
         template: nil,
-        remote_address: nil,
+        remote_address: 'http://localhost:5000',
         include_pending_stock: 0
       }
     }

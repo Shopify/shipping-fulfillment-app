@@ -2,22 +2,22 @@ ShipwireApp::Application.routes.draw do
 
   #resource routes
 
-  resource :shop, :except => [:index, :new, :edit, :destroy]
+  resource :shop, :except => [:index, :destroy]
 
   resources :fulfillments, :only => [:index, :show, :create]
 
-  resources :orders, :only => [:index, :show]
+  # resources :orders, :only => [:index, :show]
 
-  resources :variants, :except => [:update, :new, :edit] do
-    collection do
-      match "/filter/:management/:page" => "variants#index", :via => :get
-      match "/filter/:management" => "variants#index", :via => :get
-    end
-  end
+  # resources :variants, :except => [:update, :new, :edit] do
+  #   collection do
+  #     match "/filter/:management/:page" => "variants#index", :via => :get
+  #     match "/filter/:management" => "variants#index", :via => :get
+  #   end
+  # end
 
-  match "variants/update" =>  "variants#update", :as => :variant_update, :via => :post
+  # match "variants/update" =>  "variants#update", :as => :variant_update, :via => :post
 
-  match "shippingrates" => "orders#shipping_rates",   :as => :rates
+  # match "shippingrates" => "orders#shipping_rates",   :as => :rates
 
   #external routes
 
@@ -30,17 +30,18 @@ ShipwireApp::Application.routes.draw do
 
   #webhook routes
 
-  match "orderpaid" => "webhooks#order", :via => :post
+  # match "orderpaid" => "webhooks#order", :via => :post
 
-  match "ordercancelled" => "webhooks#order", :via => :post
+  # match "ordercancelled" => "webhooks#order", :via => :post
 
-  match "orderfulfilled" => "webhooks#order", :via => :post
+  # match "orderfulfilled" => "webhooks#order", :via => :post
 
-  match "ordercreated" => "webhooks#order", :via => :post
+  # match "ordercreated" => "webhooks#order", :via => :post
 
-  match "orderupdated" => "webhooks#order", :via => :post
+  # match "orderupdated" => "webhooks#order", :via => :post
 
   match "fulfillmentcreated" => "webhooks#fulfillment", :via => :post
+  match "appuninstalled" => "webhooks#uninstalled", :via => :post
 
   #login routes
 
@@ -58,7 +59,7 @@ ShipwireApp::Application.routes.draw do
 
   match 'test' => 'external#fulfill_order', :via => :post #TODO REMOVE
 
-  root :to                   => 'orders#index'
+  root :to                   => 'shops#show'
 
   mount Resque::Server, :at =>  '/resque' if Rails.env == 'development'
 
