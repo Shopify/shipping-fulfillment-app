@@ -25,7 +25,7 @@ class CreateFulfillmentJob
       
       params["shipping_method"] = "1D"
 
-      fulfillment = Fulfillment.new(params.except("line_items", "created_at", "service", "tracking_company", "tracking_url", "updated_at", "receipt", "webhook"))
+      fulfillment = Fulfillment.new(params.except("id","line_items", "created_at", "updated_at", "service", "tracking_company", "tracking_url", "receipt", "webhook").merge({"tracking_link" => params["tracking_url"]}))
       fulfillment.shopify_fulfillment_id = params["id"]
 
       params["line_items"].each do |line_item_params|
@@ -33,7 +33,8 @@ class CreateFulfillmentJob
         fulfillment.line_items << line_item
       end
 
-      fulfillment.save!
+      shop.fulfillments << fulfillment
+      shop.save
 
       if response.success?
         fulfillment.success
@@ -43,8 +44,6 @@ class CreateFulfillmentJob
       else
         fulfillment.record_failure
       end
-
-      shop.fulfillments << fulfillment
 
     }
 

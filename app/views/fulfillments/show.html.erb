@@ -1,4 +1,5 @@
-<div class="span12">
+<div class="row">
+  <div class="span12">
     <h1>Fulfillment #<%= @fulfillment.shipwire_order_id %></h1>
     
     <hr />
@@ -9,118 +10,56 @@
     <hr />
 
     <h3>Line Items</h3>
-    <ul>
-      <% @fulfillment.line_items.each do |item| %>
-        <li class="items_list"><%= item.title %> - <%= item.quantity %>x</li>
-      <% end %>
-    </ul>
+    <table class="table table-striped">
+      <thead>
+          
+        <tr>
+          <th>Title</th>
+          <th>Quantity</th>
+          <th>SubTotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @fulfillment.line_items.each do |item| %>
+        <tr>
+          <td><%= item.title %></td>
+          <td><%= item.quantity %></td>
+          <td><%= number_to_currency item.total %></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
 
-    <hr />
-
-    <h3>Address</h3>
-        <% address = @fulfillment.order %>
-        <%= address.address1 %><br />
-        <%= address.city %>, <%= address.province %>, <%= address.country %> <%= address.zip %>
     <hr />
 
     <h3>Tracking</h3>
 
     <table class="table table-striped">
-        <thead>
-          <tr>
-            <th class="sortcol">Shipwire Order ID</th>
-            <th class="sortcol">Shipping Service</th>
-            <th class="sortcol">Ship Date</th>
-            <th class="sortcol">Expected Delivery Date</th>
-            <th class="sortcol">Tracking Number</th>
-            <th class="sortcol">Total</th>
-            <% if @fulfillment.returned == "Yes" %>
-            <th class="sortcol">Returned</th>
-            <th class="sortcol">Return Date</th>
-            <th class="sortcol">Return Condition</th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody>
-            <td><%= @fulfillment.shipwire_order_id %></td>
-            <td><%= @fulfillment.shipper_name %></td>
-            <td><%= time_ago_in_words @fulfillment.ship_date %></td>
-            <td><%= time_ago_in_words @fulfillment.expected_delivery_date%></td>
-            <td><%= link_to @fulfillment.tracking_number, @fulfillment.tracking_link %></td>
-            <td>$<%= @fulfillment.total %></td>
-            <% if @fulfillment.returned == "Yes" %>
-            <td><%= @fulfillment.returned %></td>
-            <td><%= time_ago_in_words @fulfillment.return_date %></td>
-            <td><%= @fulfillment.return_condition %></td>
-            <% end %>
-        </tbody>
+      <thead>
+        <tr>
+          <th class="sortcol">Shipwire Order ID</th>
+          <th class="sortcol">Created At</th>
+          <th class="sortcol">Shipping Service</th>
+          <th class="sortcol">Tracking Number</th>
+          <% if @fulfillment.returned == "Yes" %>
+          <th class="sortcol">Returned</th>
+          <th class="sortcol">Return Date</th>
+          <th class="sortcol">Return Condition</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <td><%= @fulfillment.shipwire_order_id %></td>
+        <td><%= @fulfillment.created_at %></td>
+        <td><%= @fulfillment.shipper_name %></td>
+        <td><%= tracking_link @fulfillment %></td>
+        <% if @fulfillment.returned == "Yes" %>
+        <td><%= @fulfillment.returned %></td>
+        <td><%= time_ago_in_words @fulfillment.return_date %></td>
+        <td><%= @fulfillment.return_condition %></td>
+        <% end %>
+      </tbody>
     </table>
     <!-- <button class="btn btn-primary">Update</button> -->
   </div>
-
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBXexCR-DS5aW9d4jkj3lZMh5QMT4_1Euc&sensor=false"></script>
-<%= javascript_include_tag "markercluster.js" %>
-<script type="text/javascript">
-$(document).ready(function(){
-  var usLocation = new google.maps.LatLng(34.32178452107211, -352.7379409249999);
-
-  var mapOptions = {
-    zoom: 2,
-    mapTypeId: google.maps.MapTypeId.ROADMAP,
-    center: usLocation
-  }
-
-  var map = new google.maps.Map(document.getElementById("map_container"), mapOptions);
-
-  var markerClusterer = new MarkerClusterer(map, Array(), {'maxZoom':10});
-
-  var geocoder = new google.maps.Geocoder();
-
-  var Delivery = function(destination, shipped, shipperFullName, expectedDeliveryDate, link){
-    var self = this;
-    var base = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&';
-    var targetImage = base + 'chco=FFFFFF,DD8CFF,000000&ext=.png';
-
-    var makeContent = function(){
-      return "<ul><li>Address: " + address + "</li><li>Shipped: " + shipped + "</li><li>Shipping Service: " + shipperFullName + "</li><li>Expected Delivery Date: " + expectedDeliveryDate + "</li></ul><a href=" + link + ">view</a>";
-    }
-
-    var pinTarget = function(position){
-
-      var infoWindow = new google.maps.InfoWindow({
-        content: content,
-        disableAutoPan: true,
-      });
-
-      var marker = new google.maps.Marker({
-        position: position,
-        map: map,
-        icon: targetImage
-      });
-
-      markerClusterer.addMarker(marker);
-
-      google.maps.event.addListener(marker, 'click', function(){
-        infoWindow.open(map, marker);
-      });
-    }
-
-    var address = address;
-    var shipped = shipped;
-    var shipperFullName = shipperFullName;
-    var expectedDeliveryDate = expectedDeliveryDate;
-    var content = makeContent();
-
-    pinTarget(destination);
-  }
-
-    var destination = new google.maps.LatLng(<%= @fulfillment.destination_lat %>, <%= @fulfillment.destination_long%>);
-    var address = '<%= @fulfillment.order.address1 %>';
-    var shipped = '<%= @fulfillment.shipped.downcase %>';
-    var shipper = '<%= @fulfillment.shipper_name %>';
-    var expectedDate = '<%= @fulfillment.expected_delivery_date %>';
-    var linkPath = '<%= @fulfillment.tracking_link %>';
-    new Delivery(destination,address, shipped, shipper, expectedDate, linkPath)
-  
-});
-</script>
+</div>

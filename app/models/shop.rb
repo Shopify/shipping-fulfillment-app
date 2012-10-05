@@ -1,7 +1,7 @@
 class Shop < ActiveRecord::Base
   Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:5000/' : HOOK_ADDRESS = 'production root url'
 
-  attr_accessible :login, :password, :automatic_fulfillment
+  attr_accessible :login, :password, :automatic_fulfillment, :valid_credentials
 
   has_many :variants, :dependent => :destroy
   has_many :fulfillments, :dependent => :destroy
@@ -37,6 +37,7 @@ class Shop < ActiveRecord::Base
     return if password.empty?
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
     response = shipwire.fetch_stock_levels()
+    update_attribute(:valid_credentials, response.success?)
     unless response.success?
       errors.add(:password, "Must have valid shipwire credentials to use the services provided by this app.")
     end

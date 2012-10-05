@@ -37,15 +37,20 @@ class Fulfillment < ActiveRecord::Base
     locations.all? {|location| location}
   end
 
+  def total
+    line_items.reduce(0.0) do |total, line_item|
+      total + line_item.total.to_f
+    end
+  end
+
   private
 
   def update_fulfillment_status_on_shopify
     puts "update on shopify"
     if %w(success cancelled record_failure).include?(status)
       ShopifyAPI::Session.temp(shop.base_url, shop.token) {
-        shopify_fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id)
-        shopify_fulfillment = status
-        shopify_fulfillment.save
+        shopify_fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id, :params => {:order_id => order_id})
+        shopify_fulfillment.complete
       }
     end
   end

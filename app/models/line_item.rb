@@ -17,4 +17,8 @@ class LineItem < ActiveRecord::Base
     requires_shipping? && fulfillment_service == 'shipwire'
   end
 
+  def total
+    price.to_f * quantity
+  end
+
 end
