@@ -51,7 +51,7 @@ class Shop < ActiveRecord::Base
 
   def create_carrier_service
     ShopifyAPI::Session.temp(base_url, token) {
-      carrier_service = ShopifyAPI::CarrierService.create()
+      carrier_service = ShopifyAPI::CarrierService.create
     }
   end
 

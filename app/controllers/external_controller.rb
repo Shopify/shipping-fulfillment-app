@@ -5,14 +5,13 @@ class ExternalController < ApplicationController
   skip_before_filter :shop_exists
   skip_around_filter :shopify_session
 
-  # before_filter :verify_shopify_request
   before_filter :symbolize_params
 
-  # rescue_from Exception {|exception| head :ok } unless Rails.env == 'test'
 
   def shipping_rates
-    @rates = ShippingRates(@shop.credentials, @params[:items],@params[:destination]).rate_from_estimate
-    @rates.to_json
+    @shop = Shop.find_by_domain(shop_domain)
+    @rates = ShippingRates.new(@shop.credentials, @params[:rate]).fetch_rates
+    render :json => @rates.to_json
   end
 
   def fetch_stock
@@ -69,6 +68,10 @@ class ExternalController < ApplicationController
     calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
     head :unauthorized unless calculated_hmac == hmac
     request.body.rewind
+  end
+
+  def shop_domain
+    request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']
   end
 
   def hmac
