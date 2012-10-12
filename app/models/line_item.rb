@@ -21,4 +21,8 @@ class LineItem < ActiveRecord::Base
     price.to_f * quantity
   end
 
+  def shopify_product_link
+    "https://#{shop.domain}/admin/products/#{product_id}"
+  end
+
 end

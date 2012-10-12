@@ -4,11 +4,6 @@
     
     <hr />
 
-    <div id="map_container">
-    </div>
-
-    <hr />
-
     <h3>Line Items</h3>
     <table class="table table-striped">
       <thead>
@@ -22,7 +17,7 @@
       <tbody>
         <% @fulfillment.line_items.each do |item| %>
         <tr>
-          <td><%= item.title %></td>
+          <td><%= link_to(item.title, item.shopify_product_link) %></td>
           <td><%= item.quantity %></td>
           <td><%= number_to_currency item.total %></td>
         </tr>
@@ -38,7 +33,7 @@
       <thead>
         <tr>
           <th class="sortcol">Shipwire Order ID</th>
-          <th class="sortcol">Created At</th>
+          <th class="sortcol">Fulfilled On</th>
           <th class="sortcol">Shipping Service</th>
           <th class="sortcol">Tracking Number</th>
           <% if @fulfillment.returned == "Yes" %>
@@ -50,7 +45,7 @@
       </thead>
       <tbody>
         <td><%= @fulfillment.shipwire_order_id %></td>
-        <td><%= @fulfillment.created_at %></td>
+        <td><%= @fulfillment.created_at.to_formatted_s(:short) %></td>
         <td><%= @fulfillment.shipper_name %></td>
         <td><%= tracking_link @fulfillment %></td>
         <% if @fulfillment.returned == "Yes" %>
