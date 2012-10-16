@@ -4,7 +4,7 @@ class Fulfillment < ActiveRecord::Base
 
   SHIPPING_CODES = %w(1D 2D GD FT INTL)
 
-  attr_accessible :email, :shipping_method, :warehouse, :tracking_carrier, :tracking_link, :tracking_number, :ship_date, :expected_delivery_date, :return_date, :return_condition, :shipper_name, :total, :returned, :shipped, :line_items, :order_id, :status
+  attr_accessible :shopify_fulfillment_id, :email, :shipping_method, :warehouse, :tracking_carrier, :tracking_link, :tracking_number, :ship_date, :expected_delivery_date, :return_date, :return_condition, :shipper_name, :total, :returned, :shipped, :line_items, :order_id, :status
 
   belongs_to :shop
   has_many :fulfillment_line_items, :dependent => :delete_all
@@ -43,10 +43,19 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
+  def self.new_from_params(shop, params)
+    fulfillment = Fulfillment.new(extract_params(params))
+
+    params["line_items"].each do |line_item_params|
+      line_item = LineItem.new_from_params(shop, line_item_params)
+      fulfillment.line_items << line_item
+    end
+    fulfillment
+  end
+
   private
 
   def update_fulfillment_status_on_shopify
-    puts "update on shopify"
     if %w(success cancelled record_failure).include?(status)
       ShopifyAPI::Session.temp(shop.base_url, shop.token) {
         shopify_fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id, :params => {:order_id => order_id})
@@ -68,5 +77,10 @@ class Fulfillment < ActiveRecord::Base
   def make_shipwire_order_id
     number = SecureRandom.hex(4)
     self.shipwire_order_id ||= "#{self.order_id}.#{number}"
+  end
+
+  def self.extract_params(params)
+    params.slice("email", "shipping_method", "tracking_number").merge({"tracking_link" => params["tracking_url"], "shopify_fulfillment_id" => params['id']})
+
   end
 end

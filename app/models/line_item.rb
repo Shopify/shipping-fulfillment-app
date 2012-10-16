@@ -9,6 +9,10 @@ class LineItem < ActiveRecord::Base
 
   #variant_id is the variant_id of the shopify line_item
 
+  def self.new_from_params(shop, params)
+    LineItem.new(params.except("variant_inventory_management", "properties").merge({"shop_id" => shop.id, "line_item_id" => params["id"]}))
+  end
+
   def fulfillable?
     (fulfillment_service == "shipwire") && (fulfillment_status != "fulfilled")
   end

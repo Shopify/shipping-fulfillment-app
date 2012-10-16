@@ -5,8 +5,10 @@ class CreateFulfillmentJob
 
     shop = Shop.find_by_domain(shop_domain)
     ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+
       order = ShopifyAPI::Order.find(params["order_id"])
 
+      params["shipping_method"] = "1D"
       options = {
         warehouse: '00',
         email: order.email,
@@ -15,17 +17,9 @@ class CreateFulfillmentJob
 
       shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
       response = shipwire.fulfill(order.id, address_to_hash(order.shipping_address).merge({:email => order.email}), params["line_items"], options)
-      
-      params["shipping_method"] = "1D"
 
-      fulfillment = Fulfillment.new(params.except("id","line_items", "created_at", "updated_at", "service", "tracking_company", "tracking_url", "receipt", "webhook").merge({"tracking_link" => params["tracking_url"]}))
-      fulfillment.shopify_fulfillment_id = params["id"]
 
-      params["line_items"].each do |line_item_params|
-        line_item = LineItem.new(line_item_params.except("variant_inventory_management", "properties").merge({"shop_id" => shop.id, "line_item_id" => params["id"]}))
-        fulfillment.line_items << line_item
-      end
-
+      fulfillment = Fulfillment.new_from_params(shop, params)
       shop.fulfillments << fulfillment
       shop.save
 
