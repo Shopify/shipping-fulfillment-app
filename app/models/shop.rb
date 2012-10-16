@@ -1,98 +1,79 @@
 class Shop < ActiveRecord::Base
-  Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:3001/' : HOOK_ADDRESS = 'production root url'
+  Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:5000/' : HOOK_ADDRESS = 'production root url'
 
-  attr_accessible :login, :password, :automatic_fulfillment
+  attr_accessible :login, :password, :automatic_fulfillment, :valid_credentials
 
-  has_many :variants
-  has_many :fulfillments
-  has_many :orders
-  has_many :line_items
+  has_many :variants, :dependent => :destroy
+  has_many :fulfillments, :dependent => :destroy
+  has_many :orders, :dependent => :destroy
+  has_many :line_items, :dependent => :destroy
 
   validates_presence_of :login, :password, :token
-  #validates :domain, :presence => true, :uniqueness => true
+  validates :domain, :presence => true, :uniqueness => true
   validate :check_shipwire_credentials
-
-  before_create :set_domain
   after_create :setup_webhooks, :create_carrier_service, :create_fulfillment_service
 
   def credentials
-    Rails.env == 'production' ? test = false : test = true
+    test = Rails.env != 'production'
     {login: login, password: password, test: test}
   end
 
-  def shop_fulfillment_type
-    if automatic_fulfillment
-      return 'Automatic'
-    end
-    'Manual'
-  end
-
-  def not_shop_fulfillment_type
-    if automatic_fulfillment
-      return 'Manual'
-    end
-    'Automatic'
+  def base_url
+    Rails.env.production? ? domain : "#{domain}:3000"
   end
 
   private
 
-  def set_domain
-    domain = ShopifyAPI::Shop.current.myshopify_domain
-  end
-
   def setup_webhooks
-    return if Rails.env == 'development'
 
     hooks = {
-      'orders/paid' => 'orderpaid',
-      'orders/cancelled' => 'ordercancelled',
-      'orders/create' => 'ordercreate',
-      'orders/updated' => 'orderupdated',
-      'orders/fulfilled' => 'orderfulfilled',
-      'fulfillments/create' => 'fulfillmentcreated'
+      'fulfillments/create' => 'fulfillmentcreated',
+      'app/uninstalled' => 'appuninstalled'
     }
     hooks.each { |topic, action| make_webhook(topic, action) }
   end
 
   def check_shipwire_credentials
-    return if Rails.env == 'development'
+    return if password.empty?
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
     response = shipwire.fetch_stock_levels()
-    if response.success?
-      self.update_attribute(:valid_credentials, true)
-    else
-      errors.add(:shop, "Must have valid shipwire credentials to use the services provided by this app.")
+    update_attribute(:valid_credentials, response.success?)
+    unless response.success?
+      errors.add(:password, "Must have valid shipwire credentials to use the services provided by this app.")
     end
   end
 
   def make_webhook(topic, action)
-    ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
+    ShopifyAPI::Session.temp(base_url, token) {
+      ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
+    }
   end
 
   def create_carrier_service
-    return if Rails.env == 'development'
-
-    carrier_service = ShopifyAPI::CarrierService.create()
+    ShopifyAPI::Session.temp(base_url, token) {
+      carrier_service = ShopifyAPI::CarrierService.create
+    }
   end
 
   def create_fulfillment_service
-    return if Rails.env == 'development'
 
     params = {
       fulfillment_service:{
-        fulfillment_service_type: 'app',
-        credential1: login,
-        credential2: password,
-        name: 'shipwire_app',
+        fulfillment_service_type: 'api',
+        credential1: nil,
+        credential2: nil,
+        name: 'Shipwire App',
         handle: 'shipwire_app',
         email: nil,
         endpoint: nil,
         template: nil,
-        remote_address: nil,
+        remote_address: 'http://localhost:5000',
         include_pending_stock: 0
       }
     }
 
-    ShopifyAPI::FulfillmentService.create(params)
+    ShopifyAPI::Session.temp(base_url, token) {
+      ShopifyAPI::FulfillmentService.create(params)
+    }
   end
 end

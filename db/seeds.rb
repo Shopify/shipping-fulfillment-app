@@ -1,27 +1,27 @@
-require 'factory_girl_rails'
-require 'mocha'
+# require 'factory_girl_rails'
+# require 'mocha'
 
-Shop.any_instance.stubs(:setup_webhooks)
-Shop.any_instance.stubs(:set_domain)
-Shop.any_instance.stubs(:create_fulfillment_service)
-Shop.any_instance.stubs(:check_shipwire_credentials)
-Shop.any_instance.stubs(:create_carrier_service)
-Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
-Fulfillment.any_instance.stubs(:update_fulfillment_status_on_shopify)
-Variant.any_instance.stubs(:update_shopify)
-Variant.any_instance.stubs(:confirm_sku)
-ShopifyAPI::Base.stubs(:activate_session => true)
-ShopifyAPI::Session.new("http://localhost:3000/admin","123")
+# Shop.any_instance.stubs(:setup_webhooks)
+# Shop.any_instance.stubs(:set_domain)
+# Shop.any_instance.stubs(:create_fulfillment_service)
+# Shop.any_instance.stubs(:check_shipwire_credentials)
+# Shop.any_instance.stubs(:create_carrier_service)
+# Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+# Fulfillment.any_instance.stubs(:update_fulfillment_status_on_shopify)
+# Variant.any_instance.stubs(:update_shopify)
+# Variant.any_instance.stubs(:confirm_sku)
+# ShopifyAPI::Base.stubs(:activate_session => true)
+# ShopifyAPI::Session.new("http://localhost:3000/admin","123")
 
 
-shop = FactoryGirl.create(:shop, domain: 'davidstore.myshopify.com')
-3.times do
-  line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
-  FactoryGirl.create(:order, line_items: line_items, shop: shop)
-end
-line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
-order = FactoryGirl.create(:order, shop:shop, financial_status: 'pending', line_items: line_items)
-fulfillment = FactoryGirl.create(:fulfillment, shop: shop, line_items: [order.line_items.first])
-FactoryGirl.create(:other_fulfillment, shop: shop, line_items: order.line_items[0..3])
-variant = FactoryGirl.create(:variant, shop: shop)
-order.line_items.first.update_attribute(:variant_id, variant.shopify_variant_id)
+# shop = FactoryGirl.create(:shop, domain: 'shop1.localhost')
+# 3.times do
+#   line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
+#   FactoryGirl.create(:order, line_items: line_items, shop: shop)
+# end
+# line_items = (0...5).map { FactoryGirl.create(:line_item, shop: shop) }
+# order = FactoryGirl.create(:order, shop:shop, financial_status: 'pending', line_items: line_items)
+# fulfillment = FactoryGirl.create(:fulfillment, shop: shop, line_items: [order.line_items.first])
+# FactoryGirl.create(:other_fulfillment, shop: shop, line_items: order.line_items[0..3])
+# variant = FactoryGirl.create(:variant, shop: shop)
+# order.line_items.first.update_attribute(:variant_id, variant.shopify_variant_id)

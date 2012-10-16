@@ -21,21 +21,25 @@ class Variant < ActiveRecord::Base
   end
 
   def self.batch_create_variants(shop, shopify_variant_ids)
-   failures = shopify_variant_ids.select do |shopify_variant_id|
-      shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
-      variant = Variant.new(shopify_variant_id: shopify_variant_id, sku: shopify_variant.sku, title: shopify_variant.title)
-      !variant.save
-    end
-    failures.length
+    ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+      failures = shopify_variant_ids.select do |shopify_variant_id|
+        shopify_variant = ShopifyAPI::Variant.find(shopify_variant_id)
+        variant = Variant.new(shopify_variant_id: shopify_variant_id, sku: shopify_variant.sku, title: shopify_variant.title)
+        !variant.save
+      end
+      failures.length
+    }
   end
 
   def self.batch_destroy_variants(shop, shopify_variant_ids)
     shopify_variant_ids.each do |id|
       variant = shop.variants.find_by_shopify_variant_id(id)
       if variant.destroy
-        shopify_variant = ShopifyAPI::Variant.find(id)
-        shopify_variant.inventory_management = 'shopify'
-        shopify_variant.save
+        ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+          shopify_variant = ShopifyAPI::Variant.find(id)
+          shopify_variant.inventory_management = 'shopify'
+          shopify_variant.save
+        }
       end
     end
   end

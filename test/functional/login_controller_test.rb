@@ -22,7 +22,7 @@ class LoginControllerTest < ActionController::TestCase
     ShopifyAPI::Session.stubs(:new).returns(nil)
 
     get :finalize, shop: @shop
-    assert_redirected_to controller: 'shops', action: 'show', notice: 'Logged in'
+    assert_redirected_to controller: 'shop', action: 'show', notice: 'Logged in'
   end
 
   test "logout: clears api session" do

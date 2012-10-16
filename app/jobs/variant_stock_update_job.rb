@@ -8,8 +8,10 @@ class VariantStockUpdateJob
       response[:stock_levels].keys.each do |sku|
         variant = Variant.find_by_sku(sku)
         variant.update_attributes(response[:stock_levels][sku])
-        shopify_variant = ShopifyAPI::Variant.find(variant.shopify_variant_id)
-        shopify_variant.update_attribute(quantity: variant.quantity)
+        ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+          shopify_variant = ShopifyAPI::Variant.find(variant.shopify_variant_id)
+          shopify_variant.update_attribute(quantity: variant.quantity)
+        }
       end
     end
   end

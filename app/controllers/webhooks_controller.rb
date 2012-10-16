@@ -6,7 +6,6 @@ class WebhooksController < ApplicationController
 
   before_filter :sanitized_params
   before_filter :verify_shopify_webhook
-  before_filter :find_or_create_order, :only => [:order]
   before_filter :verify_shipwire_service, :only => [:fulfillment]
   before_filter :hook
 
@@ -14,71 +13,37 @@ class WebhooksController < ApplicationController
     head :ok
   end
 
-  def order
+  def fulfillment
     case @hook
-      when 'orders/create'
-        order_created
-      when 'orders/updated'
-        order_updated
-      when 'orders/paid'
-        order_paid
-      when 'orders/cancelled'
-        order_cancelled
-      when 'orders/fulfilled'
-        order_fulfilled
+    when 'fulfillments/create'
+      fulfillment_created
+    when 'fulfillments/update'
+      fulfillment_updated
     end
     head :ok
   end
 
-  def fulfillment
+  def uninstalled
     case @hook
-      when 'fulfillments/create'
-        fulfillment_created
-      when 'fulfillments/update'
-        fulfillment_updated
+    when 'app/uninstalled'
+      app_uninstalled
     end
+    head :ok
   end
 
   private
 
-  def order_created
-    Resque.enqueue(OrderCreateJob, @params, @shop.id)
-  end
-
-  def order_updated
-    Resque.enqueue(OrderUpdateJob, @params[:line_items])
-  end
-
-  def order_cancelled
-    Resque.enqueue(OrderCancelJob, @order.id, @params[:cancelled_at], @params[:cancel_reason])
-  end
-
-  def order_fulfilled
-    Resque.enqueue(OrderFulfillJob, @order.id)
-  end
-
-  def order_paid
-    if @order.shop.automatic_fulfillment?
-      Resque.enqueue(OrderPaidJob, @order.id, @shop.id, @params[:shipping_lines])
-    end
-    @order.update_attribute(:financial_status, 'paid')
-  end
-
   def fulfillment_created
     raise FulfillmentError unless Fulfillment.where('shopify_fulfillment_id = ?', @params[:id]).blank?
-    Resque.enqueue(CreateFulfillmentJob, @params[:line_items], @params[:shipping_method])
+    Resque.enqueue(CreateFulfillmentJob, @params, shop_domain)
   end
 
-  def find_or_create_order
-    @shop = Shop.find_by_domain(shop_domain)
-    if @shop.orders.where('shopify_order_id = ?', @params['id']).blank?
-      @hook = 'orders/create'
-    else
-      @order = @shop.orders.find_by_shopify_order_id(@params['id'])
-    end
+  def app_uninstalled
+    Resque.enqueue(AppUninstalledJob, shop_domain)
   end
 
   def verify_shopify_webhook
+    puts "HMAC: #{hmac}"
     data = request.body.read.to_s
     digest = OpenSSL::Digest::Digest.new('sha256')
     calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
@@ -87,7 +52,7 @@ class WebhooksController < ApplicationController
   end
 
   def verify_shipwire_service
-    raise FulfillmentError unless @params[:service] == 'shipwire'
+    head :ok unless @params["service"] == 'shipwire-app'
   end
 
   def sanitized_params
