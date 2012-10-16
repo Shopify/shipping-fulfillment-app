@@ -2,13 +2,6 @@ class CreateFulfillmentJob
   @queue = :default
 
   def self.perform(params, shop_domain)
-  #   options = {}
-  #   options[:line_item_ids] = shopify_line_items.map do |item|
-  #     item[:id]
-  #   end
-  #   options[:shipping_method] = @params[:shipping_method]
-
-  #   Fulfillment.fulfill(Shop.find_by_domain(shop_domain), options)
 
     shop = Shop.find_by_domain(shop_domain)
     ShopifyAPI::Session.temp(shop.base_url, shop.token) {

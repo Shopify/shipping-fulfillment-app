@@ -6,19 +6,6 @@ ShipwireApp::Application.routes.draw do
 
   resources :fulfillments, :only => [:index, :show]
 
-  # resources :orders, :only => [:index, :show]
-
-  # resources :variants, :except => [:update, :new, :edit] do
-  #   collection do
-  #     match "/filter/:management/:page" => "variants#index", :via => :get
-  #     match "/filter/:management" => "variants#index", :via => :get
-  #   end
-  # end
-
-  # match "variants/update" =>  "variants#update", :as => :variant_update, :via => :post
-
-  # match "shippingrates" => "orders#shipping_rates",   :as => :rates
-
   #external routes
 
   match "external/shipping_rates" => "external#shipping_rates", :via => :post #Consider removing the external
@@ -29,16 +16,6 @@ ShipwireApp::Application.routes.draw do
 
 
   #webhook routes
-
-  # match "orderpaid" => "webhooks#order", :via => :post
-
-  # match "ordercancelled" => "webhooks#order", :via => :post
-
-  # match "orderfulfilled" => "webhooks#order", :via => :post
-
-  # match "ordercreated" => "webhooks#order", :via => :post
-
-  # match "orderupdated" => "webhooks#order", :via => :post
 
   match "fulfillmentcreated" => "webhooks#fulfillment", :via => :post
   match "appuninstalled" => "webhooks#uninstalled", :via => :post
