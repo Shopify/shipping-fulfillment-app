@@ -2,8 +2,8 @@ FactoryGirl.define do
   factory :fulfillment do
     sequence(:id){|i| i}
     association :shop
-    association :order
 
+    order_id 123
     shipping_method '1D'
     warehouse "CHI"
     shopify_fulfillment_id 12345

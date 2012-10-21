@@ -45,14 +45,6 @@ class ActiveSupport::TestCase
     stub_callbacks(Shop, %w(setup_webhooks set_domain create_carrier_service create_fulfillment_service check_shipwire_credentials))
   end
 
-  def stub_variant_callbacks
-    stub_callbacks(Variant, %w(confirm_sku update_shopify))
-  end
-
-  def stub_fulfillment_callbacks
-    stub_callbacks(Fulfillment, %w(create_mirror_fulfillment_on_shopify update_fulfillment_status_on_shopify))
-  end
-
   def stub_api_session
     ShopifyAPI::Base.stubs(:activate_session => true)
     ShopifyAPI::Session.new("http://localhost:3000/admin","123")
@@ -69,12 +61,7 @@ class ActiveSupport::TestCase
   end
 
   def create_fulfillment
-    order = create_order
-    create(:fulfillment, :line_items => order.line_items, order: order, shop: @shop)
-  end
-
-  def create_order
     line_items = (0...5).map { create(:line_item, shop: @shop) }
-    create(:order, line_items: line_items, shop: @shop)
+    create(:fulfillment, :line_items => line_items, :shop => @shop)
   end
 end

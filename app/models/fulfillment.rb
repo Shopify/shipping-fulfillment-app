@@ -29,7 +29,7 @@ class Fulfillment < ActiveRecord::Base
       transition :pending => :failure
     end
 
-    after_transition any => any, :do => :update_fulfillment_status_on_shopify
+    after_transition any => [:success, :failure, :cancelled], :do => :update_fulfillment_status_on_shopify
   end
 
   def geolocation?
@@ -56,12 +56,15 @@ class Fulfillment < ActiveRecord::Base
   private
 
   def update_fulfillment_status_on_shopify
-    if %w(success cancelled record_failure).include?(status)
-      ShopifyAPI::Session.temp(shop.base_url, shop.token) {
-        shopify_fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id, :params => {:order_id => order_id})
+    ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+      shopify_fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id, :params => {:order_id => order_id})
+      case status
+      when "success"
         shopify_fulfillment.complete
-      }
-    end
+      when "cancelled"
+        shopify_fulfillment.cancel
+      end
+    }
   end
 
   def update_association_fulfillment_statuses
@@ -81,6 +84,5 @@ class Fulfillment < ActiveRecord::Base
 
   def self.extract_params(params)
     params.slice("email", "shipping_method", "tracking_number").merge({"tracking_link" => params["tracking_url"], "shopify_fulfillment_id" => params['id']})
-
   end
 end

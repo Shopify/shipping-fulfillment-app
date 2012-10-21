@@ -4,25 +4,6 @@ module ActiveMerchant
   module Fulfillment
     class ShipwireService < Service
 
-      # TODO: remove if not using
-      # def fetch_tracking_updates
-      #   request = buid_tracking_updates_request
-      #   data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
-
-      #   response = parse_tacking_updates_response(data)
-      # end
-
-      # def build_tracking_updates_request
-      #   xml = Builder::XmlMarkup.new
-      #   xml.instruct!
-      #   xml.declare! :DOCTYPE, :InventoryStatus, :SYSTEM, SCHEMA_URLS[:inventory]
-      #   xml.tag! 'TrackingUpdate' do
-      #     add_credentials(xml)
-      #     xml.tag! 'Server', test? ? 'Test' : 'Production'
-      #     xml.tag! 'Bookmark', 3
-      #   end
-      # end
-
       def fetch_shop_tracking_info(shipwire_order_ids)
         request = build_tracking_request(shipwire_order_ids)
         data = ssl_post(SERVICE_URLS[:tracking], "#{POST_VARS[:tracking]}=#{CGI.escape(request)}")
@@ -68,18 +49,6 @@ module ActiveMerchant
         end
 
         base_path = 'SubmitOrderResponse/OrderInformation/Order/Routing/'
-
-        # if REXML::XPath.first(document, base_path)
-        #   extensions = {
-        #     origin_lat: 'Origin/Latitude',
-        #     origin_long: 'Origin/Longitude',
-        #     destination_lat: 'Destination/Latitude',
-        #     destination_long: 'Destination/Longitude'
-        #   }
-        #   extensions.each do |key, extension|
-        #     response[key] = REXML::XPath.first(document, base_path + extension).text
-        #   end
-        # end
 
         response[:success] = response[:status] == '0'
         response[:message] = response[:success] ? "Successfully submitted the order" : message_from(response[:error_message])
