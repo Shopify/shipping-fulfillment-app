@@ -6,6 +6,7 @@ class ExternalController < ApplicationController
   skip_around_filter :shopify_session
 
   before_filter :symbolize_params
+  before_filter :verify_shopify_request
 
 
   def shipping_rates
@@ -15,9 +16,10 @@ class ExternalController < ApplicationController
   end
 
   def fetch_stock
-    @shop = Shop.find_by_domain @params[:shop]
+    stock_request = @params[:stock_levels]
+    @shop = Shop.find_by_domain stock_request[:shop]
     shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(@shop.credentials)
-    response = shipwire.fetch_stock_levels(:sku => @params[:sku])
+    response = shipwire.fetch_stock_levels(:sku => stock_request[:sku])
     stock_levels = response.stock_levels
     respond_to do |format|
       format.json { render :json => stock_levels }
@@ -40,11 +42,11 @@ class ExternalController < ApplicationController
     head :ok
   end
 
+  private
+
   def convert_to_array(string_array)
     string_array[0...-1].split(',').map { |el| el.to_i }
   end
-
-  private
 
   def build_stock_xml(stock_levels)
     output = "<StockLevels>"

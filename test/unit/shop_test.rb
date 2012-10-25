@@ -9,27 +9,6 @@ class ShopTest < ActiveSupport::TestCase
   def setup
   end
 
-  def expect_webhook(name)
-    ShopifyAPI::Webhook.expects(:create).with({topic: 'orders/'+name, address: 'http://shipwireapp:5000/order'+name, format: 'json'})
-  end
-
-  def fulfillment_service_params
-    {
-      fulfillment_service:{
-        fulfillment_service_type: 'app',
-        credential1: 'David',
-        credential2: 'password',
-        name: 'shipwire_app',
-        handle: 'shipwire_app',
-        email: nil,
-        endpoint: nil,
-        template: nil,
-        remote_address: nil,
-        include_pending_stock: 0
-      }
-    }
-  end
-
   test "Valid shop saves" do
     stub_shop_callbacks
 
@@ -46,7 +25,9 @@ class ShopTest < ActiveSupport::TestCase
   test "Webhooks created after save" do
     stub_callbacks(Shop, %w(check_shipwire_credentials create_carrier_service set_domain create_fulfillment_service))
 
-    %w(paid cancelled create updated fulfilled).each{ |name| expect_webhook(name) }
+    ShopifyAPI::Session.expects(:temp).twice.yields
+    expect_webhook('app', 'uninstalled')
+    expect_webhook('fulfillments', 'create')
     shop = create(:shop)
   end
 
@@ -68,17 +49,33 @@ class ShopTest < ActiveSupport::TestCase
   end
 
   test "create fulfillment service webhook makes shopify api call with correct params" do
+    ShopifyAPI::Session.expects(:temp).yields
     ShopifyAPI::FulfillmentService.expects(:create).with(fulfillment_service_params)
     stub_callbacks(Shop, %w(check_shipwire_credentials create_carrier_service set_domain setup_webhooks))
     create(:shop)
   end
 
-  test "#shop_fulfillment_type returns fulfillment type" do
-    stub_shop_callbacks
-    shop = create(:shop)
+  private
 
-    assert_equal 'Manual', shop.shop_fulfillment_type
-    assert_equal 'Automatic', shop.not_shop_fulfillment_type
+  def expect_webhook(object,topic)
+    ShopifyAPI::Webhook.expects(:create).with({topic: "#{object}/#{topic}", address: "http://shipwireapp:5000/#{object}#{topic}", format: 'json'})
+  end
+
+  def fulfillment_service_params
+    {
+      fulfillment_service:{
+        fulfillment_service_type: 'api',
+        credential1: nil,
+        credential2: nil,
+        name: 'Shipwire App',
+        handle: 'shipwire_app',
+        email: nil,
+        endpoint: nil,
+        template: nil,
+        remote_address: 'http://localhost:5000',
+        include_pending_stock: 0
+      }
+    }
   end
 
 end

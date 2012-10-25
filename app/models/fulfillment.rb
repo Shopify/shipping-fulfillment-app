@@ -45,6 +45,7 @@ class Fulfillment < ActiveRecord::Base
 
   def self.new_from_params(shop, params)
     fulfillment = Fulfillment.new(extract_params(params))
+    fulfillment.order_id = params["order_id"]
 
     params["line_items"].each do |line_item_params|
       line_item = LineItem.new_from_params(shop, line_item_params)
@@ -56,7 +57,7 @@ class Fulfillment < ActiveRecord::Base
   private
 
   def update_fulfillment_status_on_shopify
-    ShopifyAPI::Session.temp(shop.base_url, shop.token) {
+    shop.shopify_session {
       shopify_fulfillment = ShopifyAPI::Fulfillment.find(shopify_fulfillment_id, :params => {:order_id => order_id})
       case status
       when "success"

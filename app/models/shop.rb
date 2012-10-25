@@ -19,7 +19,12 @@ class Shop < ActiveRecord::Base
   end
 
   def base_url
-    Rails.env.production? ? domain : "#{domain}:3000"
+    # Rails.env.production? ? domain : "#{domain}:3000"
+    domain
+  end
+
+  def shopify_session(&blk)
+    ShopifyAPI::Session.temp(base_url, token, &blk)
   end
 
   private
@@ -27,7 +32,7 @@ class Shop < ActiveRecord::Base
   def setup_webhooks
 
     hooks = {
-      'fulfillments/create' => 'fulfillmentcreated',
+      'fulfillments/create' => 'fulfillmentscreate',
       'app/uninstalled' => 'appuninstalled'
     }
     hooks.each { |topic, action| make_webhook(topic, action) }
@@ -44,13 +49,13 @@ class Shop < ActiveRecord::Base
   end
 
   def make_webhook(topic, action)
-    ShopifyAPI::Session.temp(base_url, token) {
+    shopify_session {
       ShopifyAPI::Webhook.create({topic: topic, address: HOOK_ADDRESS + action, format: 'json'})
     }
   end
 
   def create_carrier_service
-    ShopifyAPI::Session.temp(base_url, token) {
+    shopify_session {
       carrier_service = ShopifyAPI::CarrierService.create
     }
   end
@@ -72,7 +77,7 @@ class Shop < ActiveRecord::Base
       }
     }
 
-    ShopifyAPI::Session.temp(base_url, token) {
+    shopify_session {
       ShopifyAPI::FulfillmentService.create(params)
     }
   end

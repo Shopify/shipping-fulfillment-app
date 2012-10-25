@@ -17,7 +17,7 @@ ShipwireApp::Application.routes.draw do
 
   #webhook routes
 
-  match "fulfillmentcreated" => "webhooks#fulfillment", :via => :post
+  match "fulfillmentscreate" => "webhooks#fulfillment", :via => :post
   match "appuninstalled" => "webhooks#uninstalled", :via => :post
 
   #login routes

@@ -20,27 +20,11 @@ class ShippingRates
   end
 
   def prepare_items(params)
-    if @order
-      items = @order.line_items.select { |item| item.requires_shipping && item.fulfillment_service == "shipwire-app" }
-    else
-      items = params[:items].select{ |item| item[:requires_shipping] && item[:fulfillment_service] == "shipwire-app" }
-    end
-    items
+    params[:items].select{ |item| item[:requires_shipping] && item[:fulfillment_service] == "shipwire-app" }
   end
 
   def prepare_destination(params)
-    if @order
-
-      location = {
-        country: @order.country,
-        province: @order.province,
-        city: @order.city,
-        address1: @order.address1,
-        zip: @order.postal_code
-      }
-    else
-      location = params[:destination].slice(:country, :province, :city, :address1).merge({:zip => params[:destination][:postal_code]})
-    end
+    location = params[:destination].slice(:country, :province, :city, :address1).merge({:zip => params[:destination][:postal_code]})
     ActiveMerchant::Shipping::Location.new(location)
   end
 

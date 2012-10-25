@@ -22,7 +22,6 @@ class ExternalControllerTest < ActionController::TestCase
   end
 
   test "build_xml" do
-    assert_equal build_xml({"sku1" => 1, "sku2" => 2})
   end
 
   def example_xml

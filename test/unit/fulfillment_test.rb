@@ -2,6 +2,8 @@ require 'test_helper'
 
 class FulfillmentTest < ActiveSupport::TestCase
 
+  should belong_to :shop
+
   def setup
     stub_shop_callbacks
     @shop = shops(:david)

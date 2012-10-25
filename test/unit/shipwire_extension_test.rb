@@ -12,22 +12,7 @@ class ShippingExtensionTest < ActiveSupport::TestCase
     assert_equal order_request_expected_xml, output
   end
 
-  test "parse fulfillment response correctly parses response with geolocations" do
-    response = @shipwire.parse_fulfillment_response(geo_order_response_xml)
-
-    expected = {
-      origin_lat: "50.9118",
-      origin_long: "0.12776",
-      destination_lat: "34.075",
-      destination_long: "-117.378"
-    }
-
-    expected.keys.each do |key|
-      assert_equal expected[key], response[key]
-    end
-  end
-
-  test "parse fulfillment response correctly parses response without geolocations" do
+  test "parse fulfillment response correctly parses response" do
     response = @shipwire.parse_fulfillment_response(order_response_xml)
     keys = [:origin_lat, :origin_long, :destination_lat, :destination_long]
 

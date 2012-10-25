@@ -3,17 +3,26 @@ require 'test_helper'
 
 class ShippingRateTest < ActiveSupport::TestCase
   def setup
-    super
-    @order = create_order
+    @shop = shops(:david)
   end
 
-  def destination(order)
+  test "find_rates for a shopify request" do
+    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination, 'UPS', 'UPS Second Day Air', rate_return)
+    ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
+
+    rates = ShippingRates.new(@shop.credentials, request_params).fetch_rates
+    assert_equal "17.44", rates.first[:price]
+  end
+
+  private
+
+  def destination
 
     location = {
-      country: order.country,
-      province: order.province,
-      city: order.city,
-      address1: order.address1
+      country: 'USA',
+      province: 'CA',
+      city: 'Sacramento',
+      address1: '1 main street'
     }
 
     ActiveMerchant::Shipping::Location.new(location)
@@ -78,21 +87,5 @@ class ShippingRateTest < ActiveSupport::TestCase
       delivery_date: DateTime.parse("Wed, 01 Aug 2012 00:00:00 +0000"),
       delivery_range: [DateTime.parse("Thu, 26 Jul 2012 00:00:00 +0000"), DateTime.parse("Wed, 01 Aug 2012 00:00:00 +0000")]
     }
-  end
-
-  test "find_rates for an order" do
-    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order), 'UPS', 'UPS Second Day Air', rate_return)
-    ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
-
-    rates = ShippingRates.new(@shop.credentials, {id: @order.id}).fetch_rates
-    assert_equal "17.44", rates.first[:price]
-  end
-
-  test "find_rates for a shopify request" do
-    estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination(@order), 'UPS', 'UPS Second Day Air', rate_return)
-    ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
-
-    rates = ShippingRates.new(@shop.credentials, request_params).fetch_rates
-    assert_equal "17.44", rates.first[:price]
   end
 end

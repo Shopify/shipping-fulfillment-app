@@ -7,11 +7,12 @@ class ApplicationController < ActionController::Base
   private
 
   def valid_shipwire_credentials
-    redirect_to(shop_path, :alert => "You must create an account") unless current_shop.valid_credentials
+    redirect_to(:controller => 'shops', :action => 'show', :alert => "You must create an account") unless current_shop.valid_credentials
   end
 
   def shop_exists
-    redirect_to(login_path, :alert => "You must login.") unless session.has_key?(:shop)
+    puts session.has_key?(:shop)
+    redirect_to(:controller => 'login', :action => 'index', :alert => "You must login.") unless session.has_key?(:shop)
   end
 
   def current_shop

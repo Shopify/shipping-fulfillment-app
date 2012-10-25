@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :line_item do
     sequence(:id){|i| i}
+    association :shop
     fulfillment_service "shipwire"
     fulfillment_status nil
     grams 0

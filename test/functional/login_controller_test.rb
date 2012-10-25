@@ -5,7 +5,7 @@ class LoginControllerTest < ActionController::TestCase
     super
   end
 
-  test "index: authenticates if shop it is passed the shop" do
+  test "index: authenticates if it is passed the shop" do
     get :index, shop: @shop.domain
     assert_redirected_to "/auth/shopify?shop=#{@shop.domain.to_s.strip}"
   end
@@ -22,7 +22,7 @@ class LoginControllerTest < ActionController::TestCase
     ShopifyAPI::Session.stubs(:new).returns(nil)
 
     get :finalize, shop: @shop
-    assert_redirected_to controller: 'shop', action: 'show', notice: 'Logged in'
+    assert_redirected_to controller: 'shops', action: 'new', notice: 'Add your Shipwire credentials.'
   end
 
   test "logout: clears api session" do

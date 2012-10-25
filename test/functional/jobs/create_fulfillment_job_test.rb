@@ -8,7 +8,7 @@ class CreateFulfillmentJobTest < ActiveSupport::TestCase
     @example_fulfillment = ActiveSupport::JSON.decode(File.read('test/data/example_fulfillment.json'))
     @shipwire_service = ActiveMerchant::Fulfillment::ShipwireService.new(@shop.credentials)
     @response = ActiveMerchant::Fulfillment::Response.new(true, "success")
-    @fulfillment = mock_fulfillment
+    @fulfillment = mock("ShopifyAPI::Fulfillment")
   end
 
   test 'fulfillments with valid skus should be successfully fulfilled' do
@@ -25,30 +25,25 @@ class CreateFulfillmentJobTest < ActiveSupport::TestCase
     
   end
 
+  private
+
   def mock_order_response
     mock('ShopifyAPI::Order - Response') do
-      stubs(:id).returns(1)
-      stubs(:email).returns("test@test.com")
+      stubs(:id => 1, :email => "test@test.com")
     end
   end
 
   def mock_address
     mock('Shopify Order Address') do
-      stubs(:address1).returns("blag")
-      stubs(:address2).returns("blag")
-      stubs(:name).returns("blag")
-      stubs(:company).returns("blag")
-      stubs(:city).returns("blag")
-      stubs(:province).returns("blag")
-      stubs(:country).returns("blag")
-      stubs(:zip).returns("blag")
-      stubs(:phone).returns("blag")
-    end
-  end
-
-  def mock_fulfillment
-    mock("ShopifyAPI::Fulfillment") do
-
+      stubs(:address1 => "blag",
+            :address2 => "blag",
+            :name => "blag",
+            :company => "blag",
+            :city => "blag",
+            :province => "blag",
+            :country => "blag",
+            :zip => "blag",
+            :phone => "blag")
     end
   end
 

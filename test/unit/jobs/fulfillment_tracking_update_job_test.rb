@@ -2,8 +2,8 @@ require 'test_helper'
 
 class FulfillmentTrackingUpdateJobTest < ActiveSupport::TestCase
   def setup
-    super
-    Fulfillment.any_instance.stubs(:create_mirror_fulfillment_on_shopify)
+    stub_shop_callbacks
+    @shop = shops(:david)
   end
 
   test "Perform makes tracking requests and updates fulfillment" do
