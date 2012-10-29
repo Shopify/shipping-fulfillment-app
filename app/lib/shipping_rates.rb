@@ -2,7 +2,6 @@
 class ShippingRates
   def initialize(credentials, params)
     @credentials = credentials
-    @order = Order.find(params[:id]) if params.has_key?(:id)
     @items = prepare_items(params)
     @destination = prepare_destination(params)
   end

@@ -2,8 +2,6 @@ require 'test_helper'
 
 class ShopTest < ActiveSupport::TestCase
 
-  should have_many(:orders)
-  should have_many(:variants)
   should have_many(:fulfillments)
 
   def setup

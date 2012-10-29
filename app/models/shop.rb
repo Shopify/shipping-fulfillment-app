@@ -2,10 +2,8 @@ class Shop < ActiveRecord::Base
   Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:5000/' : HOOK_ADDRESS = 'production root url'
 
   attr_accessible :login, :password, :automatic_fulfillment, :valid_credentials
-
-  has_many :variants, :dependent => :destroy
+  
   has_many :fulfillments, :dependent => :destroy
-  has_many :orders, :dependent => :destroy
   has_many :line_items, :dependent => :destroy
 
   validates_presence_of :login, :password, :token
