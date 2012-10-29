@@ -2,29 +2,49 @@ require 'test_helper'
 
 class ExternalControllerTest < ActionController::TestCase
   def setup
-    super
+    mock_shop_domain
     ExternalController.any_instance.stubs(:verify_shopify_request)
   end
 
   test "shipping_rates" do
+    ActiveMerchant::Shipping::Shipwire.any_instance.expects(:find_rates).returns(shipping_rate_response)
+    post :shipping_rates, shipping_rate_request_data
+    assert_response :success
   end
 
   test "fetch_stock" do
-
+    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_stock_levels).returns(stock_levels_response)
+    post :fetch_stock, {:stock_levels => {:sku => 'abd', :shop => 'localhost'}}
+    assert_response :success
   end
 
   test "fetch_tracking_numbers" do
-
+    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_tracking_numbers).returns(tracking_number_response)
+    post :fetch_tracking_numbers, {:order_ids => [1,2,3]}
+    assert_response :success
   end
 
-  test "fulfill_order" do
+  private
 
+  def shipping_rate_request_data
+    {:rate => {:items => [{:requires_shipping => true, :fulfillment_service => 'shipwire-app'}],
+         :destination => {:country => "CA", :province => "ON", :city => "Ottawa", :address1 => "126 York St", :postal_code => "K1N 5T5"}}}
   end
 
-  test "build_xml" do
+  def mock_shop_domain
+    ExternalController.any_instance.expects(:shop_domain).returns("localhost")
   end
 
-  def example_xml
-    '<StockLevels><Product><Sku>sku1</Sku><Quantity>1</Quantity></Product><Product><Sku>sku2</Sku><Quantity>2</Quantity></Product></StockLevels>'
+  def tracking_number_response
+    ActiveMerchant::Fulfillment::Response.new(true, "hello", {:tracking_numbers => [1,2,3]})
   end
+
+  def stock_levels_response
+    ActiveMerchant::Fulfillment::Response.new(true, "hello", {:stock_levels => {"qwe" => 123}})
+  end
+
+  def shipping_rate_response
+    ActiveMerchant::Shipping::RateResponse.new(true, "hello", :options => {:rates => [stub(:service_name => 'Free!', :total_price => 0)], :xml => "<rate>Free!</rate>"})
+  end
+
 end

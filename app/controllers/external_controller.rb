@@ -1,5 +1,5 @@
 class ExternalController < ApplicationController
-  #respond_to :json#, only: [:shipping_rates, :fetch_stock]#TODO change after testing
+  respond_to :json, only: [:shipping_rates, :fetch_stock, :fetch_tracking_numbers]
 
   skip_before_filter :verify_authenticity_token
   skip_before_filter :shop_exists
@@ -10,59 +10,30 @@ class ExternalController < ApplicationController
 
 
   def shipping_rates
-    @shop = Shop.find_by_domain(shop_domain)
-    @rates = ShippingRates.new(@shop.credentials, @params[:rate]).fetch_rates
-    render :json => @rates.to_json
+    shop = Shop.find_by_domain(shop_domain)
+    rates = ShippingRates.new(shop.credentials, @params[:rate]).fetch_rates
+    render :json => rates
   end
 
   def fetch_stock
     stock_request = @params[:stock_levels]
-    @shop = Shop.find_by_domain stock_request[:shop]
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(@shop.credentials)
+    shop = Shop.find_by_domain(shop_domain)
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
     response = shipwire.fetch_stock_levels(:sku => stock_request[:sku])
     stock_levels = response.stock_levels
-    respond_to do |format|
-      format.json { render :json => stock_levels }
-      format.xml { render :xml => build_stock_xml(stock_levels) }
-    end
+    render :json => stock_levels
   end
 
   def fetch_tracking_numbers
-    shipwire = ActiveMerchant::Shipping::Shipwire.new(@shop.credentials)
-    order_ids = convert_to_array(@params[:order_ids])
+    shop = Shop.find_by_domain(shop_domain)
+    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
+    order_ids = (@params[:order_ids])
     response = shipwire.fetch_tracking_numbers(order_ids)
     tracking_numbers = response.tracking_numbers
-    respond_to do |format|
-      format.json { render :json => tracking_numbers }
-      format.xml { render :xml => build_tracking_xml(tracking_numbers) }
-    end
-  end
-
-  def fulfill_order
-    head :ok
+    render :json => tracking_numbers
   end
 
   private
-
-  def convert_to_array(string_array)
-    string_array[0...-1].split(',').map { |el| el.to_i }
-  end
-
-  def build_stock_xml(stock_levels)
-    output = "<StockLevels>"
-    stock_levels.keys.each do |key|
-      output.concat("<Product><Sku>" + key + "</Sku><Quantity>" + stock_levels[key].to_s + "</Quantity></Product>")
-    end
-    output.concat "</StockLevels>"
-  end
-
-  def build_tracking_xml(tracking_numbers)
-    output = "<TrackingNumbers>"
-    tracking_numbers.keys.each do |key|
-      output.concat("<Order><ID>" + key + "</ID><Tracking>" + tracking_numbers[key] + "</Tracking></Order>")
-    end
-    output.concat "</TrackingNumbers>"
-  end
 
   def verify_shopify_request
     data = request.body.read.to_s
@@ -82,11 +53,6 @@ class ExternalController < ApplicationController
 
   def symbolize_params
     @params = params.with_indifferent_access
-  end
-
-  def credentials
-    domain = request.headers['HTTP_X_SHOPIFY_SHOP_DOMAIN']
-    @shop = Shop.find_by_domain(domain)
   end
 
 end
