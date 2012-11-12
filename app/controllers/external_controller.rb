@@ -6,27 +6,30 @@ class ExternalController < ApplicationController
   skip_around_filter :shopify_session
 
   before_filter :symbolize_params
-  before_filter :verify_shopify_request
 
 
   def shipping_rates
     shop = Shop.find_by_domain(shop_domain)
-    rates = ShippingRates.new(shop.credentials, @params[:rate]).fetch_rates
-    render :json => rates
+    response = ShippingRates.new(shop.credentials, @params[:rate])
+    rates = response.fetch_rates
+    render :json => {:rates => rates}
   end
 
   def fetch_stock
-    stock_request = @params[:stock_levels]
-    shop = Shop.find_by_domain(shop_domain)
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
-    response = shipwire.fetch_stock_levels(:sku => stock_request[:sku])
-    stock_levels = response.stock_levels
-    render :json => stock_levels
+    unless verify_shopify_request({ 'sku' => @params[:sku], 'shop' => @params[:shop]})
+      head(:unauthorized)
+    else
+      shop = Shop.find_by_domain(shop_domain)
+      shipwire = fulfillment_service_class.new(shop.credentials.merge({:include_empty_stock => true}))
+      response = shipwire.fetch_stock_levels(:sku => @params[:sku])
+      stock_levels = response.stock_levels
+      render :json => stock_levels
+    end
   end
 
   def fetch_tracking_numbers
     shop = Shop.find_by_domain(shop_domain)
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
+    shipwire = fulfillment_service_class.new(shop.credentials)
     order_ids = (@params[:order_ids])
     response = shipwire.fetch_tracking_numbers(order_ids)
     tracking_numbers = response.tracking_numbers
@@ -35,12 +38,11 @@ class ExternalController < ApplicationController
 
   private
 
-  def verify_shopify_request
-    data = request.body.read.to_s
+  def verify_shopify_request(data)
     digest = OpenSSL::Digest::Digest.new('sha256')
-    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data)).strip
-    head :unauthorized unless calculated_hmac == hmac
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShipwireApp::Application.config.shopify.secret, data.to_param)).strip
     request.body.rewind
+    calculated_hmac == hmac
   end
 
   def shop_domain
@@ -53,6 +55,10 @@ class ExternalController < ApplicationController
 
   def symbolize_params
     @params = params.with_indifferent_access
+  end
+
+  def fulfillment_service_class
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class
   end
 
 end

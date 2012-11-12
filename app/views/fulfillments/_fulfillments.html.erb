@@ -1,0 +1,22 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th class="sortcol">ID</th>
+      <th class="sortcol">Fulfilled On</th>
+      <th class="sortcol">Shipping Method</th>
+      <th class="sortcol">Status</th>
+      <th class="sortcol">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% fulfillments.each do |fulfillment| %>
+      <tr>
+        <td><%= link_to fulfillment.shipwire_order_id, fulfillment %></td>
+        <td><%= fulfillment.created_at.to_formatted_s(:short) %></td>
+        <td><%= shipping_method_in_words fulfillment %></td>
+        <td><span class=" label <%= label_style_helper fulfillment.status %>"><%= fulfillment.status %></span></td>
+        <td><%= number_to_currency fulfillment.total %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -10,7 +10,7 @@ class FulfillmentTrackingUpdateJobTest < ActiveSupport::TestCase
     fulfillment = create(:fulfillment, expected_delivery_date: DateTime.now + 1.week, shop: @shop, line_items: [create(:line_item)])
     active_order_ids = [fulfillment.shipwire_order_id]
     response = {fulfillment.shipwire_order_id => {returned: "Yes"}}
-    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_shop_tracking_info).with(active_order_ids).returns(response)
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class.any_instance.expects(:fetch_shop_tracking_info).with(active_order_ids).returns(response)
 
     FulfillmentTrackingUpdateJob.perform
     assert_equal "Yes", fulfillment.reload.returned
@@ -21,7 +21,7 @@ class FulfillmentTrackingUpdateJobTest < ActiveSupport::TestCase
     fulfillment2 = create(:fulfillment, expected_delivery_date: DateTime.now - 2.months, shop: @shop, line_items: [create(:line_item)])
 
     active_order_ids = [fulfillment1.shipwire_order_id]
-    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_shop_tracking_info).with(active_order_ids).returns({})
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class.any_instance.expects(:fetch_shop_tracking_info).with(active_order_ids).returns({})
 
     FulfillmentTrackingUpdateJob.perform
   end

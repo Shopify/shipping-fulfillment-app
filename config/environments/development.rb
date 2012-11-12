@@ -35,6 +35,6 @@ ShipwireApp::Application.configure do
   # Expands the lines which load the assets
   config.assets.debug = true
 
-  config.shopify.api_key = "7183b6e049353dcbae5401ecaa4e1dab"
-  config.shopify.secret = "5eb520fd4b2e434bd710696de8c1a7ec"
+  config.shopify.api_key = "809c723460d5ea3442d316c05b9a63be"
+  config.shopify.secret = "9605b2027bf3d301fc8badaee19f5b1b"
 end

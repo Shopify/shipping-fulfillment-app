@@ -12,7 +12,7 @@ class CreateFulfillmentJob
 
     params["shipping_method"] = "1D"
 
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
+    shipwire = ShipwireApp::Application.config.shipwire_fulfillment_service_class.new(shop.credentials)
     response = shipwire.fulfill(order.id, address_to_hash(order.shipping_address).merge({:email => order.email}), params["line_items"], generate_options(order, params))
 
 

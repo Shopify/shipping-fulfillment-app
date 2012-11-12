@@ -8,10 +8,10 @@ class ShippingRateTest < ActiveSupport::TestCase
 
   test "find_rates for a shopify request" do
     estimate = ActiveMerchant::Shipping::RateEstimate.new(nil, destination, 'UPS', 'UPS Second Day Air', rate_return)
-    ActiveMerchant::Shipping::Shipwire.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
+    ShipwireApp::Application.config.shipwire_carrier_service_class.any_instance.stubs(:find_rates).returns(stub(estimates: [estimate]))
 
     rates = ShippingRates.new(@shop.credentials, request_params).fetch_rates
-    assert_equal "17.44", rates.first[:price]
+    assert_equal 1744, rates.first[:total_price]
   end
 
   private

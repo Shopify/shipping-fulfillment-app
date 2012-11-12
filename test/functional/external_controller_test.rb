@@ -7,19 +7,20 @@ class ExternalControllerTest < ActionController::TestCase
   end
 
   test "shipping_rates" do
-    ActiveMerchant::Shipping::Shipwire.any_instance.expects(:find_rates).returns(shipping_rate_response)
+    ShipwireApp::Application.config.shipwire_carrier_service_class.any_instance.expects(:find_rates).returns(shipping_rate_response)
     post :shipping_rates, shipping_rate_request_data
     assert_response :success
   end
 
   test "fetch_stock" do
-    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_stock_levels).returns(stock_levels_response)
+    ExternalController.any_instance.expects(:verify_shopify_request).returns(true)
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class.any_instance.expects(:fetch_stock_levels).returns(stock_levels_response)
     post :fetch_stock, {:stock_levels => {:sku => 'abd', :shop => 'localhost'}}
     assert_response :success
   end
 
   test "fetch_tracking_numbers" do
-    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_tracking_numbers).returns(tracking_number_response)
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class.any_instance.expects(:fetch_tracking_numbers).returns(tracking_number_response)
     post :fetch_tracking_numbers, {:order_ids => [1,2,3]}
     assert_response :success
   end

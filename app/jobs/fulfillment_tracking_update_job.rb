@@ -3,7 +3,7 @@ class FulfillmentTrackingUpdateJob
 
   def self.perform
     Shop.all.each do |shop|
-      shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(shop.credentials)
+      shipwire = ShipwireApp::Application.config.shipwire_fulfillment_service_class.new(shop.credentials)
       active_order_ids = shop.fulfillments.where('expected_delivery_date > ?', 1.month.ago).map(&:shipwire_order_id)
       unless active_order_ids.empty?
         response = shipwire.fetch_shop_tracking_info(active_order_ids)

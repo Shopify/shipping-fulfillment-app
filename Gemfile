@@ -7,8 +7,8 @@ gem 'thin'
 gem 'simple_form'
 
 gem "sqlite3", "~> 1.3.6"
-gem 'active_fulfillment',    '1.0.3',  :git => 'git://github.com/Shopify/active_fulfillment.git', :ref => '2200cb8'
-gem "active_shipping", "~> 0.9.14"
+gem 'active_fulfillment', "1.0.3",  :git => 'git://github.com/Shopify/active_fulfillment.git'
+gem "active_shipping",    "0.9.14", :git => 'git://github.com/Shopify/active_shipping.git'
 gem 'less-rails-bootstrap'
 gem 'jquery-rails'
 gem "state_machine", "~> 1.1.2"

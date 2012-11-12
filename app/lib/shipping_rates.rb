@@ -7,7 +7,7 @@ class ShippingRates
   end
 
   def fetch_rates
-    shipwire = ActiveMerchant::Shipping::Shipwire.new(@credentials)
+    shipwire = carrier_service_class.new(@credentials)
     response = shipwire.find_rates(nil, @destination, nil, items: @items)
     response.estimates.collect { |estimate| extract_rate(estimate) }
   end
@@ -30,11 +30,16 @@ class ShippingRates
   def extract_rate(estimate)
     price = (estimate.total_price.to_f / 100).round(2).to_s
     {
-      service: estimate.service_name,
+      service_name: estimate.service_name,
       service_code: estimate.service_code,
-      price: price,
-      estimated_delivery_date: estimate.delivery_date,
-      estimated_delivery_range: estimate.delivery_range
+      total_price:  estimate.total_price,
+      currency:     estimate.currency
+      # estimated_delivery_date: estimate.delivery_date,
+      # estimated_delivery_range: estimate.delivery_range
     }
+  end
+
+  def carrier_service_class
+    ShipwireApp::Application.config.shipwire_carrier_service_class
   end
 end

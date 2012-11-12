@@ -246,6 +246,7 @@ class ShippingExtensionTest < ActiveSupport::TestCase
       </Name>
       <Address1>7318 Black Swan Place</Address1>
       <Address2></Address2>
+      <Company></Company>
       <City>Carlsbad</City>
       <State>California</State>
       <Country>United States</Country>
@@ -256,6 +257,8 @@ class ShippingExtensionTest < ActiveSupport::TestCase
       <Code>k9e34u</Code>
       <Quantity>1</Quantity>
     </Item>
+    <Note>
+    </Note>
   </Order>
 </OrderList>
 '

@@ -17,15 +17,16 @@ class ShopTest < ActiveSupport::TestCase
     stub_shop_callbacks
     shop = create(:shop)
 
-    assert_equal shop.credentials, {login: shop.login, password: shop.password, test: true}
+    assert_equal shop.credentials, {login: shop.login, password: shop.password, test: false}
   end
 
   test "Webhooks created after save" do
     stub_callbacks(Shop, %w(check_shipwire_credentials create_carrier_service set_domain create_fulfillment_service))
 
-    ShopifyAPI::Session.expects(:temp).twice.yields
+    ShopifyAPI::Session.expects(:temp).times(3).yields
     expect_webhook('app', 'uninstalled')
     expect_webhook('fulfillments', 'create')
+    expect_webhook('fulfillments', 'update')
     shop = create(:shop)
   end
 
@@ -33,7 +34,7 @@ class ShopTest < ActiveSupport::TestCase
     stub_callbacks(Shop, %w(create_carrier_service set_domain create_fulfillment_service setup_webhooks))
     response = stub(:success? => true)
 
-    ActiveMerchant::Fulfillment::ShipwireService.any_instance.expects(:fetch_stock_levels).returns(response)
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class.any_instance.expects(:fetch_stock_levels).returns(response)
     shop = create(:shop)
   end
 
@@ -56,13 +57,12 @@ class ShopTest < ActiveSupport::TestCase
   private
 
   def expect_webhook(object,topic)
-    ShopifyAPI::Webhook.expects(:create).with({topic: "#{object}/#{topic}", address: "http://shipwireapp:5000/#{object}#{topic}", format: 'json'})
+    ShopifyAPI::Webhook.expects(:create).with({topic: "#{object}/#{topic}", address: "http://davefp.showoff.io/#{object}#{topic}", format: 'json'})
   end
 
   def fulfillment_service_params
     {
       fulfillment_service:{
-        fulfillment_service_type: 'api',
         credential1: nil,
         credential2: nil,
         name: 'Shipwire App',
@@ -70,8 +70,9 @@ class ShopTest < ActiveSupport::TestCase
         email: nil,
         endpoint: nil,
         template: nil,
-        remote_address: 'http://localhost:5000',
-        include_pending_stock: 0
+        remote_address: 'http://davefp.showoff.io',
+        include_pending_stock: 0,
+        response_format: 'json'
       }
     }
   end

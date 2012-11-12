@@ -38,6 +38,10 @@ class WebhooksController < ApplicationController
     Resque.enqueue(CreateFulfillmentJob, @params, shop_domain)
   end
 
+  def fulfillment_updated
+    Resque.enqueue(UpdateFulfillmentJob, @params, shop_domain)
+  end
+
   def app_uninstalled
     Resque.enqueue(AppUninstalledJob, shop_domain)
   end

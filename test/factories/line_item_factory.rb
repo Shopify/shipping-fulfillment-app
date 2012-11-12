@@ -12,7 +12,7 @@ FactoryGirl.define do
     requires_shipping true
     sku "779i4k"
     title "API NIKE BASKETBALL"
-    variant_id 218594758
+    # variant_id 218594758
     variant_title "used ball"
     vendor "Nike"
     name "API NIKE BASKETBALL"

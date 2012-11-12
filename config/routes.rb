@@ -32,6 +32,10 @@ ShipwireApp::Application.routes.draw do
 
   match 'login/logout'       => 'login#logout',       :as => :logout
 
+  #instructions routes
+
+  get '/setup'               => 'instructions#setup', :as => :setup 
+
   #other routes
 
   root :to                   => 'shops#show'

@@ -1,12 +1,22 @@
 GIT
   remote: git://github.com/Shopify/active_fulfillment.git
-  revision: 2200cb8968463f5d7e972a92f669f4eecd88cfc2
-  ref: 2200cb8
+  revision: 103bf11b3f3cb9638053b5415781f4b01335173c
   specs:
     active_fulfillment (1.0.3)
       active_utils (>= 1.0.1)
       activesupport (>= 2.3.11)
       builder (>= 2.0.0)
+
+GIT
+  remote: git://github.com/Shopify/active_shipping.git
+  revision: 3e5b41101f7d70fd00eef99d479e1f9d143835ae
+  specs:
+    active_shipping (0.9.14)
+      active_utils (>= 1.0.1)
+      activesupport (>= 2.3.5)
+      builder
+      i18n
+      json (>= 1.5.1)
 
 GIT
   remote: git://github.com/ssoroka/redis-rb.git
@@ -32,13 +42,7 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.1.3)
-    active_shipping (0.9.14)
-      active_utils (>= 1.0.1)
-      activesupport (>= 2.3.5)
-      builder
-      i18n
-      json (>= 1.5.1)
-    active_utils (1.0.3)
+    active_utils (1.0.5)
       activesupport (>= 2.3.11)
       i18n
     activemodel (3.2.6)
@@ -236,7 +240,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_fulfillment (= 1.0.3)!
-  active_shipping (~> 0.9.14)
+  active_shipping (= 0.9.14)!
   bootstrap-will_paginate
   capybara
   coffee-rails (~> 3.2.1)

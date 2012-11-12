@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="span12">
+
+    <h1>Setup Instructions</h1>
+
+    <hr />
+
+    <h2>How to I enter/update my Shipwire credentials?</h2>
+
+    <p>Click on your shop name in the top right of this screen, then click '<%= link_to "Shipwire Credentials", edit_shop_path %>'.</p>
+
+    <h2>How do I tell Shopify which products to fulill through Shipwire?</h2>
+    
+    <p>To link a product in Shopify to one in Shipwire, you need to know the SKU. You can find product SKUs on your Shipwire Dashboard.</p>
+
+    <p>Once you have a list of SKUs from Shipwire, follow these steps to link them in Shopify:</p>
+
+    <ol>
+      
+      <li>Open the <%= link_to "products page in your Shopify admin", "https://#{@shop.domain}/admin/products" %> and click on the product you want to link.</li>
+      
+      <li>Each variant needs to be linked to a separate sku, so click the edit link next to the first one you want to add.</li>
+      
+      <li>In the form that is revealed, there's a SKU field. Fill it in with the SKU from Shipwire.</li>
+      
+      <li>Before you click save, go to the Fulfillment dropdown and select 'Shipwire App' as the fulfillment provider.</li>
+      
+      <li>Hit save. As long as your SKU matches up, you'll see a success message and your product will be automatically fulfilled by Shipwire the next time someone orders it.</li>
+
+      <li>Repeat these steps until you've linked all the products that need to be fulfilled by Shipwire.</li>
+    </ol>
+
+    <h2>How do I set up Shipping Rates?</h2>
+
+    <p>Shipwire rates have already been added to your Shopify shop. To view them, open the <%= link_to "shipping preferences page in your Shopify admin", "https://#{@shop.domain}/admin/shipping" %>.</p>
+    <p>When a customer buys something, the available rates will be shown to them during the checkout process.</p>
+
+  </div>
+</div>

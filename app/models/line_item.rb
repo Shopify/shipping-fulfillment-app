@@ -1,16 +1,17 @@
 class LineItem < ActiveRecord::Base
 
-  attr_protected :order
+  attr_accessible :fulfillment_service, :fulfillment_status, :grams, :price, :product_id, :shop_id,
+                  :quantity, :requires_shipping, :sku, :title, :vendor, :name, :line_item_id, :variant_title
 
-  belongs_to :order
   belongs_to :shop
 
-  validates_presence_of :shop, :product_id, :variant_id, :line_item_id, :quantity
+  validates_presence_of :shop, :product_id, :line_item_id, :quantity
 
   #variant_id is the variant_id of the shopify line_item
 
   def self.new_from_params(shop, params)
-    LineItem.new(params.except("variant_inventory_management", "properties").merge({"shop_id" => shop.id, "line_item_id" => params["id"]}))
+    LineItem.new(params.except("variant_inventory_management", "properties", "id", "variant_id")
+                       .merge({"shop_id" => shop.id, "line_item_id" => params["id"]}))
   end
 
   def fulfillable?

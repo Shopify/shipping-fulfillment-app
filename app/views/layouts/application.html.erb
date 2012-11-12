@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Shopify Demo App</title>
+  <title>Shipwire for Shopify</title>
   <%= stylesheet_link_tag 'application' %>
   <%= javascript_include_tag 'application' %>
   <%= csrf_meta_tags %>
@@ -36,6 +36,7 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class='<%= active_nav_class('fulfillments') %>'><%= link_to 'Fulfillments', '/fulfillments' %></li>
+              <li class='<%= active_nav_class('instructions') %>'><%= link_to 'Setup Instructions', '/setup' %></li>
             </ul>
           </div>
 

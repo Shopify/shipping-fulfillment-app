@@ -14,7 +14,7 @@ class LoginControllerTest < ActionController::TestCase
     ActionController::TestRequest.any_instance.stubs(:env).returns('omniauth.auth' => false)
 
     get :finalize
-    assert_redirected_to action: 'index', alert: 'Could not log in to Shopify store.'
+    assert_redirected_to action: 'index'
   end
 
   test "finalize: redirects when auth passes" do
@@ -22,12 +22,12 @@ class LoginControllerTest < ActionController::TestCase
     ShopifyAPI::Session.stubs(:new).returns(nil)
 
     get :finalize, shop: @shop
-    assert_redirected_to controller: 'shops', action: 'new', notice: 'Add your Shipwire credentials.'
+    assert_redirected_to controller: 'shops', action: 'new'
   end
 
   test "logout: clears api session" do
     get :logout, nil, shopify: 1, shop: @shop.domain
-    assert_redirected_to action: 'index', notice: 'Successfully logged out.'
+    assert_redirected_to action: 'index'
   end
 
 end

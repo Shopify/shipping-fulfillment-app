@@ -13,17 +13,21 @@ class LoginController < ApplicationController
       session[:shopify] = ShopifyAPI::Session.new(params['shop'], response['credentials']['token'])
       session[:shop] = params['shop']
       if current_shop
-        redirect_to controller: 'shops', action: 'show', notice: 'Logged in'
+        flash[:notice] = 'Logged in'
+        redirect_to controller: 'shops', action: 'show'
       else
-        redirect_to controller: 'shops', action: 'new', notice: 'Add your Shipwire credentials.'
+        flash[:notice] = 'Add your Shipwire credentials.'
+        redirect_to controller: 'shops', action: 'new'
       end
     else
-      redirect_to action: 'index', alert: 'Could not log in to Shopify store.'
+      flash[:alert] = 'Could not log in to Shopify store.'
+      redirect_to action: 'index'
     end
   end
 
   def logout
     reset_session
-    redirect_to action: 'index', notice: 'Successfully logged out.'
+    flash[:notice] = 'Successfully logged out.'
+    redirect_to action: 'index'
   end
 end

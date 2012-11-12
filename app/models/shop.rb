@@ -1,5 +1,5 @@
 class Shop < ActiveRecord::Base
-  Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://shipwireapp:5000/' : HOOK_ADDRESS = 'production root url'
+  Rails.env == 'development'||'test' ? HOOK_ADDRESS = 'http://davefp.showoff.io/' : HOOK_ADDRESS = 'production root url'
 
   attr_accessible :login, :password, :automatic_fulfillment, :valid_credentials
   
@@ -12,12 +12,11 @@ class Shop < ActiveRecord::Base
   after_create :setup_webhooks, :create_carrier_service, :create_fulfillment_service
 
   def credentials
-    test = Rails.env != 'production'
-    {login: login, password: password, test: test}
+    # test = Rails.env != 'production'
+    {login: login, password: password, test: false}
   end
 
   def base_url
-    # Rails.env.production? ? domain : "#{domain}:3000"
     domain
   end
 
@@ -31,6 +30,7 @@ class Shop < ActiveRecord::Base
 
     hooks = {
       'fulfillments/create' => 'fulfillmentscreate',
+      'fulfillments/update' => 'fulfillmentsupdate',
       'app/uninstalled' => 'appuninstalled'
     }
     hooks.each { |topic, action| make_webhook(topic, action) }
@@ -38,7 +38,7 @@ class Shop < ActiveRecord::Base
 
   def check_shipwire_credentials
     return if password.empty?
-    shipwire = ActiveMerchant::Fulfillment::ShipwireService.new(credentials)
+    shipwire = ShipwireApp::Application.config.shipwire_fulfillment_service_class.new(credentials.merge({:test => true}))
     response = shipwire.fetch_stock_levels()
     update_attribute(:valid_credentials, response.success?)
     unless response.success?
@@ -53,8 +53,11 @@ class Shop < ActiveRecord::Base
   end
 
   def create_carrier_service
+    params = {
+
+    }
     shopify_session {
-      carrier_service = ShopifyAPI::CarrierService.create
+      carrier_service = ShopifyAPI::CarrierService.create(params)
     }
   end
 
@@ -62,7 +65,6 @@ class Shop < ActiveRecord::Base
 
     params = {
       fulfillment_service:{
-        fulfillment_service_type: 'api',
         credential1: nil,
         credential2: nil,
         name: 'Shipwire App',
@@ -70,8 +72,9 @@ class Shop < ActiveRecord::Base
         email: nil,
         endpoint: nil,
         template: nil,
-        remote_address: 'http://localhost:5000',
-        include_pending_stock: 0
+        remote_address: 'http://davefp.showoff.io',
+        include_pending_stock: 0,
+        response_format: 'json'
       }
     }
 

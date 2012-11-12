@@ -6,7 +6,7 @@ class CreateFulfillmentJobTest < ActiveSupport::TestCase
     @shop = shops(:david)
     @order_response = mock_order_response
     @example_fulfillment = ActiveSupport::JSON.decode(File.read('test/data/example_fulfillment.json'))
-    @shipwire_service = ActiveMerchant::Fulfillment::ShipwireService.new(@shop.credentials)
+    @shipwire_service = ShipwireApp::Application.config.shipwire_fulfillment_service_class.new(@shop.credentials)
     @response = ActiveMerchant::Fulfillment::Response.new(true, "success")
     @fulfillment = mock("ShopifyAPI::Fulfillment")
   end
@@ -18,7 +18,7 @@ class CreateFulfillmentJobTest < ActiveSupport::TestCase
     ShopifyAPI::Fulfillment.expects(:find).returns(@fulfillment)
     @fulfillment.expects(:complete)
 
-    ActiveMerchant::Fulfillment::ShipwireService.expects(:new).returns(@shipwire_service)
+    ShipwireApp::Application.config.shipwire_fulfillment_service_class.expects(:new).returns(@shipwire_service)
     @shipwire_service.expects(:fulfill).returns(@response)
 
     CreateFulfillmentJob.perform(@example_fulfillment, @shop.domain)

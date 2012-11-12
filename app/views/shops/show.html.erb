@@ -3,7 +3,12 @@
     <h1>You're all set up!</h1>
 
     <hr />
-  
-    <%= link_to "Edit my credentials", edit_shop_path %>
+
+    <% unless @recent_fulfillments.empty? %>
+    <h2>Recent Fulfillments</h2>
+    <%= render :partial => 'fulfillments/fulfillments', :object => @recent_fulfillments %>
+    <% else %>
+    There are no recent fulfillments. Please read the <%= link_to "setup instructions", setup_path %> to make sure your products are correctly linked.
+    <% end %>
   </div>
 </div>

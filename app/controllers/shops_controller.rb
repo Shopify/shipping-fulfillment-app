@@ -3,6 +3,7 @@ class ShopsController < ApplicationController
 
   def show
     @shop = current_shop
+    @recent_fulfillments = @shop.fulfillments.order(:updated_at).limit(5)
   end
 
   def new
@@ -18,17 +19,21 @@ class ShopsController < ApplicationController
     @shop.token = session[:shopify].token
     @shop.domain = session[:shop]
     if @shop.save
-      redirect_to action: "show", notice: 'Your settings have been saved.'
+      flash[:notice] = 'Your settings have been saved.'
+      redirect_to action: "show"
     else
-      redirect_to action: "new", alert: 'Invalid settings, was not able to save.'
+      flash[:alert] = 'Invalid settings, was not able to save.'
+      redirect_to action: "new"
     end
   end
 
   def update
     if current_shop.update_attributes(params[:shop])
-      redirect_to action: "show", notice: 'Your settings have been updated.'
+      flash[:notice] = 'Your settings have been updated.'
+      redirect_to action: "show"
     else
-      redirect_to action: "edit", alert: 'Could not successfully update!'
+      flash[:alert] = 'Could not successfully update.'
+      redirect_to action: "edit"
     end
   end
 

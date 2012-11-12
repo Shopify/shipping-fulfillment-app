@@ -7,7 +7,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
            :scope => "write_orders,write_products,write_shipping,write_fulfillments",
            :setup => lambda {|env|
                        params = Rack::Utils.parse_query(env['QUERY_STRING'])
-                       site_url = "http://#{params['shop']}"#:3000"
+                       site_url = "http://#{params['shop']}"
                        env['omniauth.strategy'].options[:client_options][:site] = site_url
                      }
 end

@@ -23,26 +23,26 @@ class ShopsControllerTest < ActionController::TestCase
     params = {shop: {login: 'david', password: 'pass', automatic_fulfillment: true}}
     session = {shopify: stub(token: 'token'), shop: 'domain'}
     post :create, params, session
-    assert_redirected_to controller:'shops', action: 'show', notice: 'Your settings have been saved.'
+    assert_redirected_to controller:'shops', action: 'show'
   end
 
   test "create: if not save flash alert" do
     params = {shop: {automatic_fulfillment: true}}
     session = {shopify: stub(token: 'token'), shop: 'domain'}
     post :create, params, session
-    assert_redirected_to controller: 'shops', action: 'new', alert: 'Invalid settings, was not able to save.'
+    assert_redirected_to controller: 'shops', action: 'new'
   end
 
   test "update: if save then flash notice" do
     params = {login: 'david', password: 'pass', automatic_fulfillment: true}
     session = {shop: @shop.domain}
     put :update, params
-    assert_redirected_to controller:'shops', action: 'show', notice: 'Your settings have been updated.'
+    assert_redirected_to controller:'shops', action: 'show'
   end
 
   test "update: if not save flash alert" do
     params = {shop: {login: nil}}
     put :update, params
-    assert_redirected_to controller:'shops', action: 'edit', alert: 'Could not successfully update!'
+    assert_redirected_to controller:'shops', action: 'edit'
   end
 end
