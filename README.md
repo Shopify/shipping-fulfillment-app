@@ -39,23 +39,27 @@ On installation, create a new fulfillment service. You will need to provide the 
   * `callback_url` (If doing inventory checks) - The endpoint that Shopify should hit to get inventory and tracking updates
   * `tracking_support` - Does your service provide tracking numbers for packages?
   * `requires_shipping_method` - Do products fulfilled by your service require physical shipping?
+  * `response_format` - Format your service expects to receive data in. Can be 'xml' or 'json'
 
 Here’s an example of a request payload to make a new fulfillment service:
   
   `fulfillment_service.json`:
   
+  { "fulfillment_service":
     {
         "name": "My Fulfillment Service",
         "handle": "my_fulfillment_service",
         "callback_url": "http://myapp.com",
         "inventory_management": true,
         "tracking_support": true,
-        "requires_shipping_method": true
+        "requires_shipping_method": true,
+        "response_format": json
     }
+  }
 
 Here’s an example cURL request to Shopify that uses that `fulfillment_service.json` payload:
 
-  `curl -X POST -d @fulfillment_service.json -H "Content-Type:application/json"
+  `curl -X POST -d @fulfillment_services.json -H "Content-Type:application/json"
   http://myshop.myshopify.com/admin/fulfillment_services`
 
 #### Subscribe to fulfillment webhooks
