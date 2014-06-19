@@ -1,1 +1,0 @@
-require 'shopify_api/fulfillment.rb'

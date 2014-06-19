@@ -1,2 +1,0 @@
-class FulfillmentError < StandardError
-end
