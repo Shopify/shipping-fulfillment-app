@@ -2,17 +2,13 @@
 layout: index
 ---
 
-# README
-
-## Intro
 Shopify wants you to appear in the Shopify App Store as a fulfillment partner. This will allow Shopify merchants to use your app to provide shipping rates, fulfill orders, update those orders with tracking numbers, and keep track of inventory. Your app will act as a middle layer between Shopify and your fulfillment service. This document and sample application detail the steps necessary to use Shopify's fulfillment and carrier services APIs.
-
 
 ### The Fulfillment API
 
 Fulfillment Services are responsible for fulfilling orders. This involves being notified by Shopify when an order is placed, and updating Shopify about order statuses and product inventory levels.
 
-API doc at: http://docs.shopify.com/api/fulfillmentservice
+API doc at: [http://docs.shopify.com/api/fulfillmentservice](http://docs.shopify.com/api/fulfillmentservice)
 
 ### The Carrier Service API
 
@@ -20,7 +16,7 @@ Carrier Services provide shipping rates to Shopify, and are presumably backed by
 
 The terms 'carrier' and 'shipping' are often used interchangably.
 
-API doc at: http://docs.shopify.com/api/carrierservice
+API doc at: [http://docs.shopify.com/api/carrierservice](http://docs.shopify.com/api/carrierservice)
 
 ## Setup
 
@@ -49,7 +45,7 @@ On installation, create a new fulfillment service. You will need to provide the 
 
 Here’s an example of a request payload to make a new fulfillment service:
   
-  `fulfillment_service.json`:
+`fulfillment_service.json:`
   
     { "fulfillment_service": 
       {
@@ -65,11 +61,11 @@ Here’s an example of a request payload to make a new fulfillment service:
 
 Here’s an example cURL request to Shopify that uses that `fulfillment_service.json` payload:
 
-  `curl -X POST -d @fulfillment_service.json
-        -H "Accept:application/json"
-        -H "Content-Type:application/json"
-        -H "X-Shopify-Access-Token:THE_AUTH_TOKEN_GOES_HERE"
-        http://myshop.myshopify.com/admin/fulfillment_services`
+    curl -X POST -d @fulfillment_service.json
+          -H "Accept:application/json"
+          -H "Content-Type:application/json"
+          -H "X-Shopify-Access-Token:THE_AUTH_TOKEN_GOES_HERE"
+          http://myshop.myshopify.com/admin/fulfillment_services
 
 #### Subscribe to fulfillment webhooks
 
@@ -106,7 +102,9 @@ Example `/fetch_stock` response:
     {"123": 1000}
 
 ### Steps to set up a carrier/shipping service:
+
 #### Setting permissions
+
 Add the `write_shipping` permission to your [requested scopes](http://docs.shopify.com/api/tutorials/oauth).
 
 #### Register a new shipping service
@@ -142,6 +140,7 @@ Example cURL request:
         http://myshop.myshopify.com/admin/carrier_services`
 
 #### Provide shipping endpoints
+
 Your `callback_url` should be a public endpoint that expects a request for shipping rates and should return an array of applicable rates.
 
 Example request from Shopify:
@@ -223,3 +222,7 @@ Example response:
            }
        ]
     }
+
+## License
+
+Copyright (c) 2012 Shopify. Released under the [MIT-LICENSE](http://opensource.org/licenses/MIT).
